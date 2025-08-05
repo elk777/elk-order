@@ -1,7 +1,7 @@
 <template>
 	<view>
 
-		<Tabbar />
+		<Tabbar :current='3'/>
 	</view>
 </template>
 

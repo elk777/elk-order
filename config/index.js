@@ -8,7 +8,7 @@
 
 const BASE_URL = 'https://5nmzg5443748.vicp.fun' // 本地渗透开发地址
 
-const APP_ID = '' // wx appid
+const APP_ID = 'wx49ecb7bac043ee73' // wx appid
 
 // 底部tabber
 const TABBAR_DATA = [
@@ -21,14 +21,14 @@ const TABBAR_DATA = [
 	},
 	{
 		id: 1,
-		text: '分类',
+		text: '菜单',
 		icon: '/static/images/tabbar_png/sort.png',
 		actIcon: '/static/images/tabbar_png/sort_act.png',
 		pagePath: '/pages/sort/index'
 	},
 	{
 		id: 2,
-		text: '帮帮',
+		text: '订单',
 		icon: '/static/images/tabbar_png/souvv.png',
 		actIcon: '/static/images/tabbar_png/souvv_act.png',
 		pagePath: '/pages/souvv/index'

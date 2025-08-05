@@ -18,13 +18,13 @@
 		{
 			"path": "pages/sort/index",
 			"style": {
-				"navigationBarTitleText": "分类"
+				"navigationBarTitleText": "菜单"
 			}
 		},
 		{
 			"path": "pages/souvv/index",
 			"style": {
-				"navigationBarTitleText": "帮帮"
+				"navigationBarTitleText": "订单"
 			}
 		},
 		{
@@ -53,7 +53,7 @@
 	},
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "好课堂",
+		"navigationBarTitleText": "偏爱厨房",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
 	},

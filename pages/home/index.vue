@@ -1,12 +1,14 @@
 <template>
 	<view class="content">
-		<image class="logo" src="/static/logo.png"></image>
-		<view class="text-area">
-			<text class="title">{{title}}</text>
-			<up-button>测试1</up-button>
+		<!-- 背景图  60% -->
+		<view class="home-bg">
+			
 		</view>
 		
-		<Tabbar/>
+		<!--  -->
+		<!-- <image class="logo" src="/static/bj01.jpeg"></image> -->
+		
+		<Tabbar :current='0'/>
 	</view>
 </template>
 
@@ -16,12 +18,18 @@ import  Tabbar from  '@/components/Tabbar/index.vue'
 const title = ref("uniapp")
 </script>
 
-<style>
+<style lang="scss">
 	.content {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+		.home-bg {
+			width: 100vw;
+			height: 60vh;
+			background-image: url('/static/bj01.jpeg');
+			backdrop-filter: 10rpx;
+		}
 	}
 
 	.logo {

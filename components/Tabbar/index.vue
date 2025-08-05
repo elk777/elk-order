@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<up-tabbar @change="changeTab" :value="current" inactiveColor="#707070" activeColor="#2177b8">
+		<up-tabbar @change="changeTab" :value="current" inactiveColor="#707070" activeColor="#FF5C8D">
 			<up-tabbar-item v-for="tabItem in TABBAR_DATA" :key="tabItem.id" :text="tabItem.text"
 				:badgeStyle="'top: 10px'">
 				<template #active-icon>
@@ -16,12 +16,19 @@
 
 <script setup>
 	import {
-		ref
+		ref,
+		defineProps
 	} from 'vue'
 	import {
 		TABBAR_DATA
 	} from '@/config/index.js'
-	let current = ref(0); // tab选择的index
+	// tab选择的index
+	defineProps({
+		current: {
+			type: Number,
+			required: true
+		}
+	})
 	/**
 	 * @description: 底部标签点击事件
 	 * @param {e}  标签index
