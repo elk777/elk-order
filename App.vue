@@ -16,4 +16,5 @@
 	/* 注入组件库css */
 	@import "@/uni_modules/uview-plus/index.scss";
 	/*每个页面公共css */
+	@import '@/common/common.scss'
 </style>

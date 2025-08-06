@@ -3,6 +3,7 @@
 		<!-- 背景图  60% -->
 		<view class="home-bg">
 			
+		 <MainBodyVue></MainBodyVue>
 		</view>
 		
 		<!--  -->
@@ -15,6 +16,7 @@
 <script setup>
 import { ref } from 'vue';
 import  Tabbar from  '@/components/Tabbar/index.vue'
+import MainBodyVue from './component/MainBody.vue';
 const title = ref("uniapp")
 </script>
 

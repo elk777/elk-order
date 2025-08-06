@@ -14,9 +14,10 @@
 
 // 注入组件库css
 @import '@/uni_modules/uview-plus/theme.scss';
+// 注入公共样式
+@import '@/common/common.scss';
 
 /* 颜色变量 */
-
 /* 行为相关颜色 */
 $uni-color-primary: #007aff;
 $uni-color-success: #4cd964;

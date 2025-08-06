@@ -1,0 +1,40 @@
+// 公共样式定义
+
+// 主题色
+$theme-color: #FF5C8D;
+
+/* 	
+	@公共基础字体大小和颜色： 
+	@标题  32rpx:18px    #363636  加粗
+	@正文  25rpx:14px    #606266    
+	@标签  22rpx:12px    #aeaeae  
+*/
+.publcTitleSize {
+	font-size: 32rpx;
+	font-weight: 600;
+	// color: #363636;
+}
+.publcTextSize {
+	font-size: 27rpx;
+	// color: #606266;
+}
+.publcLabelSize {
+	font-size: 22rpx;
+	// color: #aeaeae;
+}
+
+.pubColumnFlex {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+.pubFlex {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+//  主色：#FFA7A7  珊瑚玫瑰
+// • 辅色：#FFF5F5  奶油白
+// • 点缀：#FF5C8D  草莓红
