@@ -7,18 +7,20 @@
  */
 
 <template>
-	<view class="side-tool pubColumnFlex">
+	<view class="side-tool pubColumnFlex" :style="{ paddingTop: getUniTopNavHeight() + 'px'  }">
 		<view @click="handelSkinPop" style="margin-bottom: 15px;">
 			<up-image :width="w" :height="h" src='/static/images/home/skin.svg'></up-image>
 		</view>
-		<up-image :width="w" :height="h"  src='/static/images/home/cut.svg'></up-image>
+		<up-image @click="handelBodyMode" :width="w" :height="h"  src='/static/images/home/cut.svg'></up-image>
 	</view>
 </template>
 
 <script setup>
 	import { ref } from "vue";
-	import { useSkinPop } from "@/hooks/home/sideTool";
+	import { useSkinPop, useBodyMode } from "@/hooks/home/sideTool";
+	import { getUniTopNavHeight } from '@/utils/tool.js'
 	const skinPop = useSkinPop();
+	const bodyMode = useBodyMode();
 	const w = ref(45);
 	const h = ref(45);
 	
@@ -29,6 +31,15 @@
 	 */
 	function handelSkinPop() {
 		skinPop.open();
+	}
+	
+	/**
+	 * @description: 切换body模式
+	 * @param {:type} 
+	 * @return {:type} 
+	 */
+	function handelBodyMode() {
+		bodyMode.cut();
 	}
 </script>
 

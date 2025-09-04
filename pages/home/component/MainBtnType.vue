@@ -1,6 +1,6 @@
 <template>
 	<view class="mainbtntype-container pubFlex">
-		<view class="pub-class" v-for="item of btnTypes" :key="item.id" :style="{backgroundImage: `url(${item.path})`}" >
+		<view @click="handelRoleCut(item)" class="pub-class" v-for="item of btnTypes" :key="item.id" :style="{backgroundImage: `url(${item.path})`}" >
 			<view class="pub-label" :class="[item.style]">
 				<view class="pub-title publcTextSize">{{item.title}}</view>
 				<view class="pub-text  publcLabelSize">{{item.text}}
@@ -22,6 +22,14 @@
 			id: 2, path: '/static/images/home/foodie.png', title: '我是吃货呀', text: '我要点餐', style: 'pub-right'
 		}
 	])
+	/**
+	 * @description: 角色切换事件
+	 * @param {:type} item: 按钮详细内容
+	 * @return {:type} 
+	 */
+	const handelRoleCut = (item) => {
+		console.log('item~~~~', item)
+	}
 </script>
 
 <style lang="scss">

@@ -17,7 +17,6 @@ import {
  * @param {:type} 
  * @return {:type} 
  */
-
 // 将open提升到模块级别，所有组件共享这个响应式对象
 let isOpen = ref(false)
 export function useSkinPop() {
@@ -31,5 +30,21 @@ export function useSkinPop() {
 		isOpen,
 		open,
 		close
+	}
+}
+
+/**
+ * @description: 控制首页中心body的模式  mini 和 max
+ * @param {:type}  isbody  true: 代表中心展示 false: 代表mini侧边展示
+ * @return {:type} 
+ */
+let isBody = ref(true)
+export function useBodyMode() {
+	const cut = () => {
+		isBody.value = !isBody.value;
+	};
+	return {
+		isBody,
+		cut,
 	}
 }

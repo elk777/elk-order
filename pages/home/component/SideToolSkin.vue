@@ -15,10 +15,11 @@
 				<view style="width: 100vw;">
 					<up-scroll-list :indicator='false'>
 						<view class="pop-imags" v-for="(item, index) in list" :key="index">
-							<up-image :width="100" :height="200" :src="item.thumb"></up-image>
+							<up-image :radius='10' :width="100" :height="200" :src="item.thumb"></up-image>
 						</view>
 					</up-scroll-list>
 				</view>
+				<view class="shade" />
 				<!-- 自定义图片上传 -->
 				<view class="pubFlex skin-pop-upload">
 					<up-image width="30" height="20" src="/static/images/home/img.svg"></up-image>
@@ -74,12 +75,20 @@
 			display: block;
 		}
 		.pop-imags {
+			border-radius: 10px;
 			margin: 15px 20px;
 		}
 		.skin-pop-upload {
 			justify-content: flex-end;
 			color: $theme-color;
 			padding-right: 15px;
+		}
+		.shade {
+			width: 100%;
+			height: 9vh;
+			position: absolute;
+			background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8), transparent);
+			top: 25vh;
 		}
 	}
 </style>
