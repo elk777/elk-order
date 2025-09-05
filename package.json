@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "clipboard": "^2.0.11",
-    "dayjs": "^1.11.13"
+    "dayjs": "^1.11.13",
+    "pinia": "^3.0.3",
+    "pinia-plugin-persistedstate": "^4.5.0"
   }
 }

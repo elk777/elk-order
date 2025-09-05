@@ -1,11 +1,16 @@
 <template>
 	<view class="mainbody-container pubColumnFlex">
+		<!-- 状态栏占位 -->
+		<view class="status-bar" :style="{ height: getUniTopNavHeight() + 'px' }"></view>
 		<!-- 左右 饲养员  吃货 -->
 		<view class="kind pubFlex">
 			<view class="kind-head pubColumnFlex">
-				<view class="kind-head-img">
+				<view v-if='userStore.token' class="kind-head-img">
 					<up-image shape='circle' width="50px" height="50px"
 						src='https://cdn.uviewui.com/uview/album/1.jpg'></up-image>
+				</view>
+				<view v-else class="kind-head-unselected">
+					<span class="unselected-plus"></span>
 				</view>
 				<view class="kind-name publcLabelSize">
 					饲养员
@@ -43,7 +48,12 @@
 	import {
 		ref
 	} from 'vue';
+	import {
+		getUniTopNavHeight
+	} from '@/utils/tool.js'
+	import { useUserStore } from '@/stores/user.js'
 
+	const userStore = useUserStore();
 	const imgPath = ref('/static/images/aixin.png')
 	const sofaIcon = ref('/static/images/love-sofa.svg')
 </script>
@@ -52,6 +62,7 @@
 	.mainbody-container {
 		color: #ffffff;
 		padding: 0 20rpx;
+
 		.kind {
 			.kind-head {}
 
@@ -81,7 +92,7 @@
 					background-repeat: no-repeat;
 				}
 			}
-	
+
 			.kind-name {
 				width: 130rpx;
 				margin-top: 30rpx;

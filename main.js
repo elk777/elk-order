@@ -1,5 +1,6 @@
 import App from './App'
-
+// 引入pinia状态管理
+import pinia from '@/stores'
 // 引入uview-plas 组件库
 import uviewPlus from '@/uni_modules/uview-plus'
 
@@ -21,6 +22,7 @@ export function createApp() {
   const app = createSSRApp(App)
   // 注入组件库
   app.use(uviewPlus)
+  app.use(pinia)
   return {
     app
   }

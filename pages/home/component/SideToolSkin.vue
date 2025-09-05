@@ -8,7 +8,7 @@
 
 <template>
 	<view class="skin-pop">
-		<up-popup :pageInline='true' :indicator="false" :show="show" @close="close" mode="top">
+		<up-popup :safeAreaInsetTop='true' :pageInline='false' :indicator="false" :show="show" @close="close" mode="top">
 			<view class="skin-pop-container">
 				<view style="padding: 10px 0 0 15px;">挑选一张你喜欢的壁纸吧~</view>
 				<!-- 本地图片列表 -->
@@ -85,10 +85,10 @@
 		}
 		.shade {
 			width: 100%;
-			height: 9vh;
+			height: 80px;
 			position: absolute;
 			background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8), transparent);
-			top: 25vh;
+			bottom: 10%;
 		}
 	}
 </style>
