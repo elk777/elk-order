@@ -1,3 +1,11 @@
+/**
+ * @Description: 首页-中心内容
+ * @Author: elk
+ * @Date: 2025-09-09 15:17:43
+ * @LastEditors: 
+ * @LastEditTime: 2025-09-09 15:17:43
+ */
+
 <template>
 	<view class="mainbody-container pubColumnFlex">
 		<!-- 状态栏占位 -->
@@ -13,7 +21,7 @@
 					<span class="unselected-plus"></span>
 				</view>
 				<view class="kind-name publcLabelSize">
-					饲养员
+					{{foramtCrveUserType}}
 				</view>
 			</view>
 			<view class="love-bounce">
@@ -46,7 +54,8 @@
 
 <script setup>
 	import {
-		ref
+		ref,
+		computed
 	} from 'vue';
 	import {
 		getUniTopNavHeight
@@ -56,6 +65,11 @@
 	const userStore = useUserStore();
 	const imgPath = ref('/static/images/aixin.png')
 	const sofaIcon = ref('/static/images/love-sofa.svg')
+	
+	// 格式化当前账户类型展示
+	const foramtCrveUserType = computed(() => {
+		return userStore.userType ? '吃货' : '饲养员'
+	})
 </script>
 
 <style lang="scss" scoped>

@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<!-- 背景图  60% -->
-		<view class="home-bg pubFlex" :style="{backgroundImage: `url(${bgPath})`, paddingT: getUniTopNavHeight() + 'px'  }">
+		<view class="home-bg pubFlex" :style="{backgroundImage: `url(${bgPath})`, paddingTop: 0 + 'px'  }">
 			 <MainBodyVue v-if="isBody" />
 			 <!-- 侧边导航工具栏 -->
 			 <MainSideToolVue />
