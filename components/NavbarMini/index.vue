@@ -1,14 +1,11 @@
 <template>
 	<view class="navbarmini-container pdx-15" :style="{paddingTop: getUniTopNavHeight() + 'px', height: getUniTopNavHeight() * 2 + 'px'  }">
 		<view class="navbarmini-title publcTitleSize">{{props.title}}</view>
-		
-		<Search />
 	</view>
 </template>
 
 <script setup>
 	import { defineProps } from 'vue'
-	import Search  from '@/components/Search/index.vue'
 	import { getUniTopNavHeight } from '@/utils/tool.js'
 	
 	const props = defineProps({

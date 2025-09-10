@@ -1,6 +1,6 @@
 <template>
 	<view class="search-container">
-		<up-search bgColor='#ffffff' placeholder='请输入关键字' v-model="value" shape="round"></up-search>
+		<up-search bgColor='#ffffff' placeholder='搜索菜品名称' v-model="value" shape="round"></up-search>
 	</view>
 </template>
 
@@ -9,5 +9,9 @@
 	const value = ref("");
 </script>
 
-<style>
+<style lang="scss" scoped>
+	.search-container {
+		width: 95%;
+		margin: 0 auto;
+	}
 </style>
