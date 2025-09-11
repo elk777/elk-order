@@ -79,7 +79,7 @@
 <style lang="scss" scoped>
 	.catetab-container {
 		width: 100%;
-		height: 100vh;
+		height: calc(100vh - 150px);
 		margin-top: 10px;
 		.cate-tab {
 			height: calc(100vh - 150px);

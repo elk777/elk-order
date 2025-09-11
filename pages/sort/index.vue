@@ -16,6 +16,7 @@
 			<CateTab />
 		</view>
 		
+		<ShoppingCat />
 		<Tabbar :current='1'/>
 	</view>
 </template>
@@ -25,6 +26,7 @@
 	import Search  from '@/components/Search/index.vue'
 	import NavbarMini from '@/components/NavbarMini/index.vue'
 	import CateTab from './component/CateTab.vue';
+	import ShoppingCat from './component/ShoppingCat.vue';
 	
 </script>
 
