@@ -10,6 +10,14 @@ const BASE_URL = 'https://5nmzg5443748.vicp.fun' // 本地渗透开发地址
 
 const APP_ID = 'wx49ecb7bac043ee73' // wx appid
 
+// 主题颜色组合
+const COLOURS = {
+	'theme-color': '#FF5C8D',
+	'fu-color': '#FFF5F5',
+	'inter-color': '#FF5C8D',
+	'tinge-color': '#707070'
+}
+
 // 底部tabber
 const TABBAR_DATA = [
 	{
@@ -45,5 +53,6 @@ const TABBAR_DATA = [
 export {
 	BASE_URL,
 	APP_ID,
-	TABBAR_DATA
+	TABBAR_DATA,
+	COLOURS
 }

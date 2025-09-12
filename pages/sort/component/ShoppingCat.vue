@@ -17,9 +17,9 @@
 				</view>
 			</view>
 			<view v-if='!userStore.userType' class="cat-breeder-right pubFlex">
-				<up-button shape='circle' color='#FF5C8D'>添加菜谱</up-button>
+				<up-button @click="handelAddRedact" shape='circle' :color="COLOURS['theme-color']">添加菜谱</up-button>
 				<view style="margin: 0 15px;" >
-					<up-button shape='circle' color='#FF5C8D' :plain='true'>菜谱排序</up-button>
+					<up-button shape='circle' :color="COLOURS['theme-color']" :plain='true'>菜谱排序</up-button>
 				</view>
 			</view>
 			<view v-else class="cat-breeder-right pubFlex">
@@ -36,7 +36,7 @@
 	import { getBottomSpacing } from '@/utils/tool.js'
 	import { ref, computed } from 'vue'
 	import { useUserStore } from '@/stores/user.js'
-	
+	import { COLOURS } from '@/config/index.js'
 	const userStore = useUserStore();
 	
 	const cartName = computed(() =>  {
@@ -47,6 +47,18 @@
 	
 	const storePath = ref(`/static/images/sort/store.svg`)
 	const cartPath = ref(`/static/images/sort/cart.svg`)
+	
+	
+	/**
+	 * @description: 添加菜谱按钮事件
+	 * @param {:type} 
+	 * @return {:type} 
+	 */
+	const handelAddRedact = () => {
+		uni.navigateTo({
+			url: '/pages/recipe/redact'
+		});
+	}
 </script>
 
 <style lang="scss" scoped>

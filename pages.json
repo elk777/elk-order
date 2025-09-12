@@ -24,6 +24,12 @@
 			}
 		},
 		{
+			"path": "pages/recipe/redact",
+			"style": {
+				"navigationBarTitleText": "编辑菜谱"
+			}
+		},
+		{
 			"path": "pages/souvv/index",
 			"style": {
 				// "navigationBarTitleText": "订单",

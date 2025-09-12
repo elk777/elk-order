@@ -11,9 +11,9 @@ import { ref } from 'vue'
 export const useUserStore = defineStore(
   'user',
   () => {
-    const token = ref('elk')
+    const token = ref('elk')   //token信息
     const userType = ref(0)   // 0 饲养员  1 吃货
-    const profile = ref({})
+    const profile = ref({})  // 当前用户信息
 
     const setToken = (v) => (token.value = v)
     const setUserType = (v) => (userType.value = v)
