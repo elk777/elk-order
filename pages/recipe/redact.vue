@@ -28,22 +28,22 @@
 			<view class="pubFlex from-title">
 				<view class="publcTitleSize from-title">食材清单</view>
 				<view class="form-button">
-					<up-button icon="plus-circle" :color="COLOURS['theme-color']" shape="circle" :plain="true">添加食材</up-button>
+					<up-button @click='handelAddInger' icon="plus-circle" :color="COLOURS['theme-color']" shape="circle" :plain="true">添加食材</up-button>
 				</view>
 			</view>
 			<view class="form">
-				<IngreItem />
+				<IngreIList @clear-inger="clearInger" :ingerList='ingerList' />
 			</view>
 		</view>
 		<view class="redact-form pubColumnFlex">
 			<view class="pubFlex from-title">
 				<view class="publcTitleSize from-title">制作步骤</view>
 				<view class="form-button">
-					<up-button icon="plus-circle" :color="COLOURS['theme-color']" shape="circle" :plain="true">添加步骤</up-button>
+					<up-button @click="handelAddStep" icon="plus-circle" :color="COLOURS['theme-color']" shape="circle" :plain="true">添加步骤</up-button>
 				</view>
 			</view>
 			<view class="form">
-				
+				<StepList @clear-step="clearStep" :stepList='stepList' />
 			</view>
 		</view>
 	</view>
@@ -51,10 +51,12 @@
 
 <script setup>
 	import {
-		ref
+		ref,
+		toRefs
 	} from 'vue';
 	import { COLOURS } from '@/config/index.js'
-	import IngreItem from './component/IngreItem.vue';
+	import IngreIList from './component/IngreIList.vue';
+	import StepList from './component/StepList.vue';
 
 	const form = ref({
 		basicForm: {},
@@ -62,6 +64,58 @@
 		stepForm: {},
 	})
 	const rules = ref([])
+	
+	let ingerList = ref([
+		{ id: '1212131231', ingreName: '鸡蛋', ingreDose: '3个'},
+		{ id: '2323232323', ingreName: '西红柿', ingreDose: '1个'},
+		{ id: '3231231233', ingreName: '番茄酱', ingreDose: '1勺'}
+	])
+	let stepList = ref([
+		{ id: '1212131231', stepDesc: '将鸡蛋打散', stepTip: '加入水', stepImg: ''},
+		{ id: '2323232323', stepDesc: '将西红柿洗净', stepTip: '加入水', stepImg: ''},
+		{ id: '3231231233', stepDesc: '将番茄酱洗净', stepTip: '加入水', stepImg: ''}
+	])
+	
+	/**
+	 * @description: 添加食材按钮事件
+	 * @param {:type} 
+	 * @return {:type}
+	 */
+	const handelAddInger = () => {
+		let obj = {
+			id: (ingerList.value.length + 1).toString(), name: '', dose: ''
+		}
+		ingerList.value.push(obj)
+	}
+	/**
+	 * @description: 删除指定食材的父组件事件
+	 * @param {:type} 
+	 * @return {:type} 
+	 */
+	const clearInger = (id) => {
+		ingerList.value = ingerList.value.filter(item => item.id !== id);
+	}
+
+	/**
+	 * @description: 添加步骤按钮事件
+	 * @param {:type} 
+	 * @return {:type}
+	 */
+	const handelAddStep = () => {
+		let obj = {
+			id: (stepList.value.length + 1).toString(), stepDesc: '', stepTip: '', stepImg: ''
+		}
+		stepList.value.push(obj)
+	}
+	/**
+	 * @description: 删除指定步骤的父组件事件
+	 * @param {:type} 
+	 * @return {:type} 
+	 */
+	const clearStep = (id) => {
+		stepList.value = stepList.value.filter(item => item.id !== id);
+	}
+	
 </script>
 
 <style lang="scss" scoped>
