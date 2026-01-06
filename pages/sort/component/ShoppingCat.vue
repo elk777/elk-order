@@ -56,7 +56,7 @@
 	 */
 	const handelAddRedact = () => {
 		uni.navigateTo({
-			url: '/pages/recipe/redact'
+			url: "/pages/recipe/redact?title=新增菜谱",
 		});
 	}
 </script>

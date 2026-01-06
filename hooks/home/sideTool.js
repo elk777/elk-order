@@ -8,9 +8,6 @@
 import {
 	ref
 } from "vue";
-import {
-	func
-} from "../../uni_modules/uview-plus/libs/function/test";
 
 /**
  * @description: 控制pop弹出框显示隐藏的hook函数

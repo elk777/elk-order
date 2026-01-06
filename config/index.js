@@ -15,7 +15,8 @@ const COLOURS = {
 	'theme-color': '#FF5C8D',
 	'fu-color': '#FFF5F5',
 	'inter-color': '#FF5C8D',
-	'tinge-color': '#707070'
+	'tinge-color': '#707070',
+	'gray-color': '#dadbde'
 }
 
 // 底部tabber
