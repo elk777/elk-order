@@ -1,0 +1,18 @@
+:deep(.u-upload) {
+	border: 1px dashed $gray-color;
+}
+:deep(.u-upload__wrap) {
+	width: 100%;
+	justify-content: center;
+}
+:deep(.u-upload__wrap__preview) {
+	width: 100%;
+	margin: 0px !important;
+}
+:deep(.u-upload__wrap__preview__image) {
+	width: 100% !important;
+	height: 250px !important;
+}
+.upload-btn {
+	width: 100%;
+}

@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2025-09-10 16:36:55
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-05 15:40:40
+ * @LastEditTime: 2026-01-07 10:46:02
  * @FilePath: /hkt-applet/pages/sort/component/CateTab.vue
  * @Description: 菜单分类组件
 -->
@@ -39,7 +39,12 @@
 		</up-cate-tab>
 	</view>
 </template>
-
+<script>
+// 专门用来放页面级配置
+export default {
+	options: { styleIsolation: "shared" }, // 微信小程序样式隔离关闭
+};
+</script>
 <script setup>
 import { ref } from "vue";
 
@@ -175,9 +180,9 @@ const tabList = ref([
 	.cate-tab {
 		height: calc(100vh - 320px);
 		// 尝试使用 :deep() 语法
-		// :deep(.u-cate-tab__page-item:last-child) {
-		// 	min-height: 70vh !important;
-		// }
+		:deep(.u-cate-tab__page-item:last-child) {
+			min-height: 70vh !important;
+		}
 	}
 }
 </style>
