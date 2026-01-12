@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2025-09-12 09:18:25
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-08 16:51:35
+ * @LastEditTime: 2026-01-12 14:25:02
  * @FilePath: /hkt-applet/pages/recipe/redact.vue
  * @Description: 菜谱-新增、编辑界面
 -->
@@ -21,8 +21,10 @@
 					name="images"
 					accept="image"
 					:sizeType="['compressed']"
+					:slotStyle="{ height: '250px' }"
+					:previewStyle="{ height: '250px' }"
 				>
-					<view class="upload-btn pubColumnFlex">
+					<view class="upload-slot pubColumnFlex">
 						<up-icon name="camera-fill" size="24" :color="COLOURS['theme-color']"></up-icon>
 						<view>上传菜谱封面</view>
 					</view>
@@ -57,7 +59,7 @@
 				</view>
 			</view>
 			<view class="form">
-				<IngreIList @clear-inger="clearInger" :ingerList="form.ingreList" />
+				<IngreIList @remove-inger="removeIngreItem" :ingerList="form.ingreList" />
 			</view>
 		</view>
 		<view class="redact-form pubColumnFlex">
@@ -75,7 +77,7 @@
 				</view>
 			</view>
 			<view class="form">
-				<StepList @clear-step="clearStep" :stepList="form.stepList" />
+				<StepList @remove-step="removeStepItem" :stepList="form.stepList" />
 			</view>
 		</view>
 		<view style="height: 100px"></view>
@@ -98,10 +100,20 @@ import BottomBtn from "./component/BottomBtn.vue";
 import Upload from "@/components/Upload/index.vue";
 // 引入usePageTitle hook函数
 import { usePageTitle } from "@/hooks/usePageTitle.js";
+import { generateId } from "@/utils/tool.js";
+import { useListOperations } from "./hook/useListOperations.js";
 
 // 调用usePageTitle hook函数，设置默认标题为"编辑菜谱"
 usePageTitle();
-
+// 调用useListOperations hook函数，初始化食材清单和制作步骤列表
+const { list: ingreList, addItem: addIngreItem, removeItem: removeIngreItem } = useListOperations(
+	[ {id: generateId(), ingreName: "", ingreDose: "" }],
+	{ ingreName: "", ingreDose: "" }
+);
+const { list: stepList, addItem: addStepItem, removeItem: removeStepItem } = useListOperations(
+	[{ id: generateId(), stepDesc: "", stepTip: "", stepImg: [] }],
+	{ stepDesc: "", stepTip: "", stepImg: [] }
+);
 const form = ref({
 	basicForm: {
 		name: "",
@@ -110,13 +122,17 @@ const form = ref({
 		// 新增：存储上传的图片列表
 		images: [],
 	},
-	ingreList: [{ id: "", ingreName: "", ingreDose: "" }],
-	stepList: [{ id: "", stepDesc: "", stepTip: "", stepImg: "" }],
+	ingreList: [],
+	stepList: [],
 });
 const rules = ref({
 	name: [{ required: true, message: "请输入名称", trigger: ["blur"] }],
 	sort: [{ required: true, message: "请输入分类", trigger: ["blur"] }],
 });
+
+// 同步到表单数据
+form.value.ingreList = ingreList;
+form.value.stepList = stepList;
 // 表单引用
 const basicForm = ref(null);
 const loading = ref(false);
@@ -126,20 +142,7 @@ const loading = ref(false);
  * @return {:type}
  */
 const handelAddInger = () => {
-	let obj = {
-		id: (form.value.ingreList.length + 1).toString(),
-		name: "",
-		dose: "",
-	};
-	form.value.ingreList.push(obj);
-};
-/**
- * @description: 删除指定食材的父组件事件
- * @param {:type}
- * @return {:type}
- */
-const clearInger = (id) => {
-	form.value.ingreList = form.value.ingreList.filter((item) => item.id !== id);
+	addIngreItem()
 };
 
 /**
@@ -148,21 +151,7 @@ const clearInger = (id) => {
  * @return {:type}
  */
 const handelAddStep = () => {
-	let obj = {
-		id: (form.value.stepList.length + 1).toString(),
-		stepDesc: "",
-		stepTip: "",
-		stepImg: "",
-	};
-	form.value.stepList.push(obj);
-};
-/**
- * @description: 删除指定步骤的父组件事件
- * @param {:type}
- * @return {:type}
- */
-const clearStep = (id) => {
-	form.value.stepList = form.value.stepList.filter((item) => item.id !== id);
+	addStepItem()
 };
 
 /**
@@ -175,7 +164,6 @@ const afterRead = (file, fileList) => {
 	// 通用上传组件已经处理了文件添加，这里可以添加额外的业务逻辑
 	console.log("图片上传成功", file);
 	console.log("当前文件列表", fileList);
-	console.log("🚀 ~ afterRead ~ form:", form.value)
 };
 
 /**
@@ -186,8 +174,6 @@ const afterRead = (file, fileList) => {
 const deleteImage = (index) => {
 	// 通用上传组件已经处理了文件删除，这里可以添加额外的业务逻辑
 	console.log("删除图片索引", index);
-	console.log("🚀 ~ deleteImage ~ form.value:", form.value)
-	// form.value.basicForm.images.splice(index, 1);
 };
 
 /**
@@ -206,7 +192,7 @@ const handelSubmit = () => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/common/upload.scss";
+
 .recipe-redact-container {
 	width: 100%;
 	height: 100vh;
@@ -233,8 +219,8 @@ const handelSubmit = () => {
 			width: 100%;
 		}
 	}
-	.upload-btn {
-		height: 250px;
-	}
+	// .upload-btn {
+	// 	height: 250px;
+	// }
 }
 </style>

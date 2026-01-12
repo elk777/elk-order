@@ -2,13 +2,12 @@
  * @Author: elk
  * @Date: 2026-01-07 11:20:00
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-08 16:39:16
+ * @LastEditTime: 2026-01-09 16:07:56
  * @FilePath: /hkt-applet/components/Upload/index.vue
  * @Description: 通用上传组件
 -->
 <template>
-	<view class="custom-upload" :style="customStyle">
-    <!-- v-if="internalFileList.length === 0" -->
+	<view class="custom-upload" :style="computedStyles">
 		<up-upload
 			:action="action"
 			:fileList="internalFileList"
@@ -29,7 +28,6 @@
 			:deletable="deletable"
 			:maxSize="maxSize"
 			:extension="extension"
-			:customStyle="uploadCustomStyle"
 			@beforeRead="handleBeforeRead"
 			@afterRead="handleAfterRead"
 			@oversize="handleOversize"
@@ -46,20 +44,16 @@
 				<view>上传文件</view>
 			</template>
 		</up-upload>
-    <!-- 已上传文件列表 -->
-    <!-- <view v-else>
-      <view v-for="(file, index) in internalFileList" :key="file.url" class="uploaded-file">
-        <view class="file-info">
-          <up-image :src="file.url" :mode="imageMode" :preview-full-image="previewFullImage" />
-        </view>
-        <view class="delete-btn" @click="handleDelete(index)">删除</view>
-      </view>
-    </view> -->
-  </view>
+	</view>
 </template>
-
+<script>
+// 专门用来放页面级配置
+export default {
+	options: { styleIsolation: "shared" }, // 微信小程序样式隔离关闭
+};
+</script>
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 
 // 定义组件属性
 const props = defineProps({
@@ -153,15 +147,15 @@ const props = defineProps({
 		type: [Number, String],
 		default: Number.MAX_VALUE,
 	},
-	// 自定义样式
-	customStyle: {
+	// slot 内容自定义样式
+	slotStyle: {
 		type: Object,
-		default: () => {},
+		default: () => ({}),
 	},
-	// 上传组件自定义样式
-	uploadCustomStyle: {
+	// 上传后预览图片样式
+	previewStyle: {
 		type: Object,
-		default: () => {},
+		default: () => ({}),
 	},
 	// 图片尺寸类型
 	sizeType: {
@@ -186,22 +180,45 @@ const internalFileList = ref([...props.fileList]);
 
 // 监听外部fileList变化，更新内部列表
 watch(
-	() => props.fileList,
-	(newVal) => {
-		internalFileList.value = [...newVal];
-	},
-	{ deep: true }
+  () => props.fileList,
+  (newVal) => {
+    // 只有当内容真正变化时才更新
+    if (JSON.stringify(newVal) !== JSON.stringify(internalFileList.value)) {
+      internalFileList.value = [...newVal];
+    }
+  },
+  { deep: true }
 );
 
 // 监听内部fileList变化，通知外部
-watch(
-	internalFileList,
-	(newVal) => {
-		console.log("🚀 ~ newVal:", newVal)
-		emit("update:fileList", [...newVal]);
-	},
-	{ deep: true }
-);
+// watch(
+// 	internalFileList,
+// 	(newVal) => {
+// 		console.log("🚀 ~ newVal:", newVal);
+// 		emit("update:fileList", [...newVal]);
+// 	},
+// 	{ deep: true }
+// );
+
+// 计算 CSS 变量
+const computedStyles = computed(() => {
+	const styles = {};
+	// 转换 slot 样式为 CSS 变量
+	if (props.slotStyle) {
+		Object.entries(props.slotStyle).forEach(([key, value]) => {
+			const cssKey = `--slot-${key.replace(/([A-Z])/g, "-$1").toLowerCase()}`;
+			styles[cssKey] = value;
+		});
+	}
+	// 转换预览图片样式为 CSS 变量
+	if (props.previewStyle) {
+		Object.entries(props.previewStyle).forEach(([key, value]) => {
+			const cssKey = `--preview-${key.replace(/([A-Z])/g, "-$1").toLowerCase()}`;
+			styles[cssKey] = value;
+		});
+	}
+	return styles;
+});
 
 // 处理上传前事件
 const handleBeforeRead = (file) => {
@@ -230,6 +247,8 @@ const handleAfterRead = ({ file }) => {
 	};
 
 	internalFileList.value.push(tempFile);
+  // 手动通知父组件
+  emit('update:fileList', [...internalFileList.value]);
 };
 
 // 处理文件超出大小限制事件
@@ -248,10 +267,12 @@ const handleClickPreview = (item, index) => {
 
 // 处理删除事件
 const handleDelete = (index) => {
-	console.log("🚀 ~ handleDelete ~ index:", index)
+	console.log("🚀 ~ handleDelete ~ index:", index);
 	internalFileList.value.splice(index, 1);
-  console.log("🚀 ~ handleDelete ~ fileList:", props.fileList)
+	console.log("🚀 ~ handleDelete ~ fileList:", props.fileList);
 	emit("delete", index);
+  // 手动通知父组件
+  emit('update:fileList', [...internalFileList.value]);
 };
 
 // 处理自动上传完成事件
@@ -261,16 +282,41 @@ const handleAfterAutoUpload = (data) => {
 </script>
 
 <style lang="scss" scoped>
+@import "@/common/upload.scss";
 .custom-upload {
 	/* 自定义上传组件容器样式 */
 	width: 100%;
+	// 自定义上传组件容器样式
+	:deep(.upload-slot) {
+		width: var(--slot-width, 100vw) !important;
+		height: var(--slot-height, 150px) !important;
+	}
+	// 自定义上传组件上传按钮样式
+	:deep(.u-upload) {
+		width: var(--slot-width, 100%) !important;
+		height: var(--slot-height, 150px) !important;
+		border: var(--slot-border, 1px dashed $gray-color) !important;
+		border-radius: var(--slot-border-radius, 0) !important;
+	}
+	:deep(.u-upload .u-popup) {
+		display: none;
+	}
 	:deep(.u-upload__wrap) {
-		/* 自定义上传组件内部样式 */
-
-		.u-upload__wrap__preview {
-			/* 自定义预览图片样式 */
-			margin: 10rpx;
-		}
+		width: var(--slot-width, 100%) !important;
+		height: var(--slot-height, 150px) !important;
+		justify-content: var(--slot-justify-content, center) !important;
+		align-items: var(--slot-align-items, center) !important;
+	}
+	// 上传成功后，预览区域的样式
+	:deep(.u-upload__wrap__preview) {
+		width: var(--preview-width, 100%) !important;
+		height: var(--preview-height, auto) !important;
+		margin: var(--preview-margin, 0px) !important;
+	}
+	// 上传成功后，预览图片的样式
+	:deep(.u-upload__wrap__preview__image) {
+		width: var(--preview-width, 100%) !important;
+		height: var(--preview-height, 150px) !important;
 	}
 }
 </style>

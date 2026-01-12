@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-01-05 15:49:54
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-06 14:17:43
+ * @LastEditTime: 2026-01-12 14:11:42
  * @FilePath: /hkt-applet/pages/recipe/component/StepList.vue
  * @Description: 制作步骤-List组件
 -->
@@ -16,7 +16,7 @@
 				</view>
 				<view class="publcTitleSize"> 步骤{{ index + 1 }} </view>
 			</view>
-			<view @click="$emit('clearStep', step.id)" v-if="stepList.length > 1">
+			<view @click="$emit('removeStep', step.id)" v-if="stepProps.stepList.length > 1">
 				<up-icon name="trash-fill" :color="COLOURS['theme-color']" size="24"></up-icon>
 			</view>
 		</view>
@@ -28,12 +28,13 @@
 		<!-- 3 步骤照片 上传步骤照片 -->
 		<view class="mdy upload-btn-container" style="width: 100%">
 			<view class="font-weight-600 step-title">步骤图片</view>
-			<up-upload :accept="image" :max-count="1" :auto-upload="false">
-				<view class="upload-btn pubColumnFlex">
+			<!-- 引入通用上传组件 -->
+			<Upload :action="uploadAction" v-model:fileList="step.stepImg" :maxCount="1" :autoUpload="false"
+				><view class="upload-slot pubColumnFlex">
 					<up-icon name="camera-fill" size="24" :color="COLOURS['theme-color']"></up-icon>
 					<view>上传步骤图片</view>
 				</view>
-			</up-upload>
+			</Upload>
 		</view>
 		<!-- 4 小提示 注意事项 单行输入框 -->
 		<view class="mdy" style="width: 100%">
@@ -55,6 +56,8 @@ export default {
 <script setup>
 import { ref, defineProps, toRefs, onMounted } from "vue";
 import { COLOURS } from "@/config/index.js";
+// 引入通用上传组件
+import Upload from "@/components/Upload/index.vue";
 const stepProps = defineProps({
 	stepList: {
 		type: Array,
@@ -78,10 +81,6 @@ const stepProps = defineProps({
 			display: flex;
 		}
 	}
-	.upload-btn {
-		width: 100%;
-		height: 120px;
-	}
 	.mdy {
 		margin: 15px 0;
 	}
@@ -90,12 +89,6 @@ const stepProps = defineProps({
 	}
 	.upload-btn-container {
 		color: $tinge-color;
-		:deep(.u-upload) {
-			border: 1px dashed $gray-color;
-		}
-		:deep(.u-upload__wrap) {
-			margin: 0 auto;
-		}
 	}
 }
 .badge {

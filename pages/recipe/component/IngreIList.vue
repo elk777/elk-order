@@ -2,8 +2,8 @@
  * @Author: elk
  * @Date: 2025-09-12 15:40:09
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-05 16:43:04
- * @FilePath: /hkt-applet/pages/recipe/component/Ingre/IngreIList.vue
+ * @LastEditTime: 2026-01-12 14:11:53
+ * @FilePath: /hkt-applet/pages/recipe/component/IngreIList.vue
  * @Description: 食材清单-List组件
 -->
 <template>
@@ -17,7 +17,7 @@
 		<view class="inger-right">
 			<up-input placeholder="请输入用量" v-model="inger.ingreDose"></up-input>
 		</view>
-		<view @click="$emit('clearInger',inger.id)" v-if="ingerList.length > 1">
+		<view @click="$emit('removeInger',inger.id)" v-if="ingerProps.ingerList.length > 1">
 			<up-icon name="close-circle" size="25" color="#FF5C8D"></up-icon>
 		</view>
 	</view>
@@ -30,9 +30,6 @@
 		toRefs,
 		onMounted
 	} from 'vue'
-	import {
-		COLOURS
-	} from '@/config/index.js'
 	// 这里的ingerList不能通过 let ingerProps = ingerProps.ingerList 接一下会失去响应式
 	const ingerProps = defineProps({
 		ingerList: {

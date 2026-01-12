@@ -1,18 +1,13 @@
-:deep(.u-upload) {
-	border: 1px dashed $gray-color;
+// 上传成功后，删除按钮的样式
+:deep(.u-upload__deletable) {
+	width: 30px !important;
+	height: 30px !important;
 }
-:deep(.u-upload__wrap) {
-	width: 100%;
-	justify-content: center;
+:deep(.u-icon--right text) {
+	font-size: 25px !important;
+	line-height: 25px !important;
 }
-:deep(.u-upload__wrap__preview) {
-	width: 100%;
-	margin: 0px !important;
-}
-:deep(.u-upload__wrap__preview__image) {
-	width: 100% !important;
-	height: 250px !important;
-}
-.upload-btn {
-	width: 100%;
+// 上传成功后，隐藏成功提示
+:deep(.u-upload__success) {
+	display: none !important;
 }

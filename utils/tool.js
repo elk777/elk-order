@@ -1,9 +1,10 @@
-/**
- * @Description: 工具类方法集合
+/*
  * @Author: elk
- * @Date: 2025-09-04 16:30:09
- * @LastEditors: 
- * @LastEditTime: 2025-09-04 16:30:09
+ * @Date: 2025-09-04 16:30:03
+ * @LastEditors: elk 
+ * @LastEditTime: 2026-01-12 14:23:04
+ * @FilePath: /hkt-applet/utils/tool.js
+ * @Description: 工具类方法集合
  */
 
 /**
@@ -29,3 +30,11 @@ export const getBottomSpacing = () => {
 	// 3. 实际“底部占位”高度
 	return tabBarHeight + safeBottom
 }
+
+/**
+ * @description: 生成唯一id-随机数
+ * @return {string} 唯一id字符串
+ */
+export const generateId = () => {
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+};
