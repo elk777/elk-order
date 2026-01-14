@@ -1,0 +1,16 @@
+{
+  "id": "5108536",
+  "name": "情侣厨房",
+  "font_family": "lovers-icon",
+  "css_prefix_text": "lovers-",
+  "description": "个人项目",
+  "glyphs": [
+    {
+      "icon_id": "3456452",
+      "name": "购物车",
+      "font_class": "gouwuche",
+      "unicode": "e70b",
+      "unicode_decimal": 59147
+    }
+  ]
+}

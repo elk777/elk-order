@@ -2,38 +2,57 @@
  * @Author: elk
  * @Date: 2025-09-10 16:36:55
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-07 10:46:02
+ * @LastEditTime: 2026-01-14 14:14:15
  * @FilePath: /hkt-applet/pages/sort/component/CateTab.vue
  * @Description: 菜单分类组件
 -->
 <template>
 	<view class="catetab-container">
-		<up-cate-tab class="cate-tab" :current="0" :tabList="tabList" tabKeyName="title" itemKeyName="title">
-			<template #tabItem="{item}">
+		<up-cate-tab class="cate-tab" :current="0" :tabList="tabList" tabKeyName="title" itemKeyName="name">
+			<template #tabItem="{ item }">
 				<view>{{ item.title }}</view>
 			</template>
 			<template #pageItem="{ pageItem }">
-				<view class="w-full">
-					<up-cell-group :border="false">
-						<up-cell :border="false">
-							<template #icon>
-								<up-image :src="pageItem.cover" width="100px" height="100px"></up-image>
-							</template>
-							<template v-slot:title>
-								<view>
-									{{ pageItem.title }}
-								</view>
-							</template>
-							<template v-slot:label>
-								<view class="h-100 pt-1">
-									<text class="text-md text-red">￥{{ pageItem.price }}</text>
-								</view>
-							</template>
-							<template v-slot:value>
-								<up-number-box></up-number-box>
-							</template>
-						</up-cell>
-					</up-cell-group>
+				<view @click="cateDetails(pageItem)" class="w-100 cate-item">
+					<!-- 图片 -->
+					<up-image :src="pageItem.cover" width="100%" height="200px"></up-image>
+					<!-- 标题 -->
+					<view class="cate-title font-weight-600 publcTitleSize">{{ pageItem.name }}</view>
+					<view class="pubFlex cate-base">
+						<!-- 左侧 烹饪时间  右侧 饲养员 删除按钮 吃货 添加购物车按钮 -->
+						<view class="pubFlex">
+							<up-icon name="clock" size="22" color="#FF5C8D" />
+							<view class="publcLabelSize cate-base-tiem">10分钟</view>
+						</view>
+						<view class="pubFlex">
+							<up-icon
+								v-if="isFeeder"
+								size="32"
+								name="share-square"
+								@tap.stop="cateEdit(pageItem)"
+								:color="COLOURS['theme-color']"
+							></up-icon>
+							<up-icon
+								v-if="isFeeder"
+								class="cate-icon"
+								size="30"
+								name="close-circle-fill"
+								@tap.stop="cateDelete(pageItem)"
+								:color="COLOURS['theme-color']"
+							></up-icon>
+							<up-icon
+								v-if="!isFeeder"
+								class="cate-icon"
+								name="cart"
+								customPrefix="lovers-icon"
+								size="30"
+								@tap.stop="cateAddCart(pageItem)"
+								:color="COLOURS['theme-color']"
+							>
+								<up-badge type="warning" max="99" :value="1"></up-badge>
+							</up-icon>
+						</view>
+					</view>
 				</view>
 			</template>
 		</up-cate-tab>
@@ -46,130 +65,86 @@ export default {
 };
 </script>
 <script setup>
-import { ref } from "vue";
-
+import { ref, computed } from "vue";
+import { COLOURS } from "@/config/index.js";
+import { useUserStore } from "@/stores/user.js";
+const userStore = useUserStore();
 const tabList = ref([
 	{
-		title: "选项一",
+		title: "默认分类",
 		children: [
 			{
-				title: "水煮肉片",
-				cover: "https://s3.bmp.ovh/imgs/2024/12/16/35bc6d28ab1c8bc7.png",
+				id: 1,
+				name: "水煮肉片",
+				cover: "/static/images/head.jpeg",
 				price: 88,
 			},
 		],
 	},
 	{
-		title: "选项二",
+		title: "分类1",
 		children: [
 			{
-				title: "酸菜鱼",
-				cover: "https://s3.bmp.ovh/imgs/2024/12/16/35bc6d28ab1c8bc7.png",
-				price: 99,
-			},
-		],
-	},
-	{
-		title: "选项三",
-		children: [
-			{
-				title: "水煮肉片",
-				cover: "https://s3.bmp.ovh/imgs/2024/12/16/35bc6d28ab1c8bc7.png",
-				price: 88,
-			},
-		],
-	},
-	{
-		title: "选项四",
-		children: [
-			{
-				title: "酸菜鱼",
-				cover: "https://s3.bmp.ovh/imgs/2024/12/16/35bc6d28ab1c8bc7.png",
-				price: 99,
-			},
-		],
-	},
-	{
-		title: "选项5",
-		children: [
-			{
-				title: "酸菜鱼",
-				cover: "https://s3.bmp.ovh/imgs/2024/12/16/35bc6d28ab1c8bc7.png",
-				price: 99,
-			},
-		],
-	},
-	{
-		title: "选项6",
-		children: [
-			{
-				title: "酸菜鱼",
-				cover: "https://s3.bmp.ovh/imgs/2024/12/16/35bc6d28ab1c8bc7.png",
-				price: 99,
-			},
-		],
-	},
-	{
-		title: "选项7",
-		children: [
-			{
-				title: "酸菜鱼",
-				cover: "https://s3.bmp.ovh/imgs/2024/12/16/35bc6d28ab1c8bc7.png",
-				price: 99,
-			},
-		],
-	},
-	{
-		title: "选项8",
-		children: [
-			{
-				title: "酸菜鱼",
-				cover: "https://s3.bmp.ovh/imgs/2024/12/16/35bc6d28ab1c8bc7.png",
-				price: 99,
-			},
-		],
-	},
-	{
-		title: "选项9",
-		children: [
-			{
-				title: "酸菜鱼",
-				cover: "https://s3.bmp.ovh/imgs/2024/12/16/35bc6d28ab1c8bc7.png",
-				price: 99,
-			},
-		],
-	},
-	{
-		title: "选项10",
-		children: [
-			{
-				title: "酸菜鱼",
-				cover: "https://s3.bmp.ovh/imgs/2024/12/16/35bc6d28ab1c8bc7.png",
-				price: 99,
-			},
-		],
-	},
-	{
-		title: "选项11",
-		children: [
-			{
-				title: "酸菜鱼",
-				cover: "https://s3.bmp.ovh/imgs/2024/12/16/35bc6d28ab1c8bc7.png",
-				price: 99,
-			},
-		],
-	},
-	{
-		title: "选项12",
-		children: [
-			{
-				title: "酸菜鱼",
-				cover: "https://s3.bmp.ovh/imgs/2024/12/16/35bc6d28ab1c8bc7.png",
+				id: 2,
+				name: "酸菜鱼",
+				cover: "/static/images/head.jpeg",
 				price: 99,
 			},
 		],
 	},
 ]);
+
+//计算属性： 根据用户类型判断图标icon的展示 0 是饲养员 1 是吃货
+const isFeeder = computed(() => {
+	return userStore.userType === 0;
+});
+
+/**
+ * @description: 菜谱详情跳转
+ * @param {Object} item - 分类项
+ * @return {void}
+ */
+const cateDetails = (item) => {
+	// 点击跳转到菜谱详情页
+	uni.navigateTo({
+		url: "/pages/recipe/details?id=" + item.id,
+	});
+};
+
+/**
+ * @description: 编辑菜谱按钮
+ * @return {*}
+ */
+const cateEdit = (item) => {
+	// 点击跳转到编辑菜谱页
+	uni.navigateTo({
+		url: "/pages/recipe/redact?id=" + item.id + "&title=编辑菜谱",
+	});
+};
+
+/**
+ * @description: 删除菜谱按钮
+ * @return {*}
+ */
+const cateDelete = (item) => {
+	// 点击删除菜谱
+	uni.showToast({
+		title: "删除菜谱：" + item.name,
+		icon: "none",
+	});
+};
+
+/**
+ * @description: 添加购物车按钮
+ * @return {*}
+ */
+const cateAddCart = (item) => {
+	// 点击添加购物车
+	uni.showToast({
+		title: "添加购物车：" + item.name,
+		icon: "none",
+	});
+};
 </script>
 
 <style lang="scss" scoped>
@@ -177,11 +152,41 @@ const tabList = ref([
 	width: 100%;
 	height: calc(100vh - 320px);
 	margin-top: 10px;
+	:deep(.item-container > view:first-child) {
+		width: 100%;
+	}
+	:deep(.item-title) {
+		margin-bottom: 10px;
+	}
+	:deep(.u-image__image) {
+		border-radius: 15px 15px 0 0 !important;
+	}
+	:deep(.item-container) {
+		padding-bottom: 15px;
+		border-radius: 15px;
+		border: 1px solid #e5e5e5;
+		box-shadow: 0 0 10px 5px $gray-color;
+	}
 	.cate-tab {
 		height: calc(100vh - 320px);
 		// 尝试使用 :deep() 语法
 		:deep(.u-cate-tab__page-item:last-child) {
 			min-height: 70vh !important;
+		}
+		.cate-title {
+			margin: 15px 0 10px;
+			padding: 0 12px;
+		}
+		.cate-icon {
+			margin-left: 5px;
+		}
+		.cate-base {
+			padding: 0 12px;
+			justify-content: space-between;
+			.cate-base-tiem {
+				margin-left: 5px;
+				color: $tinge-color;
+			}
 		}
 	}
 }
