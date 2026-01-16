@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-01-13 15:32:10
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-14 16:21:54
+ * @LastEditTime: 2026-01-16 18:46:22
  * @FilePath: /hkt-applet/pages/recipe/details.vue
  * @Description: 菜谱详情页
 -->
@@ -35,7 +35,7 @@
 			<view class="cate-ingre-content">
 				<view
 					class="cate-ingre-item publcTextSize pubFlex"
-					v-for="(item, index) in cateDetails.steps"
+					v-for="(item, index) in cateDetails.ingredients"
 					:key="index"
 				>
 					<view class="item-name">
@@ -51,24 +51,26 @@
          <view class="cate-details-ingredients w-100">
 			<DetailsTitle title="制作步骤" />
 			<view class="cate-ingre-content">
-				<view
-					class="cate-ingre-item publcTextSize pubFlex"
-					v-for="(item, index) in cateDetails.steps"
-					:key="index"
-				>
-					<view class="item-name">
-						{{ item.name }}
-					</view>
-					<view class="item-amount">
-						{{ item.amount }}
-					</view>
-				</view>
+                <view class="cate-steps" v-for="(step, index) in cateDetails.steps" :key="index">
+                    <SerialStyle :index="index" :size="45" :fontSize="18" />
+                    <view class="w-100">
+                        <view style="margin-bottom: 10px;">{{ step.describe }}</view>
+                        <up-album :rowCount="1" :urls="step.images" singleMode="aspectFill"></up-album>
+                    </view>
+                </view>
 			</view>
 		</view>
 	</view>
 </template>
+<script>
+// 专门用来放页面级配置
+export default {
+	options: { styleIsolation: "shared" }, // 微信小程序样式隔离关闭
+};
+</script>
 <script setup>
 import DetailsTitle from "./component/DetailsTitle.vue";
+import SerialStyle from "./component/SerialStyle.vue";
 import { ref } from "vue";
 const cateDetails = ref({
 	id: 1,
@@ -100,12 +102,12 @@ const cateDetails = ref({
 	],
 	steps: [
 		{
-			name: "鱼香肉丝",
-			amount: "200g",
+			describe: "鱼香肉丝",
+            images: ["/static/images/head.jpeg","/static/images/head.jpeg"],
 		},
 		{
-			name: "盐",
-			amount: "1勺",
+			describe: "盐",
+            images: ["/static/images/head.jpeg"],
 		},
 	],
 });
@@ -165,6 +167,20 @@ const cateDetails = ref({
 				border-bottom: 1px solid $gray-color;
 			}
 		}
+
+        .cate-steps {
+            display: flex;
+            margin-bottom: 30px;
+        }
 	}
+
+    :deep(.u-album__row__wrapper) {
+        width: 100% !important;
+    }
+    :deep(.u-album__row__wrapper>image) {
+        width: 100% !important;
+        height: 200px !important;
+        border-radius: 15px !important;
+    }
 }
 </style>

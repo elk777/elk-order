@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-01-05 15:49:54
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-12 14:11:42
+ * @LastEditTime: 2026-01-16 18:12:21
  * @FilePath: /hkt-applet/pages/recipe/component/StepList.vue
  * @Description: 制作步骤-List组件
 -->
@@ -11,9 +11,7 @@
 		<!-- 1 序号 步骤x  删除按钮 -->
 		<view class="stepitem-content-title" style="width: 100%">
 			<view class="title-content-container">
-				<view class="badge">
-					{{ index + 1 }}
-				</view>
+				<SerialStyle :index="index" :size="45" :fontSize="16" />
 				<view class="publcTitleSize"> 步骤{{ index + 1 }} </view>
 			</view>
 			<view @click="$emit('removeStep', step.id)" v-if="stepProps.stepList.length > 1">
@@ -58,6 +56,7 @@ import { ref, defineProps, toRefs, onMounted } from "vue";
 import { COLOURS } from "@/config/index.js";
 // 引入通用上传组件
 import Upload from "@/components/Upload/index.vue";
+import SerialStyle from "./SerialStyle.vue";
 const stepProps = defineProps({
 	stepList: {
 		type: Array,
@@ -90,24 +89,5 @@ const stepProps = defineProps({
 	.upload-btn-container {
 		color: $tinge-color;
 	}
-}
-.badge {
-	/* 设置宽度和高度，使元素为正方形，从而形成圆形 */
-	width: 45px;
-	height: 45px;
-	margin-right: 10px;
-	/* 背景颜色设置为粉色 */
-	background-color: $theme-color;
-	/* 文字颜色设置为白色 */
-	color: white;
-	/* 使元素变成圆形（ border-radius 为宽度/高度的 50% ） */
-	border-radius: 50%;
-	/* 让文字水平居中 */
-	text-align: center;
-	/* 让文字垂直居中（通过行高等于高度实现） */
-	line-height: 45px;
-	/* 可以根据需要设置字体大小等样式 */
-	font-size: 16px;
-	font-weight: 600;
 }
 </style>
