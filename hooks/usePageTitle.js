@@ -2,12 +2,18 @@
  * @Author: elk
  * @Date: 2026-01-06 16:26:41
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-06 17:04:16
+ * @LastEditTime: 2026-01-19 14:28:15
  * @FilePath: /hkt-applet/hooks/usePageTitle.js
  * @Description: 控制页面标题的hook函数
  */
 import { onLoad } from '@dcloudio/uni-app';
+import { ref } from 'vue';
 
+/**
+ * @description: 控制页面标题的hook函数
+ * @param {*} defaultTitle
+ * @return {*}
+ */
 export function usePageTitle(defaultTitle = '默认标题') {
   onLoad((options) => {
     console.log("🚀 ~ usePageTitle ~ options:", options)
@@ -16,4 +22,15 @@ export function usePageTitle(defaultTitle = '默认标题') {
       title
     });
   });
+}
+/**
+ * @description: 控制页面参数的hook函数
+ * @return {*}
+ */
+export function usePageParams() {
+  let params = ref({})
+  onLoad((options) => {
+    params.value = options
+  })
+  return params
 }

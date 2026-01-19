@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-01-13 15:32:10
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-16 18:46:22
+ * @LastEditTime: 2026-01-19 14:28:50
  * @FilePath: /hkt-applet/pages/recipe/details.vue
  * @Description: 菜谱详情页
 -->
@@ -31,7 +31,13 @@
 		</view>
 		<!-- 食材清单详情 -->
 		<view class="cate-details-ingredients w-100">
-			<DetailsTitle title="食材清单" />
+			<view class="pubFlex" style="justify-content: space-between">
+				<DetailsTitle title="食材清单" />
+				<view @click="visible = true" class="pubFlex detail-title-copy">
+					<up-icon name="order" size="22" :color="COLOURS['theme-color']" />
+					生成购物清单</view
+				>
+			</view>
 			<view class="cate-ingre-content">
 				<view
 					class="cate-ingre-item publcTextSize pubFlex"
@@ -48,19 +54,37 @@
 			</view>
 		</view>
 		<!-- 制作步骤详情 -->
-         <view class="cate-details-ingredients w-100">
+		<view class="cate-details-ingredients w-100">
 			<DetailsTitle title="制作步骤" />
 			<view class="cate-ingre-content">
-                <view class="cate-steps" v-for="(step, index) in cateDetails.steps" :key="index">
-                    <SerialStyle :index="index" :size="45" :fontSize="18" />
-                    <view class="w-100">
-                        <view style="margin-bottom: 10px;">{{ step.describe }}</view>
-                        <up-album :rowCount="1" :urls="step.images" singleMode="aspectFill"></up-album>
-                    </view>
-                </view>
+				<view class="cate-steps" v-for="(step, index) in cateDetails.steps" :key="index">
+					<SerialStyle :index="index" :size="45" :fontSize="18" />
+					<view class="w-100">
+						<view style="margin-bottom: 10px">{{ step.describe }}</view>
+						<up-album :rowCount="1" :urls="step.images" singleMode="aspectFill"></up-album>
+					</view>
+				</view>
 			</view>
 		</view>
 	</view>
+	<!-- 复制购物清单 -->
+	<up-modal :show.sync="visible" title="购物清单">
+		<view class="copy-ingre-content">
+			<view
+				class="copy-ingre-item publcTextSize pubFlex"
+				v-for="(item, index) in cateDetails.ingredients"
+				:key="index"
+			>
+				<view class="item-name">{{ item.name }}&nbsp;</view>
+				<view class="item-amount">{{ item.amount }}</view>
+			</view>
+		</view>
+		<template #confirmButton>
+			<up-copy :content="copyContent">
+				<up-button type="primary" :color="COLOURS['theme-color']" @click="copyIngredients">复制清单</up-button>
+			</up-copy>
+		</template>
+	</up-modal>
 </template>
 <script>
 // 专门用来放页面级配置
@@ -69,9 +93,16 @@ export default {
 };
 </script>
 <script setup>
+import { ref } from "vue";
 import DetailsTitle from "./component/DetailsTitle.vue";
 import SerialStyle from "./component/SerialStyle.vue";
-import { ref } from "vue";
+import { COLOURS } from "@/config/index.js";
+import { usePageParams } from "@/hooks/usePageTitle.js";
+// 复制购物清单弹框显隐
+const visible = ref(false);
+// 复制购物清单内容
+const copyContent = ref("");
+// 菜谱详情
 const cateDetails = ref({
 	id: 1,
 	name: "鱼香肉丝",
@@ -103,21 +134,31 @@ const cateDetails = ref({
 	steps: [
 		{
 			describe: "鱼香肉丝",
-            images: ["/static/images/head.jpeg","/static/images/head.jpeg"],
+			images: ["/static/images/head.jpeg", "/static/images/head.jpeg"],
 		},
 		{
 			describe: "盐",
-            images: ["/static/images/head.jpeg"],
+			images: ["/static/images/head.jpeg"],
 		},
 	],
 });
+// 页面参数
+const params = usePageParams();
+/**
+ * @description: 复制购物清单
+ * @return {*}
+ */
+const copyIngredients = () => {
+	copyContent.value = cateDetails.value.ingredients.map((item) => `${item.name}${item.amount}`).join("\n");
+	visible.value = false;
+};
 </script>
 
 <style lang="scss" scoped>
 .cate-details-container {
 	width: 100%;
 	height: 100vh;
-	background-color: $gray-color;
+	background-color: $light-color;
 	.cate-details-image {
 		position: relative;
 	}
@@ -168,19 +209,27 @@ const cateDetails = ref({
 			}
 		}
 
-        .cate-steps {
-            display: flex;
-            margin-bottom: 30px;
-        }
+		.cate-steps {
+			display: flex;
+			margin-bottom: 30px;
+		}
+		.detail-title-copy {
+			padding: 5px 10px;
+			border-radius: 30px;
+			background-color: $light-color;
+		}
 	}
 
-    :deep(.u-album__row__wrapper) {
-        width: 100% !important;
-    }
-    :deep(.u-album__row__wrapper>image) {
-        width: 100% !important;
-        height: 200px !important;
-        border-radius: 15px !important;
-    }
+	:deep(.u-album__row__wrapper) {
+		width: 100% !important;
+	}
+	:deep(.u-album__row__wrapper > image) {
+		width: 100% !important;
+		height: 200px !important;
+		border-radius: 15px !important;
+	}
+}
+.copy-ingre-content {
+	color: $tinge-color;
 }
 </style>
