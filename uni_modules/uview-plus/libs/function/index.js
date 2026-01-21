@@ -33,6 +33,20 @@ export function getPx(value, unit = false) {
 }
 
 /**
+ * @description 用于统一rpx2px方法，因uni-app现有API未统一。
+ * @param {number} value 用户传递值的rpx值
+ * @returns {number}
+ */
+export function rpx2px(value) {
+	// #ifdef APP
+	return uni.upx2px(value)
+	// #endif
+	// #ifndef APP
+	return uni.rpx2px(value)
+	// #endif
+}
+
+/**
  * @description 进行延时，以达到可以简写代码的目的 比如: await uni.$u.sleep(20)将会阻塞20ms
  * @param {number} value 堵塞时间 单位ms 毫秒
  * @returns {Promise} 返回promise
@@ -144,8 +158,13 @@ export function $parent(name = undefined) {
 	// 通过while历遍，这里主要是为了H5需要多层解析的问题
 	while (parent) {
 		// 父组件
-        name = name.replace(/up-([a-zA-Z0-9-_]+)/g, 'u-$1')        
-		if (parent.$options && parent.$options.name !== name) {
+		let name2 = ''
+		if (name.startsWith('up-')) {
+			name2 = name.replace(/up-([a-zA-Z0-9-_]+)/g, 'u-$1') 
+		} else if (name.startsWith('u-')) {
+			name2 = name.replace(/u-([a-zA-Z0-9-_]+)/g, 'up-$1') 
+		}     
+		if (parent.$options && parent.$options.name !== name && parent.$options.name !== name2) {
 			// 如果组件的name不相等，继续上一级寻找
 			parent = parent.$parent
 		} else {
@@ -360,6 +379,10 @@ export function timeFormat(dateTime = null, formatStr = 'yyyy-mm-dd') {
   // 若用户传入字符串格式时间戳，new Date无法解析，需做兼容
   else if (typeof dateTime === 'string' && /^\d+$/.test(dateTime.trim())) {
     date = new Date(Number(dateTime))
+  }
+  // 检查是否为UTC格式的时间字符串 (2024-12-18T02:25:31.432Z)
+  else if (typeof dateTime === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(dateTime)) {
+    date = new Date(dateTime)
   }
   // 其他都认为符合 RFC 2822 规范
   else {
@@ -627,8 +650,8 @@ export function padZero(value) {
  * @param {*} event
  */
 export function formValidate(instance, event) {
-	const formItem = $parent.call(instance, 'u-form-item')
-	const form = $parent.call(instance, 'u-form')
+	const formItem = $parent.call(instance, 'up-form-item')
+	const form = $parent.call(instance, 'up-form')
 	// 如果发生变化的input或者textarea等，其父组件中有u-form-item或者u-form等，就执行form的validate方法
 	// 同时将form-item的pros传递给form，让其进行精确对象验证
 	if (formItem && form) {
@@ -849,5 +872,7 @@ export default {
 	page,
 	pages,
 	getValueByPath,
-	genLightColor
+	genLightColor,
+	rpx2px
 }
+

@@ -13,10 +13,10 @@
             >￥</text
         >
         <view class="u-text__prefix-icon" v-if="prefixIcon">
-            <u-icon
+            <up-icon
                 :name="prefixIcon"
                 :customStyle="addStyle(iconStyle)"
-            ></u-icon>
+            ></up-icon>
         </view>
         <u-link
             v-if="mode === 'link'" class="u-text__value"
@@ -59,10 +59,10 @@
             >{{ value }}</text
         >
         <view class="u-text__suffix-icon" v-if="suffixIcon">
-            <u-icon
+            <up-icon
                 :name="suffixIcon"
                 :customStyle="addStyle(iconStyle)"
-            ></u-icon>
+            ></up-icon>
         </view>
     </view>
 </template>
@@ -78,7 +78,7 @@ import { addStyle, addUnit, deepMerge } from '../../libs/function/index';
 /**
  * Text 文本
  * @description 此组件集成了文本类在项目中的常用功能，包括状态，拨打电话，格式化日期，*替换，超链接...等功能。 您大可不必在使用特殊文本时自己定义，text组件几乎涵盖您能使用的大部分场景。
- * @tutorial https://ijry.github.io/uview-plus/components/loading.html
+ * @tutorial https://uview-plus.jiangruyi.com/components/loading.html
  * @property {String} 					type		主题颜色
  * @property {Boolean} 					show		是否显示（默认 true ）
  * @property {String | Number}			text		显示的值

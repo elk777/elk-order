@@ -1,4 +1,3 @@
-
 <template>
 	<u-popup
 	    :show="show"
@@ -8,6 +7,7 @@
 	    :round="round"
 	>
 		<view class="u-action-sheet">
+			<!-- 顶部标题区域 -->
 			<view
 			    class="u-action-sheet__header"
 			    v-if="title"
@@ -17,14 +17,15 @@
 				    class="u-action-sheet__header__icon-wrap"
 				    @tap.stop="cancel"
 				>
-					<u-icon
+					<up-icon
 					    name="close"
 					    size="17"
 					    color="#c8c9cc"
 					    bold
-					></u-icon>
+					></up-icon>
 				</view>
 			</view>
+			<!-- 描述信息 -->
 			<text
 			    class="u-action-sheet__description"
 				:style="[{
@@ -33,7 +34,9 @@
 			    v-if="description"
 			>{{description}}</text>
 			<slot>
+				<!-- 分割线 -->
 				<u-line v-if="description"></u-line>
+				<!-- 操作项列表 -->
 				<scroll-view scroll-y class="u-action-sheet__item-wrap" :style="{maxHeight: wrapMaxHeight}">
 					<view :key="index" v-for="(item, index) in actions">
 						<!-- #ifdef MP -->
@@ -62,6 +65,7 @@
 							    @tap.stop="selectHandler(index)"
 							    :hover-class="!item.disabled && !item.loading ? 'u-action-sheet--hover' : ''"
 							    :hover-stay-time="150"
+							    :style="getItemHoverStyle(index)"
 							>
 								<template v-if="!item.loading">
 									<text
@@ -73,6 +77,7 @@
 									    class="u-action-sheet__item-wrap__item__subname"
 									>{{ item.subname }}</text>
 								</template>
+								<!-- 加载状态图标 -->
 								<u-loading-icon
 								    v-else
 								    custom-class="van-action-sheet__loading"
@@ -83,15 +88,18 @@
 							<!-- #ifdef MP -->
 						</button>
 						<!-- #endif -->
+						<!-- 选项间分割线 -->
 						<u-line v-if="index !== actions.length - 1"></u-line>
 					</view>
 				</scroll-view>
 			</slot>
+			<!-- 取消按钮前的分割区域 -->
 			<u-gap
 			    bgColor="#eaeaec"
 			    height="6"
 			    v-if="cancelText"
 			></u-gap>
+			<!-- 取消按钮 -->
 			<view class="u-action-sheet__item-wrap__item u-action-sheet__cancel"
 				hover-class="u-action-sheet--hover" @tap="cancel" v-if="cancelText">
 				<text
@@ -114,7 +122,7 @@
 	/**
 	 * ActionSheet 操作菜单
 	 * @description 本组件用于从底部弹出一个操作菜单，供用户选择并返回结果。本组件功能类似于uni的uni.showActionSheetAPI，配置更加灵活，所有平台都表现一致。
-	 * @tutorial https://ijry.github.io/uview-plus/components/actionSheet.html
+	 * @tutorial https://uview-plus.jiangruyi.com/components/actionSheet.html
 	 * 
 	 * @property {Boolean}			show				操作菜单是否展示 （默认 false ）
 	 * @property {String}			title				操作菜单标题
@@ -168,6 +176,7 @@
 		},
 		emits: ["close", "select", "update:show"],
 		methods: {
+			// 关闭操作菜单事件处理
 			closeHandler() {
 				// 允许点击遮罩关闭时，才发出close事件
 				if(this.closeOnClickOverlay) {
@@ -180,6 +189,7 @@
 				this.$emit('update:show', false)
 				this.$emit('close')
 			},
+			// 选择操作项处理
 			selectHandler(index) {
 				const item = this.actions[index]
 				if (item && !item.disabled && !item.loading) {
@@ -189,6 +199,16 @@
 						this.$emit('close')
 					}
 				}
+			},
+			// 动态处理Hover时候第一个item的圆角
+			getItemHoverStyle(index) {
+				if (index === 0 && this.round && !this.title && !this.description) {
+					return {
+						borderTopLeftRadius: `${this.round}px`,
+						borderTopRightRadius: `${this.round}px`,
+					}
+				}
+				return {}
 			},
 		}
 	}

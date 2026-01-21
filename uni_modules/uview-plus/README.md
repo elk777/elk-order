@@ -12,7 +12,7 @@
 
 ## 说明
 
-uview-plus，是uni-app全面兼容vue3/nvue/鸿蒙/uni-app-x(即将发布)的uni-app生态框架，全面的组件和便捷的工具会让您信手拈来，如鱼得水。uview-plus是基于uView2.x移植的支持vue3的版本，感谢uView。
+uview-plus，是uni-app全面兼容vue3/nvue/鸿蒙/uni-app-x(已经发布https://ext.dcloud.net.cn/plugin?name=uview-ultra)的uni-app生态框架，全面的组件和便捷的工具会让您信手拈来，如鱼得水。uview-plus是基于uView2.x移植的支持vue3的版本，感谢uView。
 
 ## 可视化设计
 
@@ -32,7 +32,13 @@ uview-plus现已推出免费可视化设计，可以方便的进行页面可视�
 您可以通过**微信**扫码，查看最佳的演示效果。
 <br>
 <br>
-<img src="https://uview-plus.jiangruyi.com/common/h5_qrcode.png" width="220" height="220" >
+
+|  H5     |   微信小程序    |    安卓    |   鸿蒙Next（已上架）   | 
+| --- | --- | --- | --- |
+| <img src="https://uview-plus.jiangruyi.com/common/h5_qrcode.png" width="200" height="200" />   |     <img src="https://uview-plus.jiangruyi.com/common/weixin_mini_qrcode.jpg" width="200" height="200" /> | <img src="https://uview-plus.jiangruyi.com/common/android_qrcode.png" width="200" height="200" /> |    <img src="https://uview-plus.jiangruyi.com/common/hos_qrcode.jpg" width="200" height="200" /> |
+<br>
+<img src="https://uview-plus.jiangruyi.com/common/hos.png">
+
 
 ## 链接
 
@@ -41,9 +47,6 @@ uview-plus现已推出免费可视化设计，可以方便的进行页面可视�
 - [升级指南](https://uview-plus.jiangruyi.com/components/changeGuide.html)
 - [关于我们](https://uview-plus.jiangruyi.com/cooperation/about.html)
 
-## 交流反馈
-
-欢迎加入我们的QQ群交流反馈：[点此跳转](https://uview-plus.jiangruyi.com/components/addQQGroup.html)
 
 ## 关于PR
 

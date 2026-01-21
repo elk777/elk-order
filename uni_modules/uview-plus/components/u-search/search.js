@@ -1,23 +1,24 @@
 /*
  * @Author       : LQ
  * @Description  :
- * @version      : 1.0
+ * @version      : 3.0
  * @Date         : 2021-08-20 16:44:21
- * @LastAuthor   : LQ
- * @lastTime     : 2021-08-20 17:19:45
- * @FilePath     : /u-view2.0/uview-ui/libs/config/props/search.js
+ * @LastAuthor   : jry
+ * @lastTime     : 2025-12-19 08:55:21
+ * @FilePath     : /uview-plus/libs/config/props/search.js
  */
+import { t } from '../../libs/i18n'
 export default {
     // search
     search: {
         shape: 'round',
         bgColor: '#f2f2f2',
-        placeholder: '请输入关键字',
+        placeholder: t("up.search.placeholder"),
         clearabled: true,
         focus: false,
         showAction: true,
         actionStyle: {},
-        actionText: '搜索',
+        actionText: t("up.common.search"),
         inputAlign: 'left',
         inputStyle: {},
         disabled: false,
@@ -33,6 +34,8 @@ export default {
         value: '',
         maxlength: '-1',
         height: 32,
-        label: null
+        label: null,
+        adjustPosition: true,
+        autoBlur: true
     }
 }

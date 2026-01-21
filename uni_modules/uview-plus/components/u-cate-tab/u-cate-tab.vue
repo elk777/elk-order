@@ -12,41 +12,49 @@
                     <text v-if="!$slots['tabItem']" class="u-line-1">{{item[tabKeyName]}}</text>
 				</view>
 			</scroll-view>
-			<scroll-view :scroll-top="scrollRightTop" scroll-with-animation
+			<scroll-view :scroll-top="scrollRightTop" scroll-with-animation :scroll-into-view="scrollIntoView"
 				scroll-y class="u-cate-tab__right-box" @scroll="rightScroll">
-				<slot name="rightTop" :tabList="tabList">
-                </slot>
+				<view class="u-cate-tab__right-top">
+					<slot name="rightTop" :tabList="tabList">
+                	</slot>
+				</view>
 				<view class="u-cate-tab__page-view">
-					<view class="u-cate-tab__page-item" :id="'item' + index"
-						v-for="(item , index) in tabList" :key="index">
-                        <slot name="itemList" :item="item">
-                        </slot>
-						<template v-if="!$slots['itemList']">
-							<view class="item-title">
-                                <text>{{item[tabKeyName]}}</text>
-                            </view>
-                            <view class="item-container">
-                                <template v-for="(item1, index1) in item.children" :key="index1">
-                                    <slot name="pageItem" :pageItem="item1">
-                                        <view class="thumb-box" >
-                                            <image class="item-menu-image" :src="item1.icon" mode=""></image>
-                                            <view class="item-menu-name">{{item1[itemKeyName]}}</view>
-                                        </view>
-                                    </slot>
-                                </template>
-                            </view>
-						</template>
-					</view>
+					<template :key="index" v-for="(item , index) in tabList">
+						<view v-if="mode == 'follow' || ( mode == 'tab' && index == innerCurrent)"
+							class="u-cate-tab__page-item" :id="'item' + index">
+							<slot name="itemList" :item="item">
+							</slot>
+							<template v-if="!$slots['itemList']">
+								<view class="item-title">
+									<text>{{item[tabKeyName]}}</text>
+								</view>
+								<view class="item-container">
+									<template v-for="(item1, index1) in item.children" :key="index1">
+										<slot name="pageItem" :pageItem="item1">
+											<view class="thumb-box" >
+												<image class="item-menu-image" :src="item1.icon" mode=""></image>
+												<view class="item-menu-name">{{item1[itemKeyName]}}</view>
+											</view>
+										</slot>
+									</template>
+								</view>
+							</template>
+						</view>
+					</template>
 				</view>
 			</scroll-view>
 		</view>
 	</view>
 </template>
 <script>
-	import { addUnit } from '../../libs/function/index';
+	import { addUnit, sleep } from '../../libs/function/index';
 	export default {
 		name: 'up-cate-tab',
         props: {
+			mode: {
+                type: String,
+                default: 'follow' // follo跟随联动, tab单一显示。
+            },
 			height: {
                 type: String,
                 default: '100%'
@@ -71,14 +79,34 @@
             }
         },
         watch: {
-            tabList() {
-                this.getMenuItemTop()
-            }
+			tabList: {
+				deep: true,
+				handler(newVal, oldVal) {
+					// this.observer();
+					sleep(30).then(() => {
+						this.getMenuItemTop();
+						this.leftMenuStatus(this.innerCurrent);
+					})
+				}
+			},
+			current(nval) {
+				this.innerCurrent = nval;
+				this.leftMenuStatus(this.innerCurrent);
+				sleep(30).then(() => {
+					this.swichMenu(this.innerCurrent)
+				})
+			},
+			height() {
+				// console.log('height change');
+				this.getMenuItemTop();
+				this.leftMenuStatus(this.innerCurrent);
+			}
         },
 		emits: ['update:current'],
 		data() {
 			return {
 				scrollTop: 0, //tab标题的滚动条位置
+				scrollIntoView: '', // 滚动至哪个元素
 				oldScrollTop: 0,
 				innerCurrent: 0, // 预设当前项的值
 				menuHeight: 0, // 左边菜单的高度
@@ -91,36 +119,38 @@
 				timer: null, // 定时器
 			}
 		},
-		onMounted() {
+		mounted() {
+			// this.observer();
 			this.innerCurrent = this.current;
 			this.leftMenuStatus(this.innerCurrent);
 			this.getMenuItemTop()
-		},
-		watch: {
-			current(nval) {
-				this.innerCurrent = nval;
-				this.leftMenuStatus(this.innerCurrent);
-			}
+			// 设置默认index
+			sleep(50).then(() => {
+				this.swichMenu(this.innerCurrent)
+			})
 		},
 		methods: {
 			addUnit,
 			// 点击左边的栏目切换
 			async swichMenu(index) {
-				if(this.arr.length == 0) {
-					await this.getMenuItemTop();
+				if (this.mode == 'follow') {
+					if(this.arr.length == 0) {
+						await this.getMenuItemTop();
+					}
+					if (this.scrollIntoView != 'item' + index) {
+						this.scrollIntoView = 'item' + index;
+					}
 				}
+
 				if (index == this.innerCurrent) return;
-				this.scrollRightTop = this.oldScrollTop;
 				this.$nextTick(function(){
-					this.scrollRightTop = this.arr[index];
 					this.innerCurrent = index;
-					this.leftMenuStatus(index);
 					this.$emit('update:current', index);
 				})
 			},
 			// 获取一个目标元素的高度
 			getElRect(elClass, dataVal) {
-				new Promise((resolve, reject) => {
+				return new Promise((resolve, reject) => {
 					const query = uni.createSelectorQuery().in(this);
 					query.select('.' + elClass).fields({
 						size: true
@@ -139,16 +169,27 @@
 			},
 			// 观测元素相交状态
 			async observer() {
+				await this.$nextTick();
+				// 清除之前的观察器
+				if (this._observerList) {
+					this._observerList.forEach(observer => {
+						observer.disconnect();
+					});
+				}
+				this._observerList = [];
+				
 				this.tabList.map((val, index) => {
 					let observer = uni.createIntersectionObserver(this);
-					// 检测右边scroll-view的id为itemxx的元素与u-cate-tab__right-box的相交状态
-					// 如果跟.u-cate-tab__right-box底部相交，就动态设置左边栏目的活动状态
+					this._observerList.push(observer);
+					// 检测相交状态
 					observer.relativeTo('.u-cate-tab__right-box', {
-						top: 0
-					}).observe('#item' + index, res => {
+						top: 10
+					}).observe('#item' + index, (res) => {
 						if (res.intersectionRatio > 0) {
-							let id = res.id.substring(4);
-							this.leftMenuStatus(id);
+							console.log('res', res);
+							// 修复：确保正确获取索引
+							let id = res.id ? res.id.substring(4) : index;
+							this.leftMenuStatus(parseInt(id));
 						}
 					})
 				})
@@ -162,11 +203,14 @@
 					await this.getElRect('u-cate-tab__menu-scroll-view', 'menuHeight');
 					await this.getElRect('u-cate-tab__item', 'menuItemHeight');
 				}
+				// console.log(this.menuHeight, this.menuItemHeight)
 				// 将菜单活动item垂直居中
 				this.scrollTop = index * this.menuItemHeight + this.menuItemHeight / 2 - this.menuHeight / 2;
 			},
 			// 获取右边菜单每个item到顶部的距离
-			getMenuItemTop() {
+			async getMenuItemTop() {
+				// await this.$nextTick();
+				// console.log('getMenuItemTop')
 				return new Promise(resolve => {
 					let selectorQuery = uni.createSelectorQuery().in(this);
 					selectorQuery.selectAll('.u-cate-tab__page-item').boundingClientRect((rects) => {
@@ -174,20 +218,24 @@
 						if(!rects.length) {
 							setTimeout(() => {
 								this.getMenuItemTop();
-							}, 10);
+							}, 100);
 							return ;
 						}
+						// console.log(rects)
                         this.rects = rects;
+						this.arr = [];
 						rects.forEach((rect) => {
 							// 这里减去rects[0].top，是因为第一项顶部可能不是贴到导航栏(比如有个搜索框的情况)
 							this.arr.push(rect.top - rects[0].top);
 						})
+						// console.log(this.arr)
                         resolve();
 					}).exec()
 				})
 			},
 			// 右边菜单滚动
 			async rightScroll(e) {
+				if (this.mode !== 'follow') return;
 				this.oldScrollTop = e.detail.scrollTop;
                 // console.log(e.detail.scrollTop)
                 // console.log(JSON.stringify(this.arr))
@@ -218,7 +266,7 @@
 							return ;
 						}
 					}
-				}, 10)
+				}, 100)
 			}
 		}
 	}
@@ -233,6 +281,7 @@
 	.u-cate-tab__wrap {
 		flex: 1;
 		display: flex;
+		flex-direction: row;
 		overflow: hidden;
 	}
 

@@ -1,0 +1,11 @@
+{
+	"leo-drag.loading": "加载中",
+	"leo-drag.logOn": "请登录",
+	"leo-drag.loadFail": "加载失败",
+	"leo-drag.loadSuccess": "加载成功",
+	"leo-drag.notLoggedIn": "您还未登录",
+	"leo-drag.toLogin": "登录/注册",
+	"leo-drag.noData": "暂无数据",
+	"leo-drag.getData": "重新获取数据",
+	"leo-drag.error": "出错啦 !",
+}

@@ -1,21 +1,15 @@
 import config from '../../libs/config/config';
-// 定义高阶函数
-function once(fn) {
-    let called = false;
-    let result;
 
-    return function(...args) {
-        if (!called) {
-            result = fn.apply(this, args);
-            called = true;
-        }
-        return result;
-    };
-}
-
-// 使用高阶函数
-const loadFont = once(() => {
-    // console.log('这个函数只能执行一次');
+let params = {
+    loaded: false
+};
+// 加载字体方法
+const loadFont = () => {
+    // console.log('加载字体图标');
+    // 全局加载不稳定，默认关闭，需要开启可以配置loadFontOnce。
+    if (config.loadFontOnce) {
+        params.loaded = true;
+    }
     // #ifdef APP-NVUE
     // nvue通过weex的dom模块引入字体，相关文档地址如下：
     // https://weex.apache.org/zh/docs/modules/dom.html#addrule
@@ -58,18 +52,17 @@ const loadFont = once(() => {
     }
     // #endif
     // #ifdef APP-NVUE
-    if (this.customFontFamily) {
-        domModule.addRule('fontFace', {
-            'fontFamily': `${this.customPrefix}-${this.customFontFamily}`,
-            'src': `url('${this.customFontUrl}')`
-        })
-    }
+    // if (this.customFontFamily) {
+    //     domModule.addRule('fontFace', {
+    //         'fontFamily': `${this.customPrefix}-${this.customFontFamily}`,
+    //         'src': `url('${this.customFontUrl}')`
+    //     })
+    // }
     // #endif
     return true;
-});
+};
 
-let fontUtil = {
+export default {
+    params: params,
     loadFont
 }
-
-export default fontUtil

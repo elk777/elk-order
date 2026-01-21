@@ -9,13 +9,13 @@
 					v-model="inputValue"
 					v-bind="inputPropsInner"
 				></up-input>
-				<div class="input-cover">
-				</div>
+				<cover-view class="input-cover">
+				</cover-view>
 			</slot>
         </view>
         <u-picker
             ref="picker"
-            :show="show || (hasInput && showByClickInput)"
+            :show="pageInline || show || (hasInput && showByClickInput)"
             :popupMode="popupMode"
             :closeOnClickOverlay="closeOnClickOverlay"
             :columns="columns"
@@ -29,6 +29,9 @@
             :cancelColor="cancelColor"
             :confirmColor="confirmColor"
             :toolbarRightSlot="toolbarRightSlot"
+			:pageInline="pageInline"
+			:maskClass="maskClass"
+			:maskStyle="maskStyle"
             @close="close"
             @cancel="cancel"
             @confirm="confirm"
@@ -58,13 +61,13 @@
 	import { props } from './props';
 	import { mpMixin } from '../../libs/mixin/mpMixin';
 	import { mixin } from '../../libs/mixin/mixin';
-	import dayjs from 'dayjs/esm/index';
+	import dayjs from './dayjs.esm.min.js';
 	import { range, error, padZero } from '../../libs/function/index';
 	import test from '../../libs/function/test';
 	/**
 	 * DatetimePicker 时间日期选择器
 	 * @description 此选择器用于时间日期
-	 * @tutorial https://ijry.github.io/uview-plus/components/datetimePicker.html
+	 * @tutorial https://uview-plus.jiangruyi.com/components/datetimePicker.html
 	 * @property {Boolean}			show				用于控制选择器的弹出与收起 ( 默认 false )
 	 * @property {Boolean}			showToolbar			是否显示顶部的操作栏  ( 默认 true )
 	 * @property {String | Number}	modelValue		    绑定值
@@ -175,6 +178,9 @@
 								break;
 							case 'year-month':
 								format = 'YYYY-MM'
+								break;
+							case 'datehour':
+								format = 'YYYY-MM-DD HH'
 								break;
 							case 'datetime':
 								format = 'YYYY-MM-DD HH:mm'

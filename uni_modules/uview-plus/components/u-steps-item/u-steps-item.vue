@@ -12,10 +12,10 @@
 
 				</view>
 				<view class="u-steps-item__wrapper__icon" v-else-if="parentData.activeIcon || parentData.inactiveIcon">
-					<u-icon :name="index <= parentData.current ? parentData.activeIcon : parentData.inactiveIcon"
+					<up-icon :name="index <= parentData.current ? parentData.activeIcon : parentData.inactiveIcon"
 						:size="iconSize"
 						:color="index <= parentData.current ? parentData.activeColor : parentData.inactiveColor">
-					</u-icon>
+					</up-icon>
 				</view>
 				<view v-else :style="{
 						backgroundColor: statusClass === 'process' ? parentData.activeColor : 'transparent',
@@ -25,8 +25,8 @@
 						class="u-steps-item__wrapper__circle__text" :style="{
 							color: index == parentData.current ? '#ffffff' : parentData.inactiveColor
 						}">{{ index + 1}}</text>
-					<u-icon v-else :color="statusClass === 'error' ? 'error' : parentData.activeColor" size="12"
-						:name="statusClass === 'error' ? 'close' : 'checkmark'"></u-icon>
+					<up-icon v-else :color="statusClass === 'error' ? 'error' : parentData.activeColor" size="12"
+						:name="statusClass === 'error' ? 'close' : 'checkmark'"></up-icon>
 				</view>
 			</slot>
 		</view>
@@ -39,7 +39,8 @@
 				<view class="u-steps-item__content__title">
 					<slot name="title">
 					</slot>
-					<up-text v-if="!$slots['title']" :text="title" :type="parentData.current == index ? 'main' : 'content'" lineHeight="20px"
+					<up-text v-if="!$slots['title']" :text="title" lineHeight="20px"
+						:type="parentData.current == index ? 'main' : 'content'"
 						:size="parentData.current == index ? 14 : 13"></up-text>
 				</view>
 				<view class="u-steps-item__content__desc">
@@ -312,6 +313,12 @@
 		&__content {
 			@include flex;
 			flex: 1;
+
+			&__title {
+				// #ifdef H5
+				cursor: pointer;
+				// #endif
+			}
 
 			&--row {
 				flex-direction: column;

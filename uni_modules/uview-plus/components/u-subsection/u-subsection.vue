@@ -61,7 +61,7 @@ import { addStyle, addUnit, sleep } from '../../libs/function/index';
 /**
  * Subsection 分段器
  * @description 该分段器一般用于用户从几个选项中选择某一个的场景
- * @tutorial https://ijry.github.io/uview-plus/components/subsection.html
+ * @tutorial https://uview-plus.jiangruyi.com/components/subsection.html
  * @property {Array}			list			        tab的数据
  * @property {String ｜ Number}	current			        当前活动的tab的index（默认 0 ）
  * @property {String}			activeColor		        激活时的颜色（默认 '#3c9cff' ）
@@ -101,7 +101,7 @@ export default {
             immediate: true,
             handler(n) {
                 if (n !== this.innerCurrent) {
-                    this.innerCurrent = n
+                    this.innerCurrent = Number(n)
                 }
                 // #ifdef APP-NVUE
                 // 在安卓nvue上，如果通过translateX进行位移，到最后一个时，会导致右侧无法绘制圆角
@@ -210,13 +210,17 @@ export default {
     },
     mounted() {
         this.init();
+        // #ifndef APP || MP-WEIXIN || MP-LARK|| MP-QQ || H5
         this.windowResizeCallback = (res) => {
             this.init();
         }
         uni.onWindowResize(this.windowResizeCallback)
+        // #endif
     },
     beforeUnmount() {
+        // #ifndef APP || MP-WEIXIN || MP-LARK|| MP-QQ || H5
         uni.offWindowResize(this.windowResizeCallback)
+        // #endif
     },
 	emits: ["change", "update:current"],
     methods: {

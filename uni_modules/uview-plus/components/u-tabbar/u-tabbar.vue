@@ -33,7 +33,7 @@
 	/**
 	 * Tabbar 底部导航栏
 	 * @description 此组件提供了自定义tabbar的能力。
-	 * @tutorial https://ijry.github.io/uview-plus/components/tabbar.html
+	 * @tutorial https://uview-plus.jiangruyi.com/components/tabbar.html
 	 * @property {String | Number}	value				当前匹配项的name
 	 * @property {Boolean}			safeAreaInsetBottom	是否为iPhoneX留出底部安全距离（默认 true ）
 	 * @property {Boolean}			border				是否显示上方边框（默认 true ）
@@ -42,6 +42,7 @@
 	 * @property {String}			inactiveColor		未选中标签的颜色（默认 '#7d7e80' ）
 	 * @property {Boolean}			fixed				是否固定在底部（默认 true ）
 	 * @property {Boolean}			placeholder			fixed定位固定在底部时，是否生成一个等高元素防止塌陷（默认 true ）
+	 * @property {String}			backgroundColor		背景色（默认 '#ffffff' ）
 	 * @property {Object}			customStyle			定义需要用到的外部样式
 	 * 
 	 * @example <u-tabbar :value="value2" :placeholder="false" @change="name => value2 = name" :fixed="false" :safeAreaInsetBottom="false"><u-tabbar-item text="首页" icon="home" dot ></u-tabbar-item></u-tabbar>
@@ -58,6 +59,12 @@
 			tabbarStyle() {
 				const style = {
 					zIndex: this.zIndex
+				}
+				if (this.borderColor) {
+					style.borderColor = this.borderColor + ' !important'
+				}
+				if (this.backgroundColor) {
+					style.backgroundColor = this.backgroundColor
 				}
 				// 合并来自父组件的customStyle样式
 				return deepMerge(style, addStyle(this.customStyle))

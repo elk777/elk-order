@@ -2,7 +2,7 @@
 	<view class="u-calendar-month-wrapper" ref="u-calendar-month-wrapper">
 		<view v-for="(item, index) in months" :key="index" :class="[`u-calendar-month-${index}`]"
 			:ref="`u-calendar-month-${index}`" :id="`month-${index}`">
-			<text v-if="index !== 0" class="u-calendar-month__title">{{ item.year }}年{{ item.month }}月</text>
+			<text v-if="index !== 0" class="u-calendar-month__title">{{ monthTitle(item) }}</text>
 			<view class="u-calendar-month__days">
 				<view v-if="showMark" class="u-calendar-month__days__month-mark-wrapper">
 					<text class="u-calendar-month__days__month-mark-wrapper__text">{{ item.month }}</text>
@@ -37,7 +37,8 @@
 	import { colorGradient } from '../../libs/function/colorGradient';
 	import test from '../../libs/function/test';
 	import defProps from '../../libs/config/props';
-	import dayjs from 'dayjs/esm/index'
+	import dayjs from '../u-datetime-picker/dayjs.esm.min.js';
+	import { t } from '../../libs/i18n'
 	export default {
 		name: 'u-calendar-month',
 		mixins: [mpMixin, mixin],
@@ -168,7 +169,7 @@
 					// #ifdef APP-NVUE
 					style.width = addUnit(dayWidth, 'px')
 					// #endif
-					style.height = addUnit(this.rowHeight)
+					style.height = addUnit(this.rowHeight, 'px')
 					if (index2 === 0) {
 						// 获取当前为星期几，如果为0，则为星期天，减一为每月第一天时，需要向左偏移的item个数
 						week = (week === 0 ? 7 : week) - 1
@@ -221,7 +222,7 @@
 								style.opacity = 0.7
 							}
 						} else if (this.selected.length === 1) {
-							// 之所以需要这么写，是因为DCloud公司的iOS客户端的开发者能力有限导致的bug
+							// 之所以需要这么写，是因为uni-app的iOS客户端的bug
 							// 进行还原操作，否则在nvue的iOS，uni-app有bug，会导致诡异的表现
 							style.borderTopLeftRadius = '3px'
 							style.borderBottomLeftRadius = '3px'
@@ -306,6 +307,13 @@
 					})
 				})
 			},
+			monthTitle(item) {
+				if (uni.getLocale() == 'zh-Hans' || uni.getLocale() == 'zh-Hant') {
+					return item.year + '年' + (item.month < 10 ? '0' + item.month : item.month) + '月'
+				} else {
+					return (item.month < 10 ? '0' + item.month : item.month) + '/' + item.year
+				}
+			},
 			isForbid(item) {
 				let date = dayjs(item.date).format("YYYY-MM-DD")
 				if (this.mode !== 'range' && this.forbidDays.includes(date)) {
@@ -351,7 +359,7 @@
 			// 获取每个月份区域的尺寸
 			getMonthRectByPromise(el) {
 				// #ifndef APP-NVUE
-				// $uGetRect为uView自带的节点查询简化方法，详见文档介绍：https://ijry.github.io/uview-plus/js/getRect.html
+				// $uGetRect为uView自带的节点查询简化方法，详见文档介绍：https://uview-plus.jiangruyi.com/js/getRect.html
 				// 组件内部一般用this.$uGetRect，对外的为uni.$u.getRect，二者功能一致，名称不同
 				return new Promise(resolve => {
 					this.$uGetRect(`.${el}`).then(size => {
@@ -415,7 +423,7 @@
 								if(this.rangePrompt) {
 									toast(this.rangePrompt)
 								} else {
-									toast(`选择天数不能超过 ${this.maxRange} 天`)
+									toast(t("up.calendar.daysExceed", { days: this.maxRange }))
 								}
 								return
 							}

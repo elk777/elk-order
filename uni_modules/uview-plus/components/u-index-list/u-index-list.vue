@@ -66,7 +66,7 @@
 				<text
 					class="u-index-list__letter__item__index"
 					:style="{color: activeIndex === index ? '#fff' : inactiveColor}"
-				>{{ item }}</text>
+				>{{ item.key || item }}</text>
 			</view>
 		</view>
 		<u-transition
@@ -87,7 +87,7 @@
 					width: addUnit(indicatorHeight)
 				}"
 			>
-				<text class="u-index-list__indicator__text">{{ uIndexList[activeIndex] }}</text>
+				<text class="u-index-list__indicator__text">{{ uIndexList[activeIndex]?.key || uIndexList[activeIndex] }}</text>
 			</view>
 		</u-transition>
 	</view>
@@ -284,8 +284,10 @@
 				return new Promise(resolve => {
 					// 延时一定时间，以获取dom尺寸
 					// #ifndef APP-NVUE
-					this.$uGetRect('.u-index-list__scroll-view').then(size => {
-						resolve(size)
+					this.$nextTick(() => {
+						this.$uGetRect('.u-index-list__scroll-view').then(size => {
+							resolve(size)
+						})
 					})
 					// #endif
 
@@ -392,7 +394,11 @@
 				this.$emit('select', this.uIndexList[currentIndex])
 				// #ifndef APP-NVUE || MP-WEIXIN
 				// 在非nvue中，由于anchor和item都在u-index-item中，所以需要对index-item进行偏移
-				this.scrollIntoView = `u-index-item-${this.uIndexList[currentIndex].charCodeAt(0)}`
+				if (typeof this.uIndexList[currentIndex] == 'string') {
+					this.scrollIntoView = `u-index-item-${this.uIndexList[currentIndex].charCodeAt(0)}`
+				} else {
+					this.scrollIntoView = `u-index-item-${this.uIndexList[currentIndex].name.charCodeAt(0)}`
+				}
 				// #endif
 
 				// #ifdef MP-WEIXIN
@@ -407,12 +413,13 @@
 				const anchors = this.anchors
 				// 由于list组件无法获取cell的top值，这里通过header slot和各个item之间的height，模拟出类似非nvue下的位置信息
 				let children = this.children.map((item, index) => {
+					const childHeight = item.height + getPx(this.itemMargin)
 					const child = {
-						height: item.height,
+						height: childHeight,
 						top: top
 					}
 					// 进行累加，给下一个item提供计算依据
-					top = top + item.height
+					top = top + childHeight
 					// #ifdef APP-NVUE
 					// 只有nvue下，需要将锚点的高度也累加，非nvue下锚点高度是包含在index-item中的。
 					top = top + anchors[index].height
@@ -490,12 +497,13 @@
 				const anchors = this.anchors
 				// 由于list组件无法获取cell的top值，这里通过header slot和各个item之间的height，模拟出类似非nvue下的位置信息
 				children = this.children.map((item, index) => {
+					const childHeight = item.height + getPx(this.itemMargin)
 					const child = {
-						height: item.height,
+						height: childHeight,
 						top: top
 					}
 					// 进行累加，给下一个item提供计算依据
-					top = top + item.height
+					top = top + childHeight
 					// #ifdef APP-NVUE
 					// 只有nvue下，需要将锚点的高度也累加，非nvue下锚点高度是包含在index-item中的。
 					top = top + anchors[index].height

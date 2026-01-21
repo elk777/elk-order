@@ -1,0 +1,71 @@
+{
+    "id": "leo-drag",
+    "displayName": "leo-drag 拖动列表",
+    "version": "1.5.2",
+    "description": "使用了movable-area和movable-view内置组件实现，对元素进行自由排序，不限于列表，兼容APP-VUE、H5、MP-WEIXIN",
+    "keywords": [
+        "",
+        "drag",
+        "leo-drag",
+        "拖拽列表",
+        "拖拽元素"
+    ],
+    "repository": "https://gitee.com/lizt816/leo-drag",
+    "engines": {},
+    "dcloudext": {
+        "declaration": {
+          "ads": "无",
+          "data": "插件不采集任何数据",
+          "permissions": "无" 
+    },
+    "type": "component-vue"
+    },
+    "uni_modules": {
+        "dependencies": ["uni-scss","z-paging"],
+        "platforms": {
+            "cloud": {
+                "tcb": "y",
+                "aliyun": "y",
+                "alipay": "y"
+            },
+            "client": { 
+				"Vue": {
+					"vue2": "n",
+					"vue3": "y"
+				},
+                "App": {
+                    "app-vue": "y",
+                    "app-nvue": "y",
+                    "app-harmony": "u",
+                    "app-uvue": "u"
+                },
+                "H5-mobile": {
+                    "Safari": {
+                        "minVersion": "14.0.2"
+                    },
+                    "Android Browser": "y",
+                    "微信浏览器(Android)": "y",
+                    "QQ浏览器(Android)": "y"
+                },
+                "H5-pc": {
+                    "Chrome": "y",
+                    "IE": "y",
+                    "Edge": "y",
+                    "Firefox": "y",
+                    "Safari": "y"
+                },
+                "小程序": {
+                    "微信": "y",
+                    "阿里": "n",
+                    "百度": "n",
+                    "字节跳动": "n",
+                    "QQ": "n"
+                },
+                "快应用": {
+                    "华为": "u",
+                    "联盟": "u"
+                }
+            }
+        }
+    }
+}

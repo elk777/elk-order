@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2025-09-10 16:36:55
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-14 14:14:15
+ * @LastEditTime: 2026-01-19 15:07:45
  * @FilePath: /hkt-applet/pages/sort/component/CateTab.vue
  * @Description: 菜单分类组件
 -->
@@ -91,7 +91,7 @@ const tabList = ref([
 				price: 99,
 			},
 		],
-	},
+	}
 ]);
 
 //计算属性： 根据用户类型判断图标icon的展示 0 是饲养员 1 是吃货

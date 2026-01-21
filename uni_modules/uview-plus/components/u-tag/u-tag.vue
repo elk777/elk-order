@@ -24,12 +24,12 @@
 							:src="icon"
 							:style="[imgStyle]"
 						></image>
-						<u-icon
+						<up-icon
 							v-else
 							:color="elIconColor"
 							:name="icon"
 							:size="iconSize"
-						></u-icon>
+						></up-icon>
 					</view>
 				</slot>
 				<view class="u-tag__content">
@@ -63,11 +63,11 @@
 				@tap.stop="closeHandler"
 				:style="{backgroundColor: closeColor}"
 			>
-				<u-icon
+				<up-icon
 					name="close"
 					:size="closeSize"
 					color="#ffffff"
-				></u-icon>
+				></up-icon>
 			</view>
 		</view>
 	</u-transition>
@@ -82,7 +82,7 @@
 	/**
 	 * Tag 标签
 	 * @description tag组件一般用于标记和选择，我们提供了更加丰富的表现形式，能够较全面的涵盖您的使用场景
-	 * @tutorial https://ijry.github.io/uview-plus/components/tag.html
+	 * @tutorial https://uview-plus.jiangruyi.com/components/tag.html
 	 * @property {String}			type		标签类型info、primary、success、warning、error （默认 'primary' ）
 	 * @property {Boolean | String}	disabled	不可用（默认 false ）
 	 * @property {String}			size		标签的大小，large，medium，mini （默认 'medium' ）

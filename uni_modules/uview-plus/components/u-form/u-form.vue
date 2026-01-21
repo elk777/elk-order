@@ -16,7 +16,7 @@
 	/**
 	 * Form 表单
 	 * @description 此组件一般用于表单场景，可以配置Input输入框，Select弹出框，进行表单验证等。
-	 * @tutorial https://ijry.github.io/uview-plus/components/form.html
+	 * @tutorial https://uview-plus.jiangruyi.com/components/form.html
 	 * @property {Object}						model			当前form的需要验证字段的集合
 	 * @property {Object | Function | Array}	rules			验证规则
 	 * @property {String}						errorType		错误的提示方式，见上方说明 ( 默认 message )
@@ -25,10 +25,10 @@
 	 * @property {String | Number}				labelWidth		提示文字的宽度，单位px  ( 默认 45 ）
 	 * @property {String}						labelAlign		lable字体的对齐方式   ( 默认 ‘left' ）
 	 * @property {Object}						labelStyle		lable的样式，对象形式
-	 * @example <up-formlabelPosition="left" :model="model1" :rules="rules" ref="form1"></up-form>
+	 * @example <up-form labelPosition="left" :model="model1" :rules="rules" ref="form1"></up-form>
 	 */
 	export default {
-		name: "u-form",
+		name: "up-form",
 		mixins: [mpMixin, mixin, props],
 		provide() {
 			return {

@@ -1,0 +1,11 @@
+{
+	"leo-drag.loading": "Loading",
+	"leo-drag.logOn": "Please log in",
+	"leo-drag.loadFail": "Loading failed",
+	"leo-drag.loadSuccess": "Loading successful",
+	"leo-drag.notLoggedIn": "You haven't logged in yet",
+	"leo-drag.toLogin": "Login/Register",
+	"leo-drag.noData": "No data available at the moment",
+	"leo-drag.getData": "Retrieve data again",
+	"leo-drag.error": "Error !"
+}

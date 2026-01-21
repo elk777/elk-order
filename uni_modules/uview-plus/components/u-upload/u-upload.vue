@@ -35,12 +35,12 @@
 								height: addUnit(height)
 							}]"
 						/>
-						<u-icon
+						<up-icon
 							v-else
 						    color="#80CBF9"
 						    size="26"
 						    :name="item.isVideo || (item.type && item.type === 'video') ? 'movie' : 'file-text'"
-						></u-icon>
+						></up-icon>
 						<view v-if="item.status === 'success'"
 							class="u-upload__wrap__play"
 							@tap="onClickPreview(item, index)">
@@ -59,13 +59,13 @@
 							height: addUnit(height)
 						}]"
 					>
-						<u-icon
+						<up-icon
 						    color="#80CBF9"
 						    size="26"
 						    :name="item.isVideo || (item.type && item.type === 'video') ? 'movie' : 'folder'"
-						></u-icon>
+						></up-icon>
 						<text class="u-upload__wrap__preview__other__text">
-							{{item.isVideo || (item.type && item.type === 'video') ? item.name || '视频' : item.name || '文件'}}
+							{{item.isVideo || (item.type && item.type === 'video') ? item.name || t("up.common.video") : item.name || t("up.common.file")}}
 						</text>
 					</view>
 					<view
@@ -73,7 +73,7 @@
 					    v-if="item.status === 'uploading' || item.status === 'failed'"
 					>
 						<view class="u-upload__status__icon">
-							<u-icon
+							<up-icon
 							    v-if="item.status === 'failed'"
 							    name="close-circle"
 							    color="#ffffff"
@@ -98,11 +98,11 @@
 					    @tap.stop="deleteItem(index)"
 					>
 						<view class="u-upload__deletable__icon">
-							<u-icon
+							<up-icon
 							    name="close"
 							    color="#ffffff"
 							    size="10"
-							></u-icon>
+							></up-icon>
 						</view>
 					</view>
 					<slot name="success">
@@ -118,11 +118,11 @@
 							<!-- #endif -->
 							<!-- #ifndef APP-NVUE -->
 							<view class="u-upload__success__icon">
-								<u-icon
+								<up-icon
 									name="checkmark"
 									color="#ffffff"
 									size="12"
-								></u-icon>
+								></up-icon>
 							</view>
 							<!-- #endif -->
 						</view>
@@ -156,11 +156,11 @@
 						height: addUnit(height)
 					}]"
 				>
-					<u-icon
+					<up-icon
 					    :name="uploadIcon"
 					    size="26"
 					    :color="uploadIconColor"
-					></u-icon>
+					></up-icon>
 					<text
 					    v-if="uploadText"
 					    class="u-upload__button__text"
@@ -194,6 +194,7 @@
 	import { mixin } from '../../libs/mixin/mixin';
 	import { addStyle, addUnit, toast } from '../../libs/function/index';
 	import test from '../../libs/function/test';
+	import { t } from '../../libs/i18n'
 	/**
 	 * upload 上传
 	 * @description 该组件用于上传图片场景
@@ -270,6 +271,7 @@
 		emits: ['error', 'beforeRead', 'oversize', 'afterRead', 'delete', 'clickPreview', 'update:fileList', 'afterAutoUpload'],
 		// #endif
 		methods: {
+			t,
 			addUnit,
 			addStyle,
 			videoErrorCallback() {},
@@ -422,7 +424,7 @@
 					file.size > maxSize;
 				if (oversize) {
 					uni.showToast({
-						title: '超过大小限制'
+						title: t("up.upload.sizeExceed")
 					})
 					this.$emit('oversize', Object.assign({
 						file
@@ -438,7 +440,7 @@
 						this.fileList.push({
 							...item,
 							status: 'uploading',
-							message: '上传中',
+							message: t("up.upload.uploading"),
 							progress: 0
 						});
 					});
@@ -639,7 +641,7 @@
                     urls: urls,
                     current: current,
 					fail() {
-						toast('预览图片失败')
+						toast(t("up.upload.previewImageFail"))
 					},
 				});
 			},
@@ -673,7 +675,7 @@
 					sources: sources,
 					current: current,
 					fail() {
-						toast('预览视频失败')
+						toast(t("up.upload.previewVideoFail"))
 					},
 				});
 				// #endif

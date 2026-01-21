@@ -27,12 +27,12 @@
 					@tap="leftClick"
 				>
 					<slot name="left">
-						<u-icon
+						<up-icon
 							v-if="leftIcon"
 							:name="leftIcon"
 							:size="leftIconSize"
 							:color="leftIconColor"
-						></u-icon>
+						></up-icon>
 						<text
 							v-if="leftText"
 							:style="{
@@ -57,11 +57,11 @@
 					@tap="rightClick"
 				>
 					<slot name="right">
-						<u-icon
+						<up-icon
 							v-if="rightIcon"
 							:name="rightIcon"
 							size="20"
-						></u-icon>
+						></up-icon>
 						<text
 							v-if="rightText"
 							class="u-navbar__content__right__text"
@@ -82,7 +82,7 @@
 	/**
 	 * Navbar 自定义导航栏
 	 * @description 此组件一般用于在特殊情况下，需要自定义导航栏的时候用到，一般建议使用uni-app带的导航栏。
-	 * @tutorial https://ijry.github.io/uview-plus/components/navbar.html
+	 * @tutorial https://uview-plus.jiangruyi.com/components/navbar.html
 	 * @property {Boolean}			safeAreaInsetTop	是否开启顶部安全区适配  （默认 true ）
 	 * @property {Boolean}			placeholder			固定在顶部时，是否生成一个等高元素，以防止塌陷 （默认 false ）
 	 * @property {Boolean}			fixed				导航栏是否固定在顶部 （默认 false ）
