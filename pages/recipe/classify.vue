@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-01-19 15:43:23
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-21 20:14:28
+ * @LastEditTime: 2026-01-22 13:18:45
  * @FilePath: /hkt-applet/pages/recipe/classify.vue
  * @Description: 分类管理页
 -->
@@ -61,23 +61,7 @@ const classifyList = ref([
 	{ id: 11, name: "分类1", order: 1 },
 	{ id: 21, name: "分类2", order: 2 },
 	{ id: 31, name: "分类3", order: 3 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 41, name: "分类4", order: 4 },
-	{ id: 111, name: "分类111", order: 4 },
+	{ id: 41, name: "分类4", order: 4 }
 ]);
 const classifyName = ref("");
 const myDrop = ref("myDrop");

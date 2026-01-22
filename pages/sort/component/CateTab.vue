@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2025-09-10 16:36:55
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-19 15:07:45
+ * @LastEditTime: 2026-01-22 17:00:13
  * @FilePath: /hkt-applet/pages/sort/component/CateTab.vue
  * @Description: 菜单分类组件
 -->
@@ -32,14 +32,16 @@
 								@tap.stop="cateEdit(pageItem)"
 								:color="COLOURS['theme-color']"
 							></up-icon>
-							<up-icon
-								v-if="isFeeder"
-								class="cate-icon"
-								size="30"
-								name="close-circle-fill"
-								@tap.stop="cateDelete(pageItem)"
-								:color="COLOURS['theme-color']"
-							></up-icon>
+							<view style="margin-left: 5px">
+								<up-icon
+									v-if="isFeeder"
+									class="cate-icon"
+									size="30"
+									name="close-circle-fill"
+									@tap.stop="cateDelete(pageItem)"
+									:color="COLOURS['theme-color']"
+								></up-icon>
+							</view>
 							<up-icon
 								v-if="!isFeeder"
 								class="cate-icon"
@@ -65,39 +67,63 @@ export default {
 };
 </script>
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { COLOURS } from "@/config/index.js";
 import { useUserStore } from "@/stores/user.js";
+import { useRecipeStore } from "@/stores/recipe.js";
 const userStore = useUserStore();
-const tabList = ref([
-	{
-		title: "默认分类",
-		children: [
-			{
-				id: 1,
-				name: "水煮肉片",
-				cover: "/static/images/head.jpeg",
-				price: 88,
-			},
-		],
-	},
-	{
-		title: "分类1",
-		children: [
-			{
-				id: 2,
-				name: "酸菜鱼",
-				cover: "/static/images/head.jpeg",
-				price: 99,
-			},
-		],
-	}
-]);
+const recipeStore = useRecipeStore();
+const tabList = ref([]);
 
 //计算属性： 根据用户类型判断图标icon的展示 0 是饲养员 1 是吃货
 const isFeeder = computed(() => {
 	return userStore.userType === 0;
 });
+onMounted(() => {
+	getCateList();
+});
+
+/**
+ * @description: 获取菜谱列表
+ * @return {*}
+ */
+const getCateList = async () => {
+	// 调用获取菜谱列表接口
+	setTimeout(() => {
+		tabList.value = [
+			{
+				title: "默认分类",
+				children: [
+					{
+						id: 1,
+						name: "水煮肉片",
+						cover: "/static/images/head.jpeg",
+						price: 88,
+					},
+				],
+			},
+			{
+				title: "分类1",
+				children: [
+					{
+						id: 2,
+						name: "酸菜鱼",
+						cover: "/static/images/head.jpeg",
+						price: 99,
+					},
+				],
+			},
+		];
+		recipeStore.setCateTotal(tabList.value.reduce((acc, cur) => acc + cur.children.length, 0));
+	}, 100);
+	// const res = await getRecipeList({
+	// 	pageNum: 1,
+	// 	pageSize: 10,
+	// });
+	// if (res.code === 200) {
+	// 	tabList.value[0].children = res.data.records;
+	// }
+};
 
 /**
  * @description: 菜谱详情跳转
@@ -128,9 +154,21 @@ const cateEdit = (item) => {
  */
 const cateDelete = (item) => {
 	// 点击删除菜谱
-	uni.showToast({
-		title: "删除菜谱：" + item.name,
-		icon: "none",
+	uni.showModal({
+		title: "删除菜谱",
+		content: "确定删除菜谱：" + item.name + "吗？",
+		success: (res) => {
+			if (res.confirm) {
+				// 过滤出不等于id的元素
+				tabList.value.forEach((tab) => {
+					tab.children = tab.children.filter((item) => item.id !== id);
+				});
+				uni.showToast({
+					title: "删除成功",
+					icon: "none",
+				});
+			}
+		},
 	});
 };
 
