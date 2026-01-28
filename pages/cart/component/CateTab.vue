@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2025-09-10 16:36:55
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-22 17:00:13
+ * @LastEditTime: 2026-01-27 10:15:09
  * @FilePath: /hkt-applet/pages/sort/component/CateTab.vue
  * @Description: 菜单分类组件
 -->
@@ -10,7 +10,7 @@
 	<view class="catetab-container">
 		<up-cate-tab class="cate-tab" :current="0" :tabList="tabList" tabKeyName="title" itemKeyName="name">
 			<template #tabItem="{ item }">
-				<view>{{ item.title }}</view>
+				<view>{{ item.title }} </view>
 			</template>
 			<template #pageItem="{ pageItem }">
 				<view @click="cateDetails(pageItem)" class="w-100 cate-item">
@@ -42,17 +42,25 @@
 									:color="COLOURS['theme-color']"
 								></up-icon>
 							</view>
-							<up-icon
-								v-if="!isFeeder"
-								class="cate-icon"
-								name="cart"
-								customPrefix="lovers-icon"
-								size="30"
-								@tap.stop="cateAddCart(pageItem)"
-								:color="COLOURS['theme-color']"
-							>
-								<up-badge type="warning" max="99" :value="1"></up-badge>
-							</up-icon>
+							<view v-if="!isFeeder" style="position: relative">
+								<up-icon
+									class="cate-icon"
+									name="cart"
+									customPrefix="lovers-icon"
+									size="30"
+									@tap.stop="cateAddCart(pageItem)"
+									:color="COLOURS['theme-color']"
+								>
+								</up-icon>
+								<up-badge
+								    v-if="recipeStore.getCartQuantity(pageItem.id) > 0"
+									:offset="[-1, -1]"
+									:absolute="true"
+									type="error"
+									max="99"
+									:value="recipeStore.getCartQuantity(pageItem.id)"
+								></up-badge>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -79,8 +87,12 @@ const tabList = ref([]);
 const isFeeder = computed(() => {
 	return userStore.userType === 0;
 });
+
 onMounted(() => {
 	getCateList();
+	if (!isFeeder.value) {
+		getCartTotal();
+	}
 });
 
 /**
@@ -123,6 +135,16 @@ const getCateList = async () => {
 	// if (res.code === 200) {
 	// 	tabList.value[0].children = res.data.records;
 	// }
+};
+/**
+ * @description: 当角色为吃货时，获取购物车总数量
+ * @return {*}
+ */
+const getCartTotal = async () => {
+	setTimeout(() => {
+		const total = 2;
+		// recipeStore.setCartTotal(total);
+	}, 100);
 };
 
 /**
@@ -176,12 +198,26 @@ const cateDelete = (item) => {
  * @description: 添加购物车按钮
  * @return {*}
  */
-const cateAddCart = (item) => {
+const cateAddCart = async (item) => {
 	// 点击添加购物车
-	uni.showToast({
-		title: "添加购物车：" + item.name,
-		icon: "none",
-	});
+	try {
+		await recipeStore.addCart({
+			id: item.id,
+			name: item.name,
+			cover: "/static/images/head.jpeg",
+			price: item.price,
+			quantity: 1,
+		});
+		uni.showToast({
+			title: "添加购物车：" + item.name,
+			icon: "none",
+		});
+	} catch (error) {
+		uni.showToast({
+			title: recipeStore.errorMessage,
+			icon: "none",
+		});
+	}
 };
 </script>
 

@@ -14,22 +14,18 @@
 		{
 			"path": "pages/home/index",
 			"style": {
-				// "navigationBarTitleText": "首页",
 				"navigationStyle": "custom"
 			}
 		},
 		{
 			"path": "pages/sort/index",
 			"style": {
-				// "navigationBarTitleText": "菜单",
 				"navigationStyle": "custom"
 			}
 		},
 		{
 			"path": "pages/recipe/redact",
-			"style": {
-				// "navigationBarTitleText": ""
-			}
+			"style": {}
 		},
 		{
 			"path": "pages/recipe/details",
@@ -46,7 +42,6 @@
 		{
 			"path": "pages/souvv/index",
 			"style": {
-				// "navigationBarTitleText": "订单",
 				"navigationStyle": "custom"
 			}
 		},
@@ -54,6 +49,12 @@
 			"path": "pages/my/index",
 			"style": {
 				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path": "pages/cart/AffirmOrder",
+			"style": {
+				"navigationBarTitleText": "确认订单"
 			}
 		}
 	],

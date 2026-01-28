@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2025-09-04 16:30:03
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-12 14:23:04
+ * @LastEditTime: 2026-01-28 15:01:13
  * @FilePath: /hkt-applet/utils/tool.js
  * @Description: 工具类方法集合
  */
@@ -37,4 +37,17 @@ export const getBottomSpacing = () => {
  */
 export const generateId = () => {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+};
+
+/**
+ * @description: 格式化日期
+ * @param {*} date 日期对象 - 时间戳
+ * @return {string} 格式化后的日期字符串
+ */
+export const formatDate = (date) => {
+	const dateObj = new Date(date);
+	const year = dateObj.getFullYear();
+	const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+	const day = String(dateObj.getDate()).padStart(2, "0");
+	return `${year}-${month}-${day}`;
 };

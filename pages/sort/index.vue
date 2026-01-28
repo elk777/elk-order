@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2025-07-23 20:44:15
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-22 16:04:56
+ * @LastEditTime: 2026-01-27 14:35:51
  * @FilePath: /hkt-applet/pages/sort/index.vue
  * @Description: 排序页
 -->
@@ -12,12 +12,12 @@
 		<NavbarMini :title="'菜单'" />
 		<view class="sort-body">
 			<view class="pubFlex">
-				<view @click="toCateTab" style="margin-right: 5px;" class="pubFlex">
+				<view @click="toCateTab" style="margin-right: 5px" class="pubFlex">
 					<u-icon name="setting" size="24" :color="COLOURS['theme-color']" />
-					<view style="margin-left: 5px;" class="publcTitleSize">分类管理</view>
+					<view style="margin-left: 5px" class="publcTitleSize">分类管理</view>
 				</view>
 				<!-- 搜索框 -->
-				<Search style="width: 75%; margin: 0 auto;" />
+				<Search style="width: 75%; margin: 0 auto" />
 			</view>
 			<!-- 菜单分类 -->
 			<CateTab />
@@ -32,10 +32,9 @@
 import Tabbar from "@/components/Tabbar/index.vue";
 import Search from "@/components/Search/index.vue";
 import NavbarMini from "@/components/NavbarMini/index.vue";
-import CateTab from "./component/CateTab.vue";
-import ShoppingCat from "./component/ShoppingCat.vue";
+import CateTab from "@/pages/cart/component/CateTab.vue";
+import ShoppingCat from "@/pages/cart/component/ShoppingCat.vue";
 import { COLOURS } from "@/config/index.js";
-
 /**
  * @description: 分类管理点击事件
  * @return {*}
