@@ -2,8 +2,8 @@
  * @Author: elk
  * @Date: 2025-09-10 16:36:55
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-27 10:15:09
- * @FilePath: /hkt-applet/pages/sort/component/CateTab.vue
+ * @LastEditTime: 2026-01-28 16:54:33
+ * @FilePath: /hkt-applet/pages/cart/component/CateTab.vue
  * @Description: 菜单分类组件
 -->
 <template>
@@ -13,57 +13,59 @@
 				<view>{{ item.title }} </view>
 			</template>
 			<template #pageItem="{ pageItem }">
-				<view @click="cateDetails(pageItem)" class="w-100 cate-item">
-					<!-- 图片 -->
-					<up-image :src="pageItem.cover" width="100%" height="200px"></up-image>
-					<!-- 标题 -->
-					<view class="cate-title font-weight-600 publcTitleSize">{{ pageItem.name }}</view>
-					<view class="pubFlex cate-base">
-						<!-- 左侧 烹饪时间  右侧 饲养员 删除按钮 吃货 添加购物车按钮 -->
-						<view class="pubFlex">
-							<up-icon name="clock" size="22" color="#FF5C8D" />
-							<view class="publcLabelSize cate-base-tiem">10分钟</view>
-						</view>
-						<view class="pubFlex">
-							<up-icon
-								v-if="isFeeder"
-								size="32"
-								name="share-square"
-								@tap.stop="cateEdit(pageItem)"
-								:color="COLOURS['theme-color']"
-							></up-icon>
-							<view style="margin-left: 5px">
+				<!-- <up-skeleton rowsHeight="300" rows="1" :title="false" :loading="cateLoading"> -->
+					<view @click="cateDetails(pageItem)" class="w-100 cate-item">
+						<!-- 图片 -->
+						<up-image :src="pageItem.cover" width="100%" height="200px"></up-image>
+						<!-- 标题 -->
+						<view class="cate-title font-weight-600 publcTitleSize">{{ pageItem.name }}</view>
+						<view class="pubFlex cate-base">
+							<!-- 左侧 烹饪时间  右侧 饲养员 删除按钮 吃货 添加购物车按钮 -->
+							<view class="pubFlex">
+								<up-icon name="clock" size="22" color="#FF5C8D" />
+								<view class="publcLabelSize cate-base-tiem">10分钟</view>
+							</view>
+							<view class="pubFlex">
 								<up-icon
 									v-if="isFeeder"
-									class="cate-icon"
-									size="30"
-									name="close-circle-fill"
-									@tap.stop="cateDelete(pageItem)"
+									size="32"
+									name="share-square"
+									@tap.stop="cateEdit(pageItem)"
 									:color="COLOURS['theme-color']"
 								></up-icon>
-							</view>
-							<view v-if="!isFeeder" style="position: relative">
-								<up-icon
-									class="cate-icon"
-									name="cart"
-									customPrefix="lovers-icon"
-									size="30"
-									@tap.stop="cateAddCart(pageItem)"
-									:color="COLOURS['theme-color']"
-								>
-								</up-icon>
-								<up-badge
-								    v-if="recipeStore.getCartQuantity(pageItem.id) > 0"
-									:offset="[-1, -1]"
-									:absolute="true"
-									type="error"
-									max="99"
-									:value="recipeStore.getCartQuantity(pageItem.id)"
-								></up-badge>
+								<view style="margin-left: 5px">
+									<up-icon
+										v-if="isFeeder"
+										class="cate-icon"
+										size="30"
+										name="close-circle-fill"
+										@tap.stop="cateDelete(pageItem)"
+										:color="COLOURS['theme-color']"
+									></up-icon>
+								</view>
+								<view v-if="!isFeeder" style="position: relative">
+									<up-icon
+										class="cate-icon"
+										name="cart"
+										customPrefix="lovers-icon"
+										size="30"
+										@tap.stop="cateAddCart(pageItem)"
+										:color="COLOURS['theme-color']"
+									>
+									</up-icon>
+									<up-badge
+										v-if="recipeStore.getCartQuantity(pageItem.id) > 0"
+										:offset="[-1, -1]"
+										:absolute="true"
+										type="error"
+										max="99"
+										:value="recipeStore.getCartQuantity(pageItem.id)"
+									></up-badge>
+								</view>
 							</view>
 						</view>
 					</view>
-				</view>
+				<!-- </up-skeleton> -->
 			</template>
 		</up-cate-tab>
 	</view>
@@ -82,6 +84,7 @@ import { useRecipeStore } from "@/stores/recipe.js";
 const userStore = useUserStore();
 const recipeStore = useRecipeStore();
 const tabList = ref([]);
+const cateLoading = ref(true);
 
 //计算属性： 根据用户类型判断图标icon的展示 0 是饲养员 1 是吃货
 const isFeeder = computed(() => {
@@ -127,6 +130,7 @@ const getCateList = async () => {
 			},
 		];
 		recipeStore.setCateTotal(tabList.value.reduce((acc, cur) => acc + cur.children.length, 0));
+		// cateLoading.value = false;
 	}, 100);
 	// const res = await getRecipeList({
 	// 	pageNum: 1,
@@ -236,7 +240,8 @@ const cateAddCart = async (item) => {
 		border-radius: 15px 15px 0 0 !important;
 	}
 	:deep(.item-container) {
-		padding-bottom: 15px;
+		min-height: 300px;
+		// padding-bottom: 15px;
 		border-radius: 15px;
 		border: 1px solid #e5e5e5;
 		box-shadow: 0 0 10px 5px $gray-color;
