@@ -1,6 +1,6 @@
 <template>
 	<up-popup :show="popupShow" mode="bottom" :popup="false"
-		:mask="true" :closeable="true" :safe-area-inset-bottom="true"
+		:mask="true" :closeable="closeable" :safe-area-inset-bottom="true"
 		close-icon-color="#ffffff" :z-index="uZIndex"
 		:maskCloseAble="maskCloseAble" @close="close">
 		<view class="up-p-t-30 up-p-l-20 up-m-b-10" v-if="headerDirection =='column'">
@@ -61,6 +61,7 @@
 	 * @property {String} labelKey 指定选项标签为选项对象中的哪个属性值
 	 * @property {String} childrenKey 指定选项的子选项为选项对象中的哪个属性值
 	 * @property {Boolean} autoClose 是否在选择最后一级时自动关闭并触发confirm（默认false）
+	 * @property {Boolean} closeable 是否显示关闭图标（默认true）
 	 */
 	import { t } from '../../libs/i18n'
 	export default {
@@ -124,6 +125,11 @@
 			optionsCols: {
 				type: [Number],
 				default: 2
+			},
+			// 是否显示关闭图标
+			closeable: {
+				type: Boolean,
+				default: true
 			}
 		},
 		data() {
@@ -142,6 +148,7 @@
 			data: {
 				handler() {
 					this.initLevelList();
+					this.setDefaultValue();
 				},
 				immediate: true
 			},
@@ -150,7 +157,8 @@
 			},
 			modelValue: {
 				handler() {
-					this.init();
+					// 初始化选中值
+					this.setDefaultValue();
 				},
 				immediate: true
 			}
@@ -192,15 +200,9 @@
 			}
 		},
 		// 新增confirm事件
-		emits: ['update:modelValue', 'change', 'confirm'],
+		emits: ['update:modelValue', 'update:show', 'change', 'confirm', 'cancel'],
 		methods: {
 			t,
-			init() {
-				// 初始化选中值
-				if (this.modelValue && this.modelValue.length > 0) {
-					this.setDefaultValue();
-				}
-			},
 			initLevelList() {
 				// 初始化第一级数据
 				if (this.data && this.data.length > 0) {
@@ -209,14 +211,20 @@
 				}
 			},
 			setDefaultValue() {
+				// 检查data是否为空
+				if (!this.data || this.data.length == 0) return;
+				// 检查modelValue是否为空
+				if (!this.modelValue || this.modelValue.length == 0) return;
 				// 根据默认值设置选中项
 				// 根据modelValue获取indexs给selectedValueIndexs
 				this.selectedValueIndexs = [];
+				this.levelList = []; // 设置层级数据为空
 				let currentLevelData = this.data;
 				
 				for (let i = 0; i < this.modelValue.length; i++) {
 					const value = this.modelValue[i];
 					const index = currentLevelData.findIndex(item => item[this.valueKey] === value);
+					this.levelList[i] = currentLevelData; // 设置每一层级的数据
 					
 					if (index !== -1) {
 						this.selectedValueIndexs.push(index);
@@ -234,6 +242,7 @@
 				}
 			},
 			close() {
+				this.$emit('cancel');
 				this.$emit('update:show', false);
 			},
 			tabsChange(item) {

@@ -6,7 +6,8 @@
 			"^u--(.*)": "@/uni_modules/uview-plus/components/u-$1/u-$1.vue",
 			"^up-(.*)": "@/uni_modules/uview-plus/components/u-$1/u-$1.vue",
 			"^u-([^-].*)": "@/uni_modules/uview-plus/components/u-$1/u-$1.vue",
-			"^leo-drag": "@/uni_modules/leo-drag/components/leo-drag.vue"
+			"^leo-drag": "@/uni_modules/leo-drag/components/leo-drag.vue",
+			"^uni-calendar": "@/uni_modules/uni-calendar/components/uni-calendar.vue"
 		}
 	},
 	"pages": [
@@ -40,7 +41,7 @@
 			}
 		},
 		{
-			"path": "pages/souvv/index",
+			"path": "pages/order/index",
 			"style": {
 				"navigationStyle": "custom"
 			}
@@ -68,7 +69,7 @@
 				"pagePath": "pages/sort/index"
 			},
 			{
-				"pagePath": "pages/souvv/index"
+				"pagePath": "pages/order/index"
 			},
 			{
 				"pagePath": "pages/my/index"

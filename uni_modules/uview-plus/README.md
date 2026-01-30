@@ -12,7 +12,19 @@
 
 ## 说明
 
+【文档有广告，不喜勿入谢谢】
+
 uview-plus，是uni-app全面兼容vue3/nvue/鸿蒙/uni-app-x(已经发布https://ext.dcloud.net.cn/plugin?name=uview-ultra)的uni-app生态框架，全面的组件和便捷的工具会让您信手拈来，如鱼得水。uview-plus是基于uView2.x移植的支持vue3的版本，感谢uView。
+
+## 版本
+
+### uview-plus v3 (uni-app版本)
+1. 保持选项式API，尽可能兼容原有uview2各种API，比如mixins，方便大家升级更容易；
+2. 新手友好，保持原汁原味js，二次开发方便，未使用typescript重写，但带有独立的类型申明包；
+
+### uview-ultra v4 (uni-app-x版本)
+1. 尽可能保持原有组件的API一致，方便大家升级；
+2. 使用uts + 组合式API架构级全新重构，但仍然保持源码的简易，不封装过于复杂，便于修改。
 
 ## 可视化设计
 
@@ -35,7 +47,7 @@ uview-plus现已推出免费可视化设计，可以方便的进行页面可视�
 
 |  H5     |   微信小程序    |    安卓    |   鸿蒙Next（已上架）   | 
 | --- | --- | --- | --- |
-| <img src="https://uview-plus.jiangruyi.com/common/h5_qrcode.png" width="200" height="200" />   |     <img src="https://uview-plus.jiangruyi.com/common/weixin_mini_qrcode.jpg" width="200" height="200" /> | <img src="https://uview-plus.jiangruyi.com/common/android_qrcode.png" width="200" height="200" /> |    <img src="https://uview-plus.jiangruyi.com/common/hos_qrcode.jpg" width="200" height="200" /> |
+| <img src="https://uview-plus.jiangruyi.com/common/h5_qrcode.png" width="160" height="160" />   |     <img src="https://uview-plus.jiangruyi.com/common/weixin_mini_qrcode.jpg" width="160" height="160" /> | <img src="https://uview-plus.jiangruyi.com/common/android_qrcode.png" width="160" height="160" /> |    <img src="https://uview-plus.jiangruyi.com/common/hos_qrcode.jpg" width="160" height="160" /> |
 <br>
 <img src="https://uview-plus.jiangruyi.com/common/hos.png">
 

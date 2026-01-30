@@ -1,11 +1,11 @@
-/**
- * @Description: 整体基础配置
+/*
  * @Author: elk
- * @Date: 2025-07-19 16:59:02
- * @LastEditors: 
- * @LastEditTime: 2025-07-19 16:59:02
+ * @Date: 2025-07-19 16:45:55
+ * @LastEditors: elk 
+ * @LastEditTime: 2026-01-29 14:22:19
+ * @FilePath: /hkt-applet/config/index.js
+ * @Description: 整体基础配置
  */
-
 const BASE_URL = 'https://5nmzg5443748.vicp.fun' // 本地渗透开发地址
 
 const APP_ID = 'wx49ecb7bac043ee73' // wx appid
@@ -40,7 +40,7 @@ const TABBAR_DATA = [
 		text: '订单',
 		icon: '/static/images/tabbar_png/souvv.png',
 		actIcon: '/static/images/tabbar_png/souvv_act.png',
-		pagePath: '/pages/souvv/index'
+		pagePath: '/pages/order/index'
 	},
 	{
 		id: 3,

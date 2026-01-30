@@ -1,3 +1,97 @@
+## 3.6.132（2026-01-30）
+feat: dragsort支持自定义拖动句柄
+
+## 3.6.131（2026-01-29）
+fix: 优化dragdort组件
+
+## 3.6.130（2026-01-28）
+improvment: cropper组件示例改为组合式API
+
+## 3.6.129（2026-01-28）
+improvment: drag组件示例改为组合式API
+
+## 3.6.128（2026-01-27）
+improvment: tooltip组件示例改为组合式API
+
+## 3.6.127（2026-01-27）
+improvment: textarea组件示例改为组合式API
+
+## 3.6.126（2026-01-27）
+improvment: text组件示例改为组合式API
+
+## 3.6.125（2026-01-27）
+fix: 修复Cascader级联选择器设置默认值显示问题
+
+修复在传入默认值时多列只会显示第一列bug
+
+## 3.6.124（2026-01-27）
+improvment: tabs组件示例改为组合式API
+
+## 3.6.123（2026-01-27）
+improvment: swiper组件示例改为组合式API
+
+## 3.6.122（2026-01-26）
+fix: 🐛 修复u-input在change事件里无法获取value的异常情况 #950
+
+## 3.6.120（2026-01-26）
+improvment: 增加Cascader级联选择器的取消事件
+
+## 3.6.119（2026-01-26）
+improvment: skeleton组件示例改为组合式API
+
+## 3.6.118（2026-01-26）
+improvment: steps组件示例改为组合式API
+
+## 3.6.117（2026-01-24）
+improvment: subsection组就示例改为组合式API
+
+## 3.6.116（2026-01-24）
+improvment: 优化Cascader级联选择器右上角关闭图标的显示控制
+
+如果在级联文本过长或者类目过多时关闭图标会与类目文字重合，现在增加控制关闭图标的控制可以控制是否需要显示关闭图标，底部有取消按钮，关闭图标不是必须的
+
+## 3.6.115（2026-01-23）
+improvment: scroll-list组就示例改为组合式API
+
+## 3.6.114（2026-01-23）
+improvment: readmore组就示例改为组合式API
+
+## 3.6.113（2026-01-23）
+improvment: popover组就示例改为组合式API
+
+## 3.6.112（2026-01-23）
+improvment: picker组件示例改为组合式API
+
+## 3.6.111（2026-01-23）
+improvment: no-network组件示例改为组合式API
+
+## 3.6.110（2026-01-22）
+improvment: navbar组件示例改为组合式API
+
+## 3.6.109（2026-01-22）
+improvment: modal组件示例改为组合式API
+
+## 3.6.108（2026-01-22）
+improvment: loadmore组件示例改为组合式API
+
+## 3.6.107（2026-01-21）
+improvment: list组件示例改为组合式API
+
+## 3.6.106（2026-01-21）
+improvment: index-list2组件示例改为组合式API
+
+## 3.6.105（2026-01-21）
+improvment: index-list组件示例改为组合式API
+
+## 3.6.104（2026-01-21）
+improvment: layout组件示例改为组合式API
+
+## 3.6.103（2026-01-21）
+improvment: input组件示例改为组合式API
+
+## 3.6.102（2026-01-20）
+fix: 修复cascader缺少emits申明
+
 ## 3.6.101（2026-01-20）
 improvment: form组件示例改为组合式API
 
