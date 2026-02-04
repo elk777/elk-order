@@ -2,11 +2,10 @@
  * @Author: elk
  * @Date: 2025-07-23 20:44:15
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-27 14:35:51
+ * @LastEditTime: 2026-02-04 15:44:40
  * @FilePath: /hkt-applet/pages/sort/index.vue
  * @Description: 排序页
 -->
-
 <template>
 	<view class="sort-container">
 		<NavbarMini :title="'菜单'" />

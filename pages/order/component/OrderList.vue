@@ -2,67 +2,53 @@
  * @Author: elk
  * @Date: 2026-01-30 14:08:19
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-30 15:44:35
+ * @LastEditTime: 2026-02-04 16:43:39
  * @FilePath: /hkt-applet/pages/order/component/OrderList.vue
  * @Description: 订单列表组件
 -->
 <template>
 	<view class="order-list-container">
 		<up-tabs
-			v-model:current="orderStore.orderType"
+			v-model:current="orderStore.orderStatus"
 			:lineColor="COLOURS['theme-color']"
-			:list="list"
-			@click="click"
+			:list="ORDER_STATUS_INFO"
+			keyName="label"
+			@click="orderStore.setOrderStatus"
 			:scrollable="false"
 		>
 		</up-tabs>
-		<view v-if="orderList.length > 0">
-			<view v-for="order in orderList" :key="order.id">
-				{{ order.name }}
+		<view class="order-list-content" v-if="orderStore.filterOrderList.length > 0">
+			<view v-for="order in orderStore.filterOrderList" :key="order.id">
+				<OrderItem :order="order" />
 			</view>
 		</view>
-        <view style="margin-top: 50%" v-else>
-            <up-empty
-                text="暂无订单哦~"
-                mode="order"
-                textSize="16"
-                iconSize="100"
-                :iconColor="COLOURS['theme-color']"
-            >
-            </up-empty>
-        </view>
+		<view style="margin-top: 50%" v-else>
+			<up-empty text="暂无订单哦~" mode="order" textSize="16" iconSize="100" :iconColor="COLOURS['theme-color']">
+			</up-empty>
+		</view>
 	</view>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useOrderStore } from "@/stores/order";
-import { COLOURS } from "@/config/index.js";
+import { COLOURS, ORDER_STATUS_INFO } from "@/config/index.js";
+console.log("🚀 ~ ORDER_STATUS_INFO:", ORDER_STATUS_INFO);
+import OrderItem from "./OrderItem.vue";
 const orderStore = useOrderStore();
 
-const list = ref([
-	{
-		name: "全部",
-	},
-	{
-		name: "待接单",
-	},
-	{
-		name: "已接单",
-	},
-	{
-		name: "烹饪中",
-	},
-	{
-		name: "已完成",
-	},
-	{
-		name: "已取消",
-	},
-]);
-const orderList = ref([]);
+onMounted(async () => {
+	console.log("🚀 ~ orderStore.orderStatus: 执行接口");
+	await orderStore.getOrderList();
+});
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .order-list-container {
 	width: 100%;
+	.order-list-content {
+		position: absolute;
+		width: 100%;
+		height: calc(100vh - 300px);
+		overflow: auto;
+	}
 }
 </style>

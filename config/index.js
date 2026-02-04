@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2025-07-19 16:45:55
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-29 14:22:19
+ * @LastEditTime: 2026-02-04 15:33:59
  * @FilePath: /hkt-applet/config/index.js
  * @Description: 整体基础配置
  */
@@ -50,10 +50,49 @@ const TABBAR_DATA = [
 		pagePath: '/pages/my/index'
 	},
 ];
+// 订单状态信息
+const ORDER_STATUS_INFO =  [
+	{
+		value: 0,
+		label: '全部',
+	},
+	{
+		value: 1,
+		label: '待接单',
+		color: 'primary',
+		submit: '开始接单',
+		close: '拒绝接单',
+	},
+	{
+		value: 2,
+		label: '已接单',
+		color: 'warning',
+		submit: '开始烹饪',
+		close: '取消订单',
+	},
+	{
+		value: 3,
+		label: '烹饪中',
+		color: 'error',
+		submit: '完成烹饪',
+		close: '取消订单',
+	},
+	{
+		value: 4,
+		label: '已完成',
+		color: 'success',
+	},
+	{
+		value: 5,
+		label: '已取消',
+		color: 'info',
+	},
+]
 
 export {
 	BASE_URL,
 	APP_ID,
 	TABBAR_DATA,
-	COLOURS
+	COLOURS,
+	ORDER_STATUS_INFO
 }
