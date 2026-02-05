@@ -57,6 +57,12 @@
 			"style": {
 				"navigationBarTitleText": "确认订单"
 			}
+		},
+		{
+			"path": "pages/order/details",
+			"style": {
+				"navigationBarTitleText": "订单详情"
+			}
 		}
 	],
 	"tabBar": {

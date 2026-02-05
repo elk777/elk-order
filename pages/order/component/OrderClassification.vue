@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-01-29 14:06:37
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-30 11:18:10
+ * @LastEditTime: 2026-02-05 14:49:40
  * @FilePath: /hkt-applet/pages/order/component/OrderClassification.vue
  * @Description: 订单分类组件
 -->
@@ -10,7 +10,7 @@
 	<view class="order-classification-container pubFlex">
         <view>一个记录了<span :style="{'color': COLOURS['theme-color']}">{{ 0 }}</span>个订单</view>
         <view class="order-classification-subsection pubFlex">
-            <up-subsection mode="button" :list="list" :current="0" bgColor="#ffffff" activeColor="#ffffff"></up-subsection>
+            <up-subsection mode="button" :list="list" :current="0" bgColor="#ffffff" activeColor="#ffffff" @change="orderStore.setOrderSort"></up-subsection>
             <view style="margin-left: 5px;">
                 <up-icon @tap="orderStore.setDateShow" size="42" name="calendar" :color="COLOURS['theme-color']"></up-icon>
             </view>

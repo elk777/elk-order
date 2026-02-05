@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-01-30 11:13:54
  * @LastEditors: elk 
- * @LastEditTime: 2026-02-04 16:48:14
+ * @LastEditTime: 2026-02-05 17:02:19
  * @FilePath: /hkt-applet/stores/order.js
  * @Description: 订单模块状态管理
  */
@@ -24,15 +24,43 @@ export const useOrderStore = defineStore(
 		// 订单列表
 		const orderList = ref([]);
 
+		// 日期筛选组件是否显示
+		const dateShow = ref(false);
+		// 日期筛选组件选中日期
+		const selectedDate = ref("");
+
+		// 订单详情
+		const orderDetails = ref(null);
+
+		/**
+		 * @description: 根据订单 ID 获取订单详情
+		 * @param {*} id 订单 ID
+		 * @return {*}
+		 */
+		function getOrderById(id) {
+			// 先从本地订单列表中查找
+			const order = orderList.value.find((item) => item.id === parseInt(id));
+			if (order) {
+				orderDetails.value = order;
+				return order;
+			}
+			// 如果本地没有，从后端获取
+			// 这里可以添加后端接口调用逻辑
+			return null;
+		};
+
 		/**
 		 * @description: 根据当前状态过滤订单列表
 		 * @return {*}
 		 */
 		const filterOrderList = computed(() => {
-			if (orderStatus.value === 0) {
-				return orderList.value;
+			if (selectedDate.value) {
+				return orderList.value.filter((item) => item.orderTime.includes(selectedDate.value));
 			}
-			return orderList.value.filter((item) => item.orderStatus === orderStatus.value);
+			if (orderStatus.value !== 0) {
+				return orderList.value.filter((item) => item.orderStatus === orderStatus.value);
+			}
+			return orderList.value;
 		});
 
 		/**
@@ -40,8 +68,16 @@ export const useOrderStore = defineStore(
 		 * @return {*}
 		 */
 		function setOrderStatus(status) {
-			console.log("🚀 ~ setOrderStatus ~ status:", status)
+			console.log("🚀 ~ setOrderStatus ~ status:", status);
 			orderStatus.value = status.value;
+		}
+		/**
+		 * @description: 设置日期
+		 * @return {*}
+		 */
+		function setSelectedDate(date) {
+			console.log("🚀 ~ setSelectedDate ~ date:", date);
+			selectedDate.value = date;
 		}
 		/**
 		 * @description: 获取订单列表
@@ -58,12 +94,12 @@ export const useOrderStore = defineStore(
 				};
 				// 调用后端获取订单列表接口
 				const res = new Promise((resolve, reject) => {
-				    return resolve({
-				        code: 200,
-				        data: {
-				            list: [],
-				        },
-				    });
+					return resolve({
+						code: 200,
+						data: {
+							list: [],
+						},
+					});
 				});
 				// 更新本地订单列表
 				// orderList.value = res.data.list;
@@ -88,8 +124,8 @@ export const useOrderStore = defineStore(
 							},
 						],
 						orderTime: "2026-02-03 10:00:00",
-						makingTime: "2026-02-03 11:05:00",
-						completionTime: "2026-02-03 12:07:00",
+						makingTime: null,
+						completionTime: null,
 						remark: "不吃葱~~~",
 					},
 					{
@@ -204,12 +240,11 @@ export const useOrderStore = defineStore(
 		 * @param {*} index 选中项索引
 		 * @return {*}
 		 */
-		function setCurrent(index) {
-			current.value = index;
+		function setOrderSort(index) {
+			console.log("🚀 ~ setOrderSort ~ index:", index);
+			orderSort.value = index;
 		}
 
-		// 日期筛选组件是否显示
-		const dateShow = ref(false);
 		/**
 		 * @description: 设置日期筛选组件是否显示
 		 * @return {*}
@@ -222,11 +257,16 @@ export const useOrderStore = defineStore(
 			orderSort,
 			orderStatus,
 			dateShow,
+			selectedDate,
+			orderList,
 			filterOrderList,
-			setCurrent,
+			orderDetails,
+			setOrderSort,
 			setDateShow,
 			getOrderList,
 			setOrderStatus,
+			setSelectedDate,
+			getOrderById,
 		};
 	},
 	{

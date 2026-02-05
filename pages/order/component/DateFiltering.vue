@@ -2,12 +2,12 @@
  * @Author: elk
  * @Date: 2026-01-29 14:46:34
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-30 11:17:12
+ * @LastEditTime: 2026-02-05 14:33:39
  * @FilePath: /hkt-applet/pages/order/component/DateFiltering.vue
  * @Description: 日期筛选组件
 -->
 <template>
-	<view v-if="orderStore.dateShow" class="date-filtering-container">
+	<!-- <view v-if="orderStore.dateShow" class="date-filtering-container">
 		<up-read-more
 			closeText="展开"
 			openText="收起"
@@ -17,13 +17,13 @@
 		>
 			<uni-calendar lunar insert @change="handleChange"></uni-calendar>
 		</up-read-more>
-		<!-- <up-datetime-picker
-            hasInput
-            :show="show"
-            v-model="value1"
-            mode="datetime"
-        ></up-datetime-picker> -->
-	</view>
+	</view> -->
+	<up-popup :show="orderStore.dateShow" @close="orderStore.setDateShow()" safeAreaInsetTop mode="top">
+		<uni-calendar lunar insert @change="handleChange"></uni-calendar>
+		<view :style="{ top: topNavHeight + 10 + 'px' }" class="clear-filter" @click="handleConfirm"
+			>清除筛选</view
+		>
+	</up-popup>
 </template>
 <script>
 // 专门用来放页面级配置
@@ -34,44 +34,50 @@ export default {
 <script setup>
 import { ref } from "vue";
 import { COLOURS } from "@/config/index.js";
-
 import { useOrderStore } from "@/stores/order.js";
-
+import { getUniTopNavHeight } from "@/utils/tool.js";
 const orderStore = useOrderStore();
 
-
-const show = ref(false);
-
+const topNavHeight = getUniTopNavHeight();
 /**
  * @description: 处理日期改变事件
  * @param {*} date 选中的日期
  * @return {*}
  */
 const handleChange = (date) => {
-	console.log("🚀 ~ handleChange ~ date:", date);
+	orderStore.setSelectedDate(date.fulldate);
+	orderStore.setDateShow();
 };
 /**
- * @description: 处理确认事件
- * @param {*} date 选中的日期
+ * @description: 清除筛选
  * @return {*}
  */
-const handleConfirm = (date) => {
-	console.log("🚀 ~ handleConfirm ~ date:", date);
+const handleConfirm = () => {
+	orderStore.setSelectedDate('');
+	orderStore.setDateShow();
 };
 </script>
 <style lang="scss" scoped>
 .date-filtering-container {
 	width: 100%;
-	height: 100%;
-	:deep(.uni-calendar-item--checked) {
-		background-color: $theme-color;
-	}
-	:deep(.uni-calendar-item--isDay) {
-		background-color: $theme-color;
-        color: #fff !important;
-	}
-	:deep(.uni-calendar-item--isDay-text) {
-		color: $theme-color;
-	}
+	height: auto;
+}
+.clear-filter {
+	position: absolute;
+	left: 18px;
+	padding: 5px 10px;
+	background-color: $light-color;
+	color: $tinge-color;
+	border-radius: 50px;
+}
+:deep(.uni-calendar-item--checked) {
+	background-color: $theme-color;
+}
+:deep(.uni-calendar-item--isDay) {
+	background-color: $theme-color;
+	color: #fff !important;
+}
+:deep(.uni-calendar-item--isDay-text) {
+	color: $theme-color;
 }
 </style>

@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-01-30 14:08:19
  * @LastEditors: elk 
- * @LastEditTime: 2026-02-04 16:43:39
+ * @LastEditTime: 2026-02-05 15:44:12
  * @FilePath: /hkt-applet/pages/order/component/OrderList.vue
  * @Description: 订单列表组件
 -->
@@ -32,7 +32,6 @@
 import { ref, onMounted } from "vue";
 import { useOrderStore } from "@/stores/order";
 import { COLOURS, ORDER_STATUS_INFO } from "@/config/index.js";
-console.log("🚀 ~ ORDER_STATUS_INFO:", ORDER_STATUS_INFO);
 import OrderItem from "./OrderItem.vue";
 const orderStore = useOrderStore();
 
@@ -44,6 +43,7 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .order-list-container {
 	width: 100%;
+	margin-top: 10px;
 	.order-list-content {
 		position: absolute;
 		width: 100%;

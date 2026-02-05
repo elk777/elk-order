@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-01-23 16:52:57
  * @LastEditors: elk 
- * @LastEditTime: 2026-02-03 20:48:57
+ * @LastEditTime: 2026-02-05 17:12:56
  * @FilePath: /hkt-applet/components/CateList/index.vue
  * @Description: 分类列表组件
 -->
@@ -61,7 +61,7 @@ const deleteCart = (item) => {
 </script>
 <style lang="scss" scoped>
 .cate-list-container {
-    padding: 0px 15px;
+    // padding: 0px 15px;
     .cate-list-item {
         justify-content: space-between;
         margin-bottom: 20px;
