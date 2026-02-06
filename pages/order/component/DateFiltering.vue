@@ -2,22 +2,11 @@
  * @Author: elk
  * @Date: 2026-01-29 14:46:34
  * @LastEditors: elk 
- * @LastEditTime: 2026-02-05 14:33:39
+ * @LastEditTime: 2026-02-06 10:49:12
  * @FilePath: /hkt-applet/pages/order/component/DateFiltering.vue
  * @Description: 日期筛选组件
 -->
 <template>
-	<!-- <view v-if="orderStore.dateShow" class="date-filtering-container">
-		<up-read-more
-			closeText="展开"
-			openText="收起"
-			:color="COLOURS['theme-color']"
-			:showHeight="200"
-			ref="uReadMoreRef"
-		>
-			<uni-calendar lunar insert @change="handleChange"></uni-calendar>
-		</up-read-more>
-	</view> -->
 	<up-popup :show="orderStore.dateShow" @close="orderStore.setDateShow()" safeAreaInsetTop mode="top">
 		<uni-calendar lunar insert @change="handleChange"></uni-calendar>
 		<view :style="{ top: topNavHeight + 10 + 'px' }" class="clear-filter" @click="handleConfirm"
@@ -32,8 +21,6 @@ export default {
 };
 </script>
 <script setup>
-import { ref } from "vue";
-import { COLOURS } from "@/config/index.js";
 import { useOrderStore } from "@/stores/order.js";
 import { getUniTopNavHeight } from "@/utils/tool.js";
 const orderStore = useOrderStore();

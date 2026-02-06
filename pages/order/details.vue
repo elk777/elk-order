@@ -61,9 +61,7 @@
 						</view>
 						<view class="info-item">
 							<text class="info-label">订单状态：</text>
-							<text class="info-value status-text" :style="{ color: color[orderStatusInfo.color], backgroundColor: colorOpacity }">
-								{{ orderStatusInfo.label }}
-							</text>
+                            <OrderStatus class="info-value" :status="orderStore.orderDetails.orderStatus" />
 						</view>
 						<view class="info-item" v-if="orderStore.orderDetails.remark">
 							<text class="info-label">口味偏好：</text>
@@ -95,21 +93,32 @@
 			<up-empty text="订单不存在" mode="order" textSize="16" iconSize="100" :iconColor="COLOURS['theme-color']">
 			</up-empty>
 		</view>
+
+
+        <!-- 底部按钮 -->
+         <view :style="{ paddingBottom: bottomSpacing + 'px' }" class="bottom-button-container">
+            <OrderButton :status="orderStore.orderDetails.orderStatus" />
+         </view>
+
 	</view>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { COLOURS, ORDER_STATUS_INFO } from "@/config/index.js";
+import { COLOURS } from "@/config/index.js";
+import { getBottomSpacing } from '@/utils/tool.js'
 import { useOrderStore } from "@/stores/order.js";
 import { usePageParams } from "@/hooks/usePageTitle.js";
-import { color, colorToRgba } from "@/uni_modules/uview-plus";
 
 import CateList from "@/components/CateList/index.vue";
+import OrderStatus from "./component/OrderStatus.vue";
+import OrderButton from "./component/OrderButton.vue";
 
 const orderStore = useOrderStore();
 const params = usePageParams();
 const loading = ref(true);
+
+const bottomSpacing = computed(() => getBottomSpacing() - 50)
 
 // 计算订单 ID
 const orderId = computed(() => params.value.id);
@@ -155,15 +164,6 @@ const formatTime = (time) => {
 	// 这里可以添加时间格式化逻辑
 	return time;
 };
-
-// 订单状态信息
-const orderStatusInfo = computed(() => {
-	return ORDER_STATUS_INFO.find((item) => item.value === orderStore.orderDetails.orderStatus);
-});
-// 颜色透明度
-const colorOpacity = computed(() => {
-	return colorToRgba(color[orderStatusInfo.value.color], 0.2);
-});
 
 onMounted(() => {
 	if (orderId.value) {
@@ -217,17 +217,21 @@ onMounted(() => {
 		display: flex;
 		align-items: center;
 	}
-
-	.status-text {
-		padding: 4px 12px;
-		border-radius: 12px;
-		font-size: 12px;
-	}
 }
 
 .recipe-info {
 	.recipe-title {
 		margin-bottom: 15px;
 	}
+}
+.bottom-button-container {
+    width: 100%;
+    box-sizing: border-box;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 15px 15px 0 15px;
+    background-color: #fff;
 }
 </style>
