@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2025-09-05 15:24:16
  * @LastEditors: elk 
- * @LastEditTime: 2026-02-09 17:44:13
+ * @LastEditTime: 2026-02-10 16:03:56
  * @FilePath: /hkt-applet/stores/user.js
  * @Description: 用户信息状态管理
  */
@@ -16,17 +16,27 @@ export const useUserStore = defineStore(
 		const token = ref("elk"); //token信息
 		const userType = ref(0); // 0 饲养员  1 吃货
 		const profile = ref({
-			avatar: "https://img2.baidu.com/it/u=3422228222,2822228222&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+			avatar: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
 			nickName: "星雾",
 			uuId: "ko4k1ttv",
 			gender: 0,
 			userType: 0,
-			binding: false, // 是否绑定另一半
+			binding: true, // 是否绑定另一半
 		}); // 当前用户信息
 
 		const setToken = (v) => (token.value = v);
 		const setUserType = (v) => (userType.value = v);
-		const setProfile = (v) => (profile.value = v);
+
+		/**
+		 * @description: 设置用户信息
+		 * @param {*} v 新的用户信息对象
+		 * @return {*}
+		 */
+		const setProfile = (v) => {
+			console.log("🚀 ~ setProfile ~ v:", v);
+			profile.value = { ...v };
+			console.log("🚀 ~ setProfile ~ profile:", profile)
+		};
 
 		return { token, userType, profile, setToken, setUserType, setProfile };
 	},

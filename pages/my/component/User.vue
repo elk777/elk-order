@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-02-09 10:48:39
  * @LastEditors: elk 
- * @LastEditTime: 2026-02-09 16:25:11
+ * @LastEditTime: 2026-02-10 11:16:01
  * @FilePath: /hkt-applet/pages/my/component/User.vue
  * @Description: 用户信息模块
 -->
@@ -33,12 +33,14 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useUserStore } from "@/stores/user.js";
 import { COLOURS } from "@/config/index.js";
 
 import UserEdit from "./UserEdit.vue";
-const userInfo = ref(useUserStore().profile);
+
+const userStore = useUserStore();
+const userInfo = computed(() => ({ ...userStore.profile }));
 
 const showEdit = ref(false);
 
