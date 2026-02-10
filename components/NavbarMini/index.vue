@@ -1,6 +1,14 @@
+<!--
+ * @Author: elk
+ * @Date: 2025-09-09 15:18:21
+ * @LastEditors: elk 
+ * @LastEditTime: 2026-02-06 12:30:39
+ * @FilePath: /hkt-applet/components/NavbarMini/index.vue
+ * @Description: 文件内容描述语
+-->
 <template>
 	<view class="navbarmini-container pdx-15" :style="{paddingTop: getUniTopNavHeight() + 'px', height: getUniTopNavHeight() * 2 + 'px'  }">
-		<view class="navbarmini-title publcTitleSize">{{props.title}}</view>
+		<view v-if="title" class="navbarmini-title publcTitleSize">{{props.title}}</view>
 	</view>
 </template>
 
@@ -11,7 +19,7 @@
 	const props = defineProps({
 		title: {
 			type: String,
-			required: true
+			default: ''
 		}
 	})
 	

@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-01-07 11:20:00
  * @LastEditors: elk 
- * @LastEditTime: 2026-01-09 16:07:56
+ * @LastEditTime: 2026-02-09 19:13:33
  * @FilePath: /hkt-applet/components/Upload/index.vue
  * @Description: 通用上传组件
 -->
@@ -162,6 +162,11 @@ const props = defineProps({
 		type: Array,
 		default: () => ["original", "compressed"],
 	},
+	// 是否显示边框
+	showBorder: {
+		type: Boolean,
+		default: true,
+	},
 });
 
 // 定义组件事件
@@ -180,14 +185,14 @@ const internalFileList = ref([...props.fileList]);
 
 // 监听外部fileList变化，更新内部列表
 watch(
-  () => props.fileList,
-  (newVal) => {
-    // 只有当内容真正变化时才更新
-    if (JSON.stringify(newVal) !== JSON.stringify(internalFileList.value)) {
-      internalFileList.value = [...newVal];
-    }
-  },
-  { deep: true }
+	() => props.fileList,
+	(newVal) => {
+		// 只有当内容真正变化时才更新
+		if (JSON.stringify(newVal) !== JSON.stringify(internalFileList.value)) {
+			internalFileList.value = [...newVal];
+		}
+	},
+	{ deep: true },
 );
 
 // 监听内部fileList变化，通知外部
@@ -216,6 +221,10 @@ const computedStyles = computed(() => {
 			const cssKey = `--preview-${key.replace(/([A-Z])/g, "-$1").toLowerCase()}`;
 			styles[cssKey] = value;
 		});
+	}
+	// 控制边框显示
+	if (!props.showBorder && !styles["--slot-border"]) {
+		styles["--slot-border"] = "none";
 	}
 	return styles;
 });
@@ -247,8 +256,8 @@ const handleAfterRead = ({ file }) => {
 	};
 
 	internalFileList.value.push(tempFile);
-  // 手动通知父组件
-  emit('update:fileList', [...internalFileList.value]);
+	// 手动通知父组件
+	emit("update:fileList", [...internalFileList.value]);
 };
 
 // 处理文件超出大小限制事件
@@ -271,8 +280,8 @@ const handleDelete = (index) => {
 	internalFileList.value.splice(index, 1);
 	console.log("🚀 ~ handleDelete ~ fileList:", props.fileList);
 	emit("delete", index);
-  // 手动通知父组件
-  emit('update:fileList', [...internalFileList.value]);
+	// 手动通知父组件
+	emit("update:fileList", [...internalFileList.value]);
 };
 
 // 处理自动上传完成事件

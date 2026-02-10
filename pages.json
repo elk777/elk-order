@@ -49,7 +49,7 @@
 		{
 			"path": "pages/my/index",
 			"style": {
-				"navigationBarTitleText": "我的"
+				"navigationStyle": "custom"
 			}
 		},
 		{
