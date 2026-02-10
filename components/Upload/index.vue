@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-01-07 11:20:00
  * @LastEditors: elk 
- * @LastEditTime: 2026-02-09 19:13:33
+ * @LastEditTime: 2026-02-10 10:29:47
  * @FilePath: /hkt-applet/components/Upload/index.vue
  * @Description: 通用上传组件
 -->
@@ -181,18 +181,21 @@ const emit = defineEmits([
 ]);
 
 // 内部文件列表
-const internalFileList = ref([...props.fileList]);
+const internalFileList = ref([...(Array.isArray(props.fileList) ? props.fileList : [])]);
+console.log("🚀 ~ internalFileList:", internalFileList)
 
 // 监听外部fileList变化，更新内部列表
 watch(
-	() => props.fileList,
-	(newVal) => {
-		// 只有当内容真正变化时才更新
-		if (JSON.stringify(newVal) !== JSON.stringify(internalFileList.value)) {
-			internalFileList.value = [...newVal];
-		}
-	},
-	{ deep: true },
+  () => props.fileList,
+  (newVal) => {
+    // 确保newVal是数组类型
+    const normalizedVal = Array.isArray(newVal) ? newVal : [];
+    // 只有当内容真正变化时才更新
+    if (JSON.stringify(normalizedVal) !== JSON.stringify(internalFileList.value)) {
+      internalFileList.value = [...normalizedVal];
+    }
+  },
+  { deep: true }
 );
 
 // 监听内部fileList变化，通知外部
