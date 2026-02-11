@@ -53,6 +53,12 @@
 			}
 		},
 		{
+			"path": "pages/my/integral",
+			"style": {
+				"navigationBarTitleText": "我的积分"
+			}
+		},
+		{
 			"path": "pages/cart/AffirmOrder",
 			"style": {
 				"navigationBarTitleText": "确认订单"
