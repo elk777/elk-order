@@ -1,3 +1,46 @@
+## 3.7.20（2026-02-26）
+improvement：box组件示例改为组合式API
+
+## 3.7.19（2026-02-25）
+improvement：agreement组件示例改为组合式API
+
+## 3.7.18（2026-02-24）
+improvement：barcode组件示例改为组合式API
+
+## 3.7.17（2026-02-11）
+fix: 修复steps组件current失效
+
+## 3.7.16（2026-02-09）
+improvment: choose组件示例改为组合式API
+
+## 3.7.14（2026-02-08）
+refactor: up-signature组件改用up-canvas组件
+
+## 3.7.13（2026-02-07）
+add: 新增up-canvas组件
+
+## 3.7.12（2026-02-07）
+improvment: 优化签名组件兼容性修复微信小程序支持
+
+## 3.7.11（2026-02-06）
+add: action-sheet组件新增nameKey和subnameKey属性
+
+## 3.7.10（2026-02-06）
+add: checkbox-group组件的change事件增加第二个返回参数为当前触发变化的checkbox组件name信息等
+
+## 3.7.9（2026-02-06）
+fix: 修复align-self属性值缺少d导致样式不生效的问题
+
+## 3.7.8（2026-02-05）
+improvment: 优化card组件示例
+
+## 3.7.7（2026-02-05）
+add: select组件新增closeSelect方法用于自定义控制关闭
+
+
+## 3.7.6（2026-02-04）
+add: picker组件示例onLoad后加载数据
+
 ## 3.7.5（2026-02-03）
 add: up-slider组件新增垂直模式
 
