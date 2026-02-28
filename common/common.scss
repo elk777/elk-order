@@ -19,22 +19,22 @@ $gray-color: #dadbde;
 $light-color: #f5f5f5;
 /* 	
 	@公共基础字体大小和颜色： 
-	@标题  32rpx:18px    #363636  加粗
-	@正文  25rpx:14px    #606266    
-	@标签  22rpx:12px    #aeaeae  
+	@标题  36rpx:18px    #363636  加粗
+	@正文  32rpx:16px    #606266    
+	@标签  28rpx:14px    #aeaeae  
 */
 .publcTitleSize {
 	font-size: 32rpx;
 	font-weight: 600;
-	// color: #363636;
+	// color: #333333;
 }
 .publcTextSize {
 	font-size: 28rpx;
-	// color: #606266;
+	// color: #666666;
 }
 .publcLabelSize {
-	font-size: 22rpx;
-	// color: #aeaeae;
+	font-size: 24rpx;
+	// color: #999999;
 }
 
 .pubColumnFlex {

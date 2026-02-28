@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-02-09 14:03:58
  * @LastEditors: elk 
- * @LastEditTime: 2026-02-10 19:25:47
+ * @LastEditTime: 2026-02-27 15:25:24
  * @FilePath: /hkt-applet/pages/my/component/FunList.vue
  * @Description: 功能列表模块
 -->
@@ -10,7 +10,7 @@
 	<up-card class="fun-list-container" :show-head="false" :head-border-bottom="false" :border="false">
 		<template #body>
 			<view class="fun-list-body">
-				<view @click="navigateTo(fun.path)" class="fun-list-item pubFlex" v-for="fun in funList" :key="fun.id">
+				<view @click="navigateTo(fun)" class="fun-list-item pubFlex" v-for="fun in funList" :key="fun.id">
 					<view class="pubFlex">
 						<up-icon :color="COLOURS['theme-color']" :name="fun.icon" size="26" />
 						<view class="fun-list-name publcTextSize">{{ fun.name }}</view>
@@ -30,30 +30,35 @@ const funList = ref([
 		name: "我的积分",
 		icon: "coupon",
 		path: "/pages/my/integral",
+		open: true,
 	},
 	{
 		id: 1,
 		name: "每日签到",
 		icon: "order",
 		path: "/pages/my/attendance",
+		open: false,
 	},
 	{
 		id: 2,
 		name: "烹饪日历",
 		icon: "calendar",
 		path: "/pages/my/calendar",
+		open: false,
 	},
 	{
 		id: 3,
 		name: "意见反馈",
 		icon: "chat",
 		path: "/pages/my/feedback",
+		open: false,
 	},
 	{
 		id: 4,
 		name: "联系客服",
 		icon: "kefu-ermai",
 		path: "/pages/my/contact",
+		open: false,
 	},
 ]);
 
@@ -63,11 +68,18 @@ const funList = ref([
  * @param {*} path
  * @return {*}
  */
-const navigateTo = (path) => {
-    console.log("🚀 ~ navigateTo ~ path:", path)
-    uni.navigateTo({
-        url: path,
-    })
+const navigateTo = (fun) => {
+    console.log("🚀 ~ navigateTo ~ path:", fun.path)
+	if(fun.open) {
+        uni.navigateTo({
+            url: fun.path,
+        })
+    }else {
+		uni.showToast({
+			title: "功能暂未开放",
+			icon: "none",
+		})
+	}
 }
 </script>
 <style lang="scss" scoped>
