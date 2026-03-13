@@ -2,7 +2,7 @@
  * @Author: elk
  * @Date: 2026-02-28 13:02:01
  * @LastEditors: elk 
- * @LastEditTime: 2026-02-28 17:42:05
+ * @LastEditTime: 2026-03-13 17:28:34
  * @FilePath: /hkt-applet/pages/my/component/IntegralDetail.vue
  * @Description: 积分详细模块
 -->
@@ -86,15 +86,15 @@ const title = ref("积分明细");
 
 // 获取积分方式：list
 const gainOptions = ref([
-	{ name: "全部", value: 0 },
+	{ name: "全部", value: 2 },
 	{ name: "收入", value: 1 },
-	{ name: "支出", value: 2 },
+	{ name: "支出", value: 0 },
 ]);
 // 积分详细选项卡：active
-const active = ref(0);
+const active = ref(2);
 
-// 积分详细内容项
-const integralContentItems = ref([
+// 原始积分详细内容项（作为数据源）
+const originalIntegralContentItems = [
 	{ name: "签到", time: "2026-02-28 13:02:01", amount: 5, type: 1 },
 	{ name: "注册奖励", time: "2026-02-28 13:02:01", amount: 5, type: 1 },
 	{ name: "AI识别菜谱", time: "2026-02-28 13:02:01", amount: 5, type: 0 },
@@ -102,16 +102,28 @@ const integralContentItems = ref([
 	{ name: "AI识别菜谱", time: "2026-02-28 13:02:01", amount: 5, type: 0 },
 	{ name: "AI识别菜谱", time: "2026-02-28 13:02:01", amount: 5, type: 0 },
 	{ name: "AI识别菜谱", time: "2026-02-28 13:02:01", amount: 5, type: 0 },
-	{ name: "AI识别菜谱", time: "2026-02-28 13:02:01", amount: 5, type: 0 },
-]);
+	{ name: "AI识别菜谱-max", time: "2026-02-28 13:02:01", amount: 5, type: 0 },
+];
+
+// 积分详细内容项（用于显示）
+const integralContentItems = ref([...originalIntegralContentItems]);
 
 /**
  * @description: 选项卡切换事件
- * @param {*} index
+ * @param {*} tab 选项卡
  * @return {*}
  */
-const handleChange = (index) => {
-	active.value = index;
+const handleChange = (tab) => {
+	// 过滤出当前选项卡的内容项
+	active.value = tab.value;
+	if (tab.value === 2) {
+		// 全部，显示所有数据
+		integralContentItems.value = [...originalIntegralContentItems];
+	} else {
+		// 收入或支出，基于原始数据过滤
+		integralContentItems.value = originalIntegralContentItems.filter((item) => item.type === tab.value);
+	}
+	console.log("🚀 ~ handleChange ~ integralContentItems:", integralContentItems)
 };
 </script>
 <style lang="scss" scoped>
@@ -121,8 +133,8 @@ const handleChange = (index) => {
 	box-sizing: border-box;
 	overflow: auto;
 	.integral-detail-content {
-        height: 450px;
-        overflow: auto;
+		height: 450px;
+		overflow: auto;
 		.integral-content-item {
 			justify-content: space-between;
 			padding: 12px 15px;
@@ -146,6 +158,6 @@ const handleChange = (index) => {
 	justify-content: space-around;
 }
 :deep(.u-tabs__wrapper__nav__line) {
-	display: none;
+	display: none !important;
 }
 </style>
