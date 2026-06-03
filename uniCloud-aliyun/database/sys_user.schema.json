@@ -1,0 +1,52 @@
+{
+	"bsonType": "object",
+	"description": "用户基础信息表",
+	"required": [],
+	"permission": {
+		"read": false,
+		"create": false,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"id": {
+			"description": "ID，系统自动生成"
+		},
+		"openid": {
+			"bsonType": "string",
+			"description": "微信 OpenID（uni-id 对接）"
+		},
+		"unionid": {
+			"bsonType": "string",
+			"description": "微信 UnionID"
+		},
+		"nick_name": {
+			"bsonType": "string",
+			"description": "用户昵称"
+		},
+		"avatar": {
+			"bsonType": "string",
+			"description": "头像 URL"
+		},
+		"gender": {
+			"bsonType": "int",
+			"description": "性别：0=男, 1=女"
+		},
+		"user_type": {
+			"bsonType": "int",
+			"description": "角色类型：0=饲养员, 1=吃货"
+		},
+		"uuid": {
+			"bsonType": "string",
+			"description": "用户唯一标识码（邀请分享用）"
+		},
+		"binding": {
+			"bsonType": "int",
+			"description": "是否已绑定情侣：0=未绑定, 1=已绑定"
+		},
+		"status": {
+			"bsonType": "int",
+			"description": "账户状态：0=禁用, 1=正常"
+		}
+	}
+}
