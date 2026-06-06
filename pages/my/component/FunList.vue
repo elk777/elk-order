@@ -1,7 +1,7 @@
 <!--
  * @Author: elk
  * @Date: 2026-02-09 14:03:58
- * @LastEditors: elk 
+ * @LastEditors: elk
  * @LastEditTime: 2026-02-27 15:25:24
  * @FilePath: /hkt-applet/pages/my/component/FunList.vue
  * @Description: 功能列表模块
@@ -24,6 +24,7 @@
 <script setup>
 import { ref } from "vue";
 import { COLOURS } from "@/config/index.js";
+import { requireLogin } from "@/utils/auth.js";
 const funList = ref([
 	{
 		id: 0,
@@ -69,18 +70,21 @@ const funList = ref([
  * @return {*}
  */
 const navigateTo = (fun) => {
-    console.log("🚀 ~ navigateTo ~ path:", fun.path)
-	if(fun.open) {
-        uni.navigateTo({
-            url: fun.path,
-        })
-    }else {
+	if (fun.open) {
+		requireLogin(() => {
+			uni.navigateTo({
+				url: fun.path,
+			});
+		}, {
+			redirect: fun.path,
+		});
+	} else {
 		uni.showToast({
 			title: "功能暂未开放",
 			icon: "none",
-		})
+		});
 	}
-}
+};
 </script>
 <style lang="scss" scoped>
 .fun-list-body {

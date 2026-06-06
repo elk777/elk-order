@@ -1,7 +1,7 @@
 <!--
  * @Author: elk
  * @Date: 2026-01-30 14:08:19
- * @LastEditors: elk 
+ * @LastEditors: elk
  * @LastEditTime: 2026-02-05 15:44:12
  * @FilePath: /hkt-applet/pages/order/component/OrderList.vue
  * @Description: 订单列表组件
@@ -36,7 +36,6 @@ import OrderItem from "./OrderItem.vue";
 const orderStore = useOrderStore();
 
 onMounted(async () => {
-	console.log("🚀 ~ orderStore.orderStatus: 执行接口");
 	await orderStore.getOrderList();
 });
 </script>

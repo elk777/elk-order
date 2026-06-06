@@ -1,7 +1,7 @@
 <!--
  * @Author: elk
  * @Date: 2025-09-12 09:18:25
- * @LastEditors: elk 
+ * @LastEditors: elk
  * @LastEditTime: 2026-01-12 14:25:02
  * @FilePath: /hkt-applet/pages/recipe/redact.vue
  * @Description: 菜谱-新增、编辑界面
@@ -102,7 +102,9 @@ import Upload from "@/components/Upload/index.vue";
 import { usePageTitle } from "@/hooks/usePageTitle.js";
 import { generateId } from "@/utils/tool.js";
 import { useListOperations } from "./hook/useListOperations.js";
+import { useAuthGuard } from "@/hooks/useAuthGuard.js";
 
+useAuthGuard();
 // 调用usePageTitle hook函数，设置默认标题为"编辑菜谱"
 usePageTitle();
 // 调用useListOperations hook函数，初始化食材清单和制作步骤列表

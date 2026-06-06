@@ -1,7 +1,7 @@
 <!--
  * @Author: elk
  * @Date: 2026-01-19 15:43:23
- * @LastEditors: elk 
+ * @LastEditors: elk
  * @LastEditTime: 2026-01-22 13:18:45
  * @FilePath: /hkt-applet/pages/recipe/classify.vue
  * @Description: 分类管理页
@@ -56,13 +56,11 @@
 import { ref, onMounted } from "vue";
 import { COLOURS } from "@/config/index.js";
 import EditCate from "./component/EditCate.vue";
+import { useAuthGuard } from "@/hooks/useAuthGuard.js";
 
-const classifyList = ref([
-	{ id: 11, name: "分类1", order: 1 },
-	{ id: 21, name: "分类2", order: 2 },
-	{ id: 31, name: "分类3", order: 3 },
-	{ id: 41, name: "分类4", order: 4 }
-]);
+useAuthGuard();
+
+const classifyList = ref([]);
 const classifyName = ref("");
 const myDrop = ref("myDrop");
 const editCate = ref("editCate");
@@ -70,10 +68,8 @@ const editId = ref("");
 const listLoading = ref(true);
 
 onMounted(() => {
-	// 模拟异步加载数据
-	setTimeout(() => {
-		listLoading.value = false;
-	}, 1000);
+	// 后续联调后端时替换为真实分类列表接口。
+	listLoading.value = false;
 });
 /**
  * @description: 打开编辑分类组件
@@ -107,7 +103,6 @@ const addClassify = () => {
 	});
 	// 调用changeList函数更新列表
 	changeList();
-	console.log("🚀 ~ addClassify ~ classifyList:", classifyList.value);
 	// 清空分类名称输入框
 	classifyName.value = "";
 };
@@ -117,10 +112,8 @@ const addClassify = () => {
  * @return {*}
  */
 const editClassify = (name) => {
-	console.log("🚀 ~ editClassify ~ name:", name);
 	// 找到要编辑的分类
 	let classify = classifyList.value.find((item) => item.id === editId.value);
-	console.log("🚀 ~ editClassify ~ classify:", classify);
 	if (classify) {
 		// 更新分类名称
 		classify.name = name;

@@ -19,6 +19,15 @@
 			}
 		},
 		{
+			"path": "pages/login/index",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"navigationBarBackgroundColor": "#FFF0F2",
+				"navigationBarTextStyle": "black",
+				"backgroundColor": "#FFF9F7"
+			}
+		},
+		{
 			"path": "pages/sort/index",
 			"style": {
 				"navigationStyle": "custom"

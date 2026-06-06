@@ -113,8 +113,11 @@ import { usePageParams } from "@/hooks/usePageTitle.js";
 import CateList from "@/components/CateList/index.vue";
 import OrderStatus from "./component/OrderStatus.vue";
 import OrderButton from "./component/OrderButton.vue";
+import { useAuthGuard } from "@/hooks/useAuthGuard.js";
 
 const orderStore = useOrderStore();
+useAuthGuard();
+
 const params = usePageParams();
 const loading = ref(true);
 

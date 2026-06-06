@@ -1,7 +1,7 @@
 <!--
  * @Author: elk
  * @Date: 2026-01-27 14:27:31
- * @LastEditors: elk 
+ * @LastEditors: elk
  * @LastEditTime: 2026-01-28 16:25:55
  * @FilePath: /hkt-applet/pages/cart/AffirmOrder.vue
  * @Description: 确认订单页
@@ -101,6 +101,9 @@ import CartList from "./component/CartList.vue";
 import { useRecipeStore } from "@/stores/recipe.js";
 import { COLOURS } from "@/config/index.js";
 import { formatDate } from "@/utils/tool.js";
+import { useAuthGuard } from "@/hooks/useAuthGuard.js";
+
+useAuthGuard();
 
 const recipeStore = useRecipeStore();
 const cartList = computed(() => recipeStore.cartList);

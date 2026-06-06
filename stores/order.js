@@ -1,7 +1,7 @@
 /*
  * @Author: elk
  * @Date: 2026-01-30 11:13:54
- * @LastEditors: elk 
+ * @LastEditors: elk
  * @LastEditTime: 2026-02-05 17:02:19
  * @FilePath: /hkt-applet/stores/order.js
  * @Description: 订单模块状态管理
@@ -20,6 +20,8 @@ export const useOrderStore = defineStore(
 		const page = ref(1);
 		// 加载中
 		const loading = ref(false);
+		// 错误信息
+		const errorMessage = ref("");
 
 		// 订单列表
 		const orderList = ref([]);
@@ -68,7 +70,6 @@ export const useOrderStore = defineStore(
 		 * @return {*}
 		 */
 		function setOrderStatus(status) {
-			console.log("🚀 ~ setOrderStatus ~ status:", status);
 			orderStatus.value = status.value;
 		}
 		/**
@@ -76,7 +77,6 @@ export const useOrderStore = defineStore(
 		 * @return {*}
 		 */
 		function setSelectedDate(date) {
-			console.log("🚀 ~ setSelectedDate ~ date:", date);
 			selectedDate.value = date;
 		}
 		/**
@@ -92,139 +92,14 @@ export const useOrderStore = defineStore(
 					page: isRefresh ? 1 : page.value,
 					pageSize: 10,
 				};
-				// 调用后端获取订单列表接口
-				const res = new Promise((resolve, reject) => {
-					return resolve({
-						code: 200,
-						data: {
-							list: [],
-						},
-					});
+				// 后续联调后端时替换为真实订单列表接口。
+				const res = await Promise.resolve({
+					code: 200,
+					data: {
+						list: [],
+					},
 				});
-				// 更新本地订单列表
-				// orderList.value = res.data.list;
-				orderList.value = [
-					{
-						id: 1,
-						orderUser: "用户1",
-						userAvatar: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-						orderStatus: 1,
-						orderList: [
-							{
-								id: 1,
-								name: "西红柿炒蛋",
-								quantity: 2,
-								cover: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-							},
-							{
-								id: 2,
-								name: "红烧肉",
-								quantity: 1,
-								cover: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-							},
-						],
-						orderTime: "2026-02-03 10:00:00",
-						makingTime: null,
-						completionTime: null,
-						remark: "不吃葱~~~",
-					},
-					{
-						id: 2,
-						orderUser: "用户2",
-						userAvatar: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-						orderStatus: 2,
-						orderList: [
-							{
-								id: 1,
-								name: "西红柿炒蛋",
-								quantity: 2,
-								cover: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-							},
-							{
-								id: 2,
-								name: "红烧肉",
-								quantity: 1,
-								cover: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-							},
-						],
-						orderTime: "2026-02-03 10:00:00",
-						makingTime: "2026-02-03 11:05:00",
-						completionTime: "2026-02-03 12:07:00",
-						remark: "不吃蒜~~~",
-					},
-					{
-						id: 3,
-						orderUser: "用户3",
-						userAvatar: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-						orderStatus: 3,
-						orderList: [
-							{
-								id: 1,
-								name: "西红柿炒蛋",
-								quantity: 2,
-								cover: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-							},
-							{
-								id: 2,
-								name: "红烧肉",
-								quantity: 1,
-								cover: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-							},
-						],
-						orderTime: "2026-02-03 10:00:00",
-						makingTime: "2026-02-03 11:05:00",
-						completionTime: "2026-02-03 12:07:00",
-						remark: "不吃蒜~~~",
-					},
-					{
-						id: 4,
-						orderUser: "用户4",
-						userAvatar: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-						orderStatus: 4,
-						orderList: [
-							{
-								id: 1,
-								name: "西红柿炒蛋",
-								quantity: 2,
-								cover: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-							},
-							{
-								id: 2,
-								name: "红烧肉",
-								quantity: 1,
-								cover: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-							},
-						],
-						orderTime: "2026-02-03 10:00:00",
-						makingTime: "2026-02-03 11:05:00",
-						completionTime: "2026-02-03 12:07:00",
-						remark: "不吃蒜~~~",
-					},
-					{
-						id: 5,
-						orderUser: "用户5",
-						userAvatar: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-						orderStatus: 5,
-						orderList: [
-							{
-								id: 1,
-								name: "西红柿炒蛋",
-								quantity: 2,
-								cover: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-							},
-							{
-								id: 2,
-								name: "红烧肉",
-								quantity: 1,
-								cover: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-							},
-						],
-						orderTime: "2026-02-03 10:00:00",
-						makingTime: "2026-02-03 11:05:00",
-						completionTime: "2026-02-03 12:07:00",
-						remark: "不吃蒜~~~",
-					},
-				];
+				orderList.value = res.data?.list || [];
 
 				return res;
 			} catch (error) {
@@ -241,7 +116,6 @@ export const useOrderStore = defineStore(
 		 * @return {*}
 		 */
 		function setOrderSort(index) {
-			console.log("🚀 ~ setOrderSort ~ index:", index);
 			orderSort.value = index;
 		}
 
@@ -253,12 +127,29 @@ export const useOrderStore = defineStore(
 			dateShow.value = !dateShow.value;
 		}
 
+		/**
+		 * @description: 重置订单模块状态
+		 * @return {void}
+		 */
+		function resetOrderState() {
+			orderSort.value = 0;
+			orderStatus.value = 0;
+			page.value = 1;
+			loading.value = false;
+			orderList.value = [];
+			dateShow.value = false;
+			selectedDate.value = "";
+			orderDetails.value = null;
+			errorMessage.value = "";
+		}
+
 		return {
 			orderSort,
 			orderStatus,
 			dateShow,
 			selectedDate,
 			orderList,
+			errorMessage,
 			filterOrderList,
 			orderDetails,
 			setOrderSort,
@@ -267,6 +158,7 @@ export const useOrderStore = defineStore(
 			setOrderStatus,
 			setSelectedDate,
 			getOrderById,
+			resetOrderState,
 		};
 	},
 	{

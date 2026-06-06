@@ -1,7 +1,7 @@
 <!--
  * @Author: elk
  * @Date: 2025-09-11 14:32:34
- * @LastEditors: elk 
+ * @LastEditors: elk
  * @LastEditTime: 2026-01-27 14:35:11
  * @FilePath: /hkt-applet/pages/cart/component/ShoppingCat.vue
  * @Description: 购物车-底部组件
@@ -45,6 +45,7 @@ import { ref, computed } from "vue";
 import { useUserStore } from "@/stores/user.js";
 import { COLOURS } from "@/config/index.js";
 import { useRecipeStore } from "@/stores/recipe.js";
+import { requireLogin } from "@/utils/auth.js";
 import CartPopup from "./CartPopup.vue";
 
 const userStore = useUserStore();
@@ -78,18 +79,20 @@ const closeCartPopup = () => {
  * @return {*}
  */
 const handelCart = () => {
-	// 当用户为吃货时，点击购物车按钮，关闭弹窗
-	if (userStore.userType) {
-		if (total.value === 0) {
-			uni.showToast({
-				title: "您的购物车为空",
-				icon: "none",
-			});
+	return requireLogin(() => {
+		// 当用户为吃货时，点击购物车按钮，关闭弹窗
+		if (userStore.userType) {
+			if (total.value === 0) {
+				uni.showToast({
+					title: "您的购物车为空",
+					icon: "none",
+				});
+				return;
+			}
+			showCart.value = true;
 			return;
 		}
-		showCart.value = true;
-		return;
-	}
+	});
 };
 /**
  * @description: 添加菜谱按钮事件
@@ -97,8 +100,13 @@ const handelCart = () => {
  * @return {:type}
  */
 const handelAddRedact = () => {
-	uni.navigateTo({
-		url: "/pages/recipe/redact?title=新增菜谱",
+	const url = "/pages/recipe/redact?title=新增菜谱";
+	requireLogin(() => {
+		uni.navigateTo({
+			url,
+		});
+	}, {
+		redirect: url,
 	});
 };
 
@@ -107,6 +115,7 @@ const handelAddRedact = () => {
  * @return {*}
  */
 const handelApplyFeed = () => {
+	const url = "/pages/cart/AffirmOrder";
 	// 购物车为空时，提醒用户
 	if (total.value === 0) {
 		uni.showToast({
@@ -115,9 +124,14 @@ const handelApplyFeed = () => {
 		});
 		return;
 	}
-	// 跳转确认订单页面
-	uni.navigateTo({
-		url: "/pages/cart/AffirmOrder",
+
+	requireLogin(() => {
+		// 跳转确认订单页面
+		uni.navigateTo({
+			url,
+		});
+	}, {
+		redirect: url,
 	});
 };
 </script>

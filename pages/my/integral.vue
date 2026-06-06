@@ -1,7 +1,7 @@
 <!--
  * @Author: elk
  * @Date: 2026-02-10 18:16:48
- * @LastEditors: elk 
+ * @LastEditors: elk
  * @LastEditTime: 2026-02-28 17:55:31
  * @FilePath: /hkt-applet/pages/my/integral.vue
  * @Description: 用户积分界面
@@ -87,12 +87,13 @@ export default {
 };
 </script>
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 // import { upGridItem } from "uview-plus";
 import IntegralDetail from "./component/IntegralDetail.vue";
-import { useUserStore } from "@/stores/user.js";
 import { COLOURS } from "@/config/index.js";
-// const userStore = useUserStore();
+import { useAuthGuard } from "@/hooks/useAuthGuard.js";
+
+useAuthGuard();
 
 // 获取积分方式：list
 const gainOptions = ref([

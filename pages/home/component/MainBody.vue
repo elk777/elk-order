@@ -13,12 +13,12 @@
 		<!-- 左右 饲养员  吃货 -->
 		<view class="kind pubFlex">
 			<view class="kind-head pubColumnFlex">
-				<view v-if="userStore.token" class="kind-head-img">
+				<view v-if="userStore.isLogin && userStore.profile.avatar" class="kind-head-img">
 					<up-image
 						shape="circle"
 						width="50px"
 						height="50px"
-						src="https://cdn.uviewui.com/uview/album/1.jpg"
+						:src="userStore.profile.avatar"
 					></up-image>
 				</view>
 				<view v-else class="kind-head-unselected">
@@ -37,11 +37,14 @@
 			</view>
 		</view>
 		<!-- 吃饭时间  日历-->
-		<view class="calendar">
-			<view>我们在一起吃饭已经</view>
-			<view class="calendar-days"><span class="calendar-days-span publcTitleSize">13</span>天</view>
-			<view>2025/08/06 周三</view>
-		</view>
+			<view v-if="userStore.isLogin && userStore.profile.binding" class="calendar">
+				<view>我们在一起吃饭已经</view>
+				<view class="calendar-days"><span class="calendar-days-span publcTitleSize">0</span>天</view>
+				<view>等待后端同步纪念日</view>
+			</view>
+			<view v-else class="calendar">
+				<view>登录后开启两个人的厨房记录</view>
+			</view>
 		<!-- 邀请另一半开通按钮 -->
 		<view class="invite">
 			<up-button
@@ -69,6 +72,9 @@ const sofaIcon = ref("/static/images/love-sofa.svg");
 
 // 格式化当前账户类型展示
 const foramtCrveUserType = computed(() => {
+	if (!userStore.isLogin) {
+		return "未登录";
+	}
 	return userStore.userType ? "吃货" : "饲养员";
 });
 </script>

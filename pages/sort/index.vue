@@ -1,7 +1,7 @@
 <!--
  * @Author: elk
  * @Date: 2025-07-23 20:44:15
- * @LastEditors: elk 
+ * @LastEditors: elk
  * @LastEditTime: 2026-02-04 15:44:40
  * @FilePath: /hkt-applet/pages/sort/index.vue
  * @Description: 排序页
@@ -34,13 +34,19 @@ import NavbarMini from "@/components/NavbarMini/index.vue";
 import CateTab from "@/pages/cart/component/CateTab.vue";
 import ShoppingCat from "@/pages/cart/component/ShoppingCat.vue";
 import { COLOURS } from "@/config/index.js";
+import { requireLogin } from "@/utils/auth.js";
 /**
  * @description: 分类管理点击事件
  * @return {*}
  */
 function toCateTab() {
-	uni.navigateTo({
-		url: "/pages/recipe/classify",
+	const url = "/pages/recipe/classify";
+	requireLogin(() => {
+		uni.navigateTo({
+			url,
+		});
+	}, {
+		redirect: url,
 	});
 }
 </script>

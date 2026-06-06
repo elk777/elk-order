@@ -81,6 +81,7 @@ import { ref, computed, onMounted } from "vue";
 import { COLOURS } from "@/config/index.js";
 import { useUserStore } from "@/stores/user.js";
 import { useRecipeStore } from "@/stores/recipe.js";
+import { requireLogin } from "@/utils/auth.js";
 const userStore = useUserStore();
 const recipeStore = useRecipeStore();
 const tabList = ref([]);
@@ -103,52 +104,18 @@ onMounted(() => {
  * @return {*}
  */
 const getCateList = async () => {
-	// 调用获取菜谱列表接口
-	setTimeout(() => {
-		tabList.value = [
-			{
-				title: "默认分类",
-				children: [
-					{
-						id: 1,
-						name: "水煮肉片",
-						cover: "/static/images/head.jpeg",
-						price: 88,
-					},
-				],
-			},
-			{
-				title: "分类1",
-				children: [
-					{
-						id: 2,
-						name: "酸菜鱼",
-						cover: "/static/images/head.jpeg",
-						price: 99,
-					},
-				],
-			},
-		];
-		recipeStore.setCateTotal(tabList.value.reduce((acc, cur) => acc + cur.children.length, 0));
-		// cateLoading.value = false;
-	}, 100);
-	// const res = await getRecipeList({
-	// 	pageNum: 1,
-	// 	pageSize: 10,
-	// });
-	// if (res.code === 200) {
-	// 	tabList.value[0].children = res.data.records;
-	// }
+	// 后续联调后端时替换为真实菜谱列表接口。
+	tabList.value = [];
+	recipeStore.setCateTotal(0);
+	cateLoading.value = false;
 };
 /**
  * @description: 当角色为吃货时，获取购物车总数量
  * @return {*}
  */
 const getCartTotal = async () => {
-	setTimeout(() => {
-		const total = 2;
-		// recipeStore.setCartTotal(total);
-	}, 100);
+	// 后续联调后端时替换为真实购物车数量接口。
+	recipeStore.setCartTotal(0);
 };
 
 /**
@@ -168,9 +135,14 @@ const cateDetails = (item) => {
  * @return {*}
  */
 const cateEdit = (item) => {
+	const url = "/pages/recipe/redact?id=" + item.id + "&title=编辑菜谱";
 	// 点击跳转到编辑菜谱页
-	uni.navigateTo({
-		url: "/pages/recipe/redact?id=" + item.id + "&title=编辑菜谱",
+	requireLogin(() => {
+		uni.navigateTo({
+			url,
+		});
+	}, {
+		redirect: url,
 	});
 };
 
@@ -180,21 +152,23 @@ const cateEdit = (item) => {
  */
 const cateDelete = (item) => {
 	// 点击删除菜谱
-	uni.showModal({
-		title: "删除菜谱",
-		content: "确定删除菜谱：" + item.name + "吗？",
-		success: (res) => {
-			if (res.confirm) {
-				// 过滤出不等于id的元素
-				tabList.value.forEach((tab) => {
-					tab.children = tab.children.filter((item) => item.id !== id);
-				});
-				uni.showToast({
-					title: "删除成功",
-					icon: "none",
-				});
-			}
-		},
+	requireLogin(() => {
+		uni.showModal({
+			title: "删除菜谱",
+			content: "确定删除菜谱：" + item.name + "吗？",
+			success: (res) => {
+				if (res.confirm) {
+					// 过滤出不等于id的元素
+					tabList.value.forEach((tab) => {
+						tab.children = tab.children.filter((child) => child.id !== item.id);
+					});
+					uni.showToast({
+						title: "删除成功",
+						icon: "none",
+					});
+				}
+			},
+		});
 	});
 };
 
@@ -203,25 +177,27 @@ const cateDelete = (item) => {
  * @return {*}
  */
 const cateAddCart = async (item) => {
-	// 点击添加购物车
-	try {
-		await recipeStore.addCart({
-			id: item.id,
-			name: item.name,
-			cover: "/static/images/head.jpeg",
-			price: item.price,
-			quantity: 1,
-		});
-		uni.showToast({
-			title: "添加购物车：" + item.name,
-			icon: "none",
-		});
-	} catch (error) {
-		uni.showToast({
-			title: recipeStore.errorMessage,
-			icon: "none",
-		});
-	}
+	return requireLogin(async () => {
+		// 点击添加购物车
+		try {
+			await recipeStore.addCart({
+				id: item.id,
+				name: item.name,
+				cover: "/static/images/head.jpeg",
+				price: item.price,
+				quantity: 1,
+			});
+			uni.showToast({
+				title: "添加购物车：" + item.name,
+				icon: "none",
+			});
+		} catch (error) {
+			uni.showToast({
+				title: recipeStore.errorMessage,
+				icon: "none",
+			});
+		}
+	});
 };
 </script>
 

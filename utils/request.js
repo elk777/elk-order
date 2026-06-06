@@ -20,6 +20,7 @@
 
 import { useUserStore } from '@/stores/user.js'
 import { BASE_URL } from '@/config/index.js'
+import { handleUnauthorized } from '@/utils/auth.js'
 
 // ===================== 配置项 =====================
 
@@ -229,8 +230,11 @@ class Http {
 
             // token 过期处理
             if (reqConfig.auth && REFRESH_CODES.has(normalized.code)) {
-              const newToken = await refreshToken()
+              // 先尝试刷新已有 token；无 token 时直接进入登录兜底。
+              const currentToken = getToken()
+              const newToken = currentToken ? await refreshToken() : ''
               if (newToken) {
+                // 刷新成功后重放当前请求，调用方不需要感知 token 更新。
                 headers['Authorization'] = `Bearer ${newToken}`
                 const retryRes = await uniRequest({
                   url: fullUrl,
@@ -244,7 +248,7 @@ class Http {
                 return
               }
               // 刷新失败，跳转登录
-              redirectLogin()
+              handleUnauthorized()
               reject(createError(401, '登录已过期，请重新登录', id, res))
               return
             }
@@ -420,18 +424,6 @@ async function refreshToken() {
     refreshing = false
     refreshQueue = []
   }
-}
-
-/** 跳转登录页 */
-let loginRedirectTimer = null
-function redirectLogin() {
-  if (loginRedirectTimer) return
-  loginRedirectTimer = setTimeout(() => {
-    const userStore = useUserStore()
-    userStore.setToken('')
-    uni.reLaunch({ url: '/pages/home/index' })
-    loginRedirectTimer = null
-  }, 100)
 }
 
 /** 全局 loading */

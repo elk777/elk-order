@@ -135,6 +135,17 @@ export const useRecipeStore = defineStore(
 			}
 		};
 
+		/**
+		 * @description: 重置菜谱和购物车状态
+		 * @return {void}
+		 */
+		const resetRecipeState = () => {
+			cartList.value = [];
+			cartTotal.value = 0;
+			cateTotal.value = 0;
+			errorMessage.value = "";
+		};
+
 		return {
 			cartList,
 			cartTotal,
@@ -146,6 +157,7 @@ export const useRecipeStore = defineStore(
 			addCart,
 			deleteCart,
 			clearCart,
+			resetRecipeState,
 		};
 	},
 	{

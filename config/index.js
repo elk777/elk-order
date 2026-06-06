@@ -2,11 +2,11 @@
  * @Author: elk
  * @Date: 2025-07-19 16:45:55
  * @LastEditors: elk 
- * @LastEditTime: 2026-03-13 14:12:39
+ * @LastEditTime: 2026-06-05 15:39:03
  * @FilePath: /hkt-applet/config/index.js
  * @Description: 整体基础配置
  */
-const BASE_URL = 'https://5nmzg5443748.vicp.fun' // 本地渗透开发地址
+const BASE_URL = 'http://localhost:3000/' // 本地渗透开发地址
 
 const APP_ID = 'wx49ecb7bac043ee73' // wx appid
 

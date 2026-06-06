@@ -26,6 +26,9 @@ import Tabbar from "@/components/Tabbar/index.vue";
 import User from "./component/User.vue";
 import Couple from "./component/Couple.vue";
 import FunList from "./component/FunList.vue";
+import { useAuthGuard } from "@/hooks/useAuthGuard.js";
+
+useAuthGuard();
 </script>
 
 <style lang="scss" scoped>
