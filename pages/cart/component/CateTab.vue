@@ -8,7 +8,17 @@
 -->
 <template>
 	<view class="catetab-container">
-		<up-cate-tab class="cate-tab" :current="0" :tabList="tabList" tabKeyName="title" itemKeyName="name">
+		<EmptyState
+			v-if="isMenuEmpty"
+			:icon="emptyState.icon"
+			:title="emptyState.title"
+			:desc="emptyState.desc"
+			:actionText="emptyState.actionText"
+			:actionIcon="emptyState.actionIcon"
+			minHeight="calc(100vh - 320px)"
+			@action="handleEmptyAction"
+		/>
+		<up-cate-tab v-else class="cate-tab" :current="0" :tabList="tabList" tabKeyName="title" itemKeyName="name">
 			<template #tabItem="{ item }">
 				<view>{{ item.title }} </view>
 			</template>
@@ -79,9 +89,10 @@ export default {
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { COLOURS } from "@/config/index.js";
+import EmptyState from "@/components/EmptyState/index.vue";
 import { useUserStore } from "@/stores/user.js";
 import { useRecipeStore } from "@/stores/recipe.js";
-import { requireLogin } from "@/utils/auth.js";
+import { goLogin, requireLogin } from "@/utils/auth.js";
 const userStore = useUserStore();
 const recipeStore = useRecipeStore();
 const tabList = ref([]);
@@ -90,6 +101,46 @@ const cateLoading = ref(true);
 //计算属性： 根据用户类型判断图标icon的展示 0 是饲养员 1 是吃货
 const isFeeder = computed(() => {
 	return userStore.userType === 0;
+});
+
+const recipeTotal = computed(() => {
+	return tabList.value.reduce((total, tab) => {
+		return total + (Array.isArray(tab.children) ? tab.children.length : 0);
+	}, 0);
+});
+
+const isMenuEmpty = computed(() => {
+	return !cateLoading.value && recipeTotal.value === 0;
+});
+
+const emptyState = computed(() => {
+	if (!userStore.isLogin) {
+		return {
+			icon: "account",
+			title: "登录后查看专属菜单",
+			desc: "登录后可以查看家里的菜谱，饲养员也能在这里创建菜单。",
+			actionText: "去登录",
+			actionIcon: "account",
+		};
+	}
+
+	if (isFeeder.value) {
+		return {
+			icon: "file-text",
+			title: "还没有创建菜谱",
+			desc: "先添加一道常做菜，菜单页就能展示给吃货选择。",
+			actionText: "添加菜谱",
+			actionIcon: "plus-circle",
+		};
+	}
+
+	return {
+		icon: "empty-list",
+		title: "菜单还没准备好",
+		desc: "饲养员创建菜谱后，你就可以在这里选择想吃的菜。",
+		actionText: "刷新菜单",
+		actionIcon: "reload",
+	};
 });
 
 onMounted(() => {
@@ -116,6 +167,30 @@ const getCateList = async () => {
 const getCartTotal = async () => {
 	// 后续联调后端时替换为真实购物车数量接口。
 	recipeStore.setCartTotal(0);
+};
+
+const handleEmptyAction = () => {
+	if (!userStore.isLogin) {
+		goLogin({
+			redirect: "/pages/sort/index",
+			message: "请先登录后查看菜单",
+		});
+		return;
+	}
+
+	if (isFeeder.value) {
+		const url = "/pages/recipe/redact?title=新增菜谱";
+		requireLogin(() => {
+			uni.navigateTo({
+				url,
+			});
+		}, {
+			redirect: url,
+		});
+		return;
+	}
+
+	getCateList();
 };
 
 /**
