@@ -1,8 +1,8 @@
 <!--
  * @Author: elk
  * @Date: 2025-09-04 14:32:36
- * @LastEditors: elk 
- * @LastEditTime: 2026-02-10 16:28:23
+ * @LastEditors: elk
+ * @LastEditTime: 2026-06-10 17:02:17
  * @FilePath: /hkt-applet/pages/home/component/MainBodyMini.vue
  * @Description: 首页-中心内容mini版 - 通过侧边按钮切换模式
 -->
@@ -16,40 +16,29 @@
 				src="https://cdn.uviewui.com/uview/album/1.jpg"
 			></up-image>
 		</view>
-		<Love :isAnimated="false" />
-		<view class="kind-head-unselected">
-			<span class="unselected-plus"></span>
-		</view>
+		<Love :isAnimated="false" :size="20" />
+		<DefaultInviteAvatar />
 	</view>
 </template>
 
 <script setup>
-import { ref } from "vue";
 import Love from "@/components/Love/index.vue";
+import DefaultInviteAvatar from "@/components/DefaultInviteAvatar/index.vue";
 </script>
 
 <style lang="scss" scoped>
 .body-mini {
-	margin-right: 10px;
-	.kind-head-unselected {
-		position: relative;
-		width: 30px;
-		height: 30px;
-		padding: 1px;
-		border: 1px solid $theme-color;
-		background-color: #fff;
-		border-radius: 50%;
-		.unselected-plus {
-			position: absolute;
-			top: 7px;
-			left: 7px;
-			width: 100%;
-			height: 100%;
-			z-index: 1;
-			background-image: url("/static/images/add.svg");
-			background-size: 55%;
-			background-repeat: no-repeat;
-		}
-	}
+	width: 188rpx;
+	height: 68rpx;
+	margin-right: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	box-sizing: border-box;
+	// overflow: hidden;
+}
+
+.body-mini :deep(.love-bounce) {
+	margin: 0;
 }
 </style>

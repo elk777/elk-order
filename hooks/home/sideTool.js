@@ -40,8 +40,12 @@ export function useBodyMode() {
 	const cut = () => {
 		isBody.value = !isBody.value;
 	};
+	const show = () => {
+		isBody.value = true;
+	};
 	return {
 		isBody,
 		cut,
+		show,
 	}
 }
