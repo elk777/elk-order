@@ -189,16 +189,15 @@ class Http {
 
     if (loading) showLoading()
 
-    const executor = () => {
-      return new Promise((resolve, reject) => {
-        async function run() {
-          try {
-            // 构建请求配置
-            let reqConfig = { url, method, params, data, auth, timeout, id }
-
-            // 执行请求拦截器链
-            for (const fn of requestInterceptors) {
-              reqConfig = await fn(reqConfig)
+	    const executor = () => {
+	      return new Promise((resolve, reject) => {
+	        async function run() {
+	          let reqConfig = { url, method, params, data, auth, timeout, id }
+	          try {
+	            // 构建请求配置
+	            // 执行请求拦截器链
+	            for (const fn of requestInterceptors) {
+	              reqConfig = await fn(reqConfig)
             }
 
             // 拼接 URL 参数
@@ -404,7 +403,7 @@ async function refreshToken() {
   refreshing = true
   try {
     const res = await uniRequest({
-      url: BASE + '/auth/refresh',
+      url: BASE + '/api/auth/refresh',
       method: 'POST',
       data: {},
       header: buildHeaders(),

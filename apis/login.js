@@ -15,7 +15,7 @@ import http from '@/utils/request.js'
  * @return {Promise} 登录响应
  */
 export function login(data) {
-	return http.post('/login', data, {
+	return http.post('/api/auth/wechat-login', data, {
 		auth: false,
 		loading: true,
 	})

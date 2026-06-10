@@ -14,6 +14,7 @@ const DEFAULT_PROFILE = {
 	avatar: "",
 	nickName: "",
 	uuId: "",
+	phone: "",
 	gender: null,
 	userType: null,
 	binding: false,

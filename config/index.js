@@ -6,7 +6,7 @@
  * @FilePath: /hkt-applet/config/index.js
  * @Description: 整体基础配置
  */
-const BASE_URL = 'http://localhost:3000/' // 本地渗透开发地址
+const BASE_URL = 'http://localhost:3000' // 本地渗透开发地址
 
 const APP_ID = 'wx49ecb7bac043ee73' // wx appid
 

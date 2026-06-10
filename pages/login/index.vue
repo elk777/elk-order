@@ -22,15 +22,13 @@
 			<button
 				class="primary-login pubFlex"
 				:class="{ disabled: !isAgreed || logging }"
-				:open-type="isAgreed ? 'getPhoneNumber' : ''"
 				:disabled="logging"
 				:loading="logging"
 				hover-class="primary-login-hover"
-				@click="handleQuickLoginTap"
-				@getphonenumber="handleGetPhoneNumber"
+				@click="handleWechatLogin"
 			>
 				<up-icon name="weixin-fill" color="#ffffff" size="22" />
-				<text class="primary-login-text">手机号快捷登录</text>
+				<text class="primary-login-text">微信授权登录</text>
 			</button>
 
 			<button class="other-login pubFlex" hover-class="other-login-hover" @click="openOtherLogin">
@@ -109,6 +107,7 @@ import { onUnmounted, ref } from "vue";
 import { COLOURS } from "@/config/index.js";
 import { login } from "@/apis/login.js";
 import { completeLogin, redirectAfterLogin } from "@/utils/auth.js";
+import { getWechatLoginCode, getWechatUserProfile } from "@/utils/wechatAuth.js";
 
 const isAgreed = ref(false);
 const showOtherLogin = ref(false);
@@ -139,49 +138,36 @@ const toggleAgreement = () => {
 };
 
 /**
- * @description: 点击快捷登录按钮时校验协议状态
+ * @description: 微信授权登录
  * @return {void}
  */
-const handleQuickLoginTap = () => {
-	if (!isAgreed.value) {
-		showAgreementToast();
-	}
-};
-
-/**
- * @description: 处理微信手机号快捷授权回调
- * @param {Object} event 微信手机号授权事件
- * @return {void}
- */
-const handleGetPhoneNumber = (event) => {
-	const { errMsg, code, encryptedData, iv } = event.detail || {};
+const handleWechatLogin = async () => {
 	if (!isAgreed.value) {
 		showAgreementToast();
 		return;
 	}
 
-	if (errMsg !== "getPhoneNumber:ok") {
-		uni.showToast({
-			title: "已取消授权",
-			icon: "none",
-		});
+	if (logging.value) {
 		return;
 	}
 
-	// 微信新版本优先使用 code，旧版本兼容 encryptedData + iv。
-	if (!code && (!encryptedData || !iv)) {
+	let loginCode = "";
+	let wechatProfile = {};
+	try {
+		loginCode = await getWechatLoginCode();
+		wechatProfile = await getWechatUserProfile();
+	} catch (error) {
 		uni.showToast({
-			title: "授权参数缺失",
+			title: error.message || "微信登录失败",
 			icon: "none",
 		});
 		return;
 	}
 
 	submitLogin({
-		loginType: "WECHAT_PHONE",
-		phoneCode: code,
-		encryptedData,
-		iv,
+		loginType: "WECHAT",
+		loginCode,
+		...wechatProfile,
 	});
 };
 
@@ -248,25 +234,9 @@ const sendCode = () => {
  * @return {void}
  */
 const submitPhoneLogin = () => {
-	if (!isValidPhone()) {
-		uni.showToast({
-			title: "请输入正确手机号",
-			icon: "none",
-		});
-		return;
-	}
-	if (!/^\d{4,6}$/.test(verifyCode.value)) {
-		uni.showToast({
-			title: "请输入验证码",
-			icon: "none",
-		});
-		return;
-	}
-
-	submitLogin({
-		loginType: "PHONE_CODE",
-		phone: phone.value,
-		verifyCode: verifyCode.value,
+	uni.showToast({
+		title: "验证码登录暂未开放，请使用微信授权登录",
+		icon: "none",
 	});
 };
 

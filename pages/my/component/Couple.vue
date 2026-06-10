@@ -18,7 +18,7 @@
 			<view v-if="!userInfo.binding" class="couple-body pubColumnFlex">
 				<view class="couple-body-text">准备好了吗？ 开启两个人的厨房</view>
 				<view>
-					<up-button shape="circle" size="large" :color="COLOURS['theme-color']" type="primary"
+					<up-button shape="circle" size="large" :color="COLOURS['theme-color']" type="primary" @click="handleBindClick"
 						>绑定情侣</up-button
 					>
 				</view>
@@ -53,10 +53,22 @@
 import { ref, computed } from "vue";
 import { useUserStore } from "@/stores/user.js";
 import { COLOURS } from "@/config/index.js";
+import { requireLogin } from "@/utils/auth.js";
 
 import Love from "@/components/Love/index.vue";
 const userStore = useUserStore();
 const userInfo = computed(() => userStore.profile);
+
+const handleBindClick = () => {
+	requireLogin(() => {
+		uni.showToast({
+			title: "绑定功能准备中",
+			icon: "none",
+		});
+	}, {
+		message: "请先登录后绑定情侣",
+	});
+};
 </script>
 <style lang="scss" scoped>
 .couple-relation {
