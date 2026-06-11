@@ -90,6 +90,10 @@ class Http {
     return this._request({ ...opts, url, method: 'PUT', data })
   }
 
+  patch(url, data = {}, opts = {}) {
+    return this._request({ ...opts, url, method: 'PATCH', data })
+  }
+
   del(url, data = {}, opts = {}) {
     return this._request({ ...opts, url, method: 'DELETE', data })
   }
@@ -98,6 +102,7 @@ class Http {
     const {
       loading = true,
       timeout = 30000,
+      auth = true,
       onProgress,
     } = opts
 
@@ -106,6 +111,12 @@ class Http {
 
     if (loading) showLoading()
 
+    const header = buildUploadHeaders()
+    if (auth) {
+      const token = getToken()
+      if (token) header['Authorization'] = `Bearer ${token}`
+    }
+
     return new Promise((resolve, reject) => {
       const uploadTask = uni.uploadFile({
         url: this.baseURL + url,
@@ -113,7 +124,7 @@ class Http {
         name,
         formData: { ...formData, _t: Date.now() },
         timeout,
-        header: buildHeaders(),
+        header,
         success: (res) => {
           if (loading) hideLoading()
           const cost = Date.now() - startTime
@@ -189,15 +200,15 @@ class Http {
 
     if (loading) showLoading()
 
-	    const executor = () => {
-	      return new Promise((resolve, reject) => {
-	        async function run() {
-	          let reqConfig = { url, method, params, data, auth, timeout, id }
-	          try {
-	            // 构建请求配置
-	            // 执行请求拦截器链
-	            for (const fn of requestInterceptors) {
-	              reqConfig = await fn(reqConfig)
+    const executor = () => {
+      return new Promise((resolve, reject) => {
+        const run = async () => {
+          let reqConfig = { url, method, params, data, auth, timeout, id }
+          try {
+            // 构建请求配置
+            // 执行请求拦截器链
+            for (const fn of requestInterceptors) {
+              reqConfig = await fn(reqConfig)
             }
 
             // 拼接 URL 参数
@@ -333,6 +344,15 @@ function buildHeaders(extra = {}) {
   }
 }
 
+/** 构建上传请求头（不含 Content-Type，由 uni.uploadFile 自动设置 multipart/form-data 边界） */
+function buildUploadHeaders(extra = {}) {
+  return {
+    'X-Request-From': 'mini-app',
+    'X-Timestamp': String(Date.now()),
+    ...extra,
+  }
+}
+
 /** 构建完整 URL，拼接 query 参数 */
 function buildUrl(url, params = {}) {
   const query = Object.entries(params)
@@ -403,7 +423,7 @@ async function refreshToken() {
   refreshing = true
   try {
     const res = await uniRequest({
-      url: BASE + '/api/auth/refresh',
+      url: BASE + '/auth/refresh',
       method: 'POST',
       data: {},
       header: buildHeaders(),
