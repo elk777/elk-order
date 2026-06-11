@@ -18,6 +18,7 @@ const DEFAULT_PROFILE = {
 	gender: null,
 	userType: null,
 	binding: false,
+	createTime: "",
 };
 
 const MOCK_TOKENS = ["elk"];

@@ -22,20 +22,18 @@
 			<view class="user-edit w-100">
 				<up-form :model="userInfo" :rules="rules" labelPosition="top" labelWidth="auto" ref="formRef">
 					<up-form-item label="头像" prop="avatar">
-						<Upload
-							:maxCount="1"
-							v-model:fileList="userInfo.avatar"
-							accept="image"
-							@after-read="afterRead"
-							:sizeType="['compressed']"
-							:showBorder="false"
+						<button
+							class="avatar-picker"
+							open-type="chooseAvatar"
+							@chooseavatar="handleChooseWechatAvatar"
+							@click="handleAvatarClick"
 						>
 							<up-avatar shape="circle" :src="userInfo.avatar" size="75" />
-							<view class="change-avatar">点击更换</view>
-						</Upload>
+							<view class="change-avatar">{{ avatarUploading ? "上传中..." : "点击更换" }}</view>
+						</button>
 					</up-form-item>
 					<up-form-item label="昵称" prop="nickName">
-						<up-input v-model="userInfo.nickName" placeholder="请输入用户名"></up-input>
+						<up-input v-model="userInfo.nickName" type="nickname" placeholder="请输入用户名"></up-input>
 					</up-form-item>
 					<up-form-item label="性别" prop="gender">
 						<up-radio-group v-model="userInfo.gender" :options="genderOptions">
@@ -69,16 +67,17 @@ export default {
 };
 </script>
 <script setup>
-import { ref, computed } from "vue";
+import { reactive, ref, watch } from "vue";
 import { COLOURS } from "@/config/index.js";
 
 import { useUserStore } from "@/stores/user.js";
-// 引入通用上传组件
-import Upload from "@/components/Upload/index.vue";
+import { updateUserProfile, uploadUserAvatar } from "@/apis/user.js";
 
 const userStore = useUserStore();
-// 深拷贝创建本地副本，避免直接修改store
-const userInfo = computed(() => ({ ...userStore.profile }));
+const formRef = ref(null);
+const saving = ref(false);
+const avatarUploading = ref(false);
+const userInfo = reactive(createEditableProfile());
 
 const genderOptions = ref([
 	{ label: "男", value: 0 },
@@ -91,7 +90,7 @@ const userTypeOptions = ref([
 ]);
 
 const rules = ref({
-	username: [{ required: true, message: "请输入用户名", trigger: ["blur"] }],
+	nickName: [{ required: true, message: "请输入用户名", trigger: ["blur"] }],
 });
 
 const props = defineProps({
@@ -107,36 +106,139 @@ const props = defineProps({
  */
 const emit = defineEmits(["close"]);
 const handleClose = () => {
+	resetForm();
 	emit("close");
 };
 
-/**
- * @description: 图片上传后的处理函数
- * @param {Object} file - 上传的文件对象
- * @param {Array} fileList - 当前文件列表
- * @return {void}
- */
-const afterRead = (file, fileList) => {
-	// 通用上传组件已经处理了文件添加，这里可以添加额外的业务逻辑
-	console.log("图片上传成功", file);
-	console.log("当前文件列表", fileList);
+watch(
+	() => props.show,
+	(show) => {
+		if (show) resetForm();
+	},
+);
+
+function createEditableProfile(profile = userStore.profile) {
+	return {
+		avatar: profile.avatar || "",
+		nickName: profile.nickName || "",
+		gender: normalizeOptionValue(profile.gender, 0),
+		userType: normalizeOptionValue(profile.userType ?? userStore.userType, 0),
+	};
+}
+
+function resetForm() {
+	Object.assign(userInfo, createEditableProfile());
+}
+
+function normalizeOptionValue(value, fallback) {
+	const numberValue = Number(value);
+	return Number.isNaN(numberValue) ? fallback : numberValue;
+}
+
+const handleAvatarClick = () => {
+	// #ifndef MP-WEIXIN
+	chooseLocalAvatar();
+	// #endif
 };
+
+const handleChooseWechatAvatar = (event) => {
+	const avatarUrl = event?.detail?.avatarUrl;
+	if (!avatarUrl) return;
+	uploadAvatarFile(avatarUrl);
+};
+
+function chooseLocalAvatar() {
+	uni.chooseImage({
+		count: 1,
+		sizeType: ["compressed"],
+		sourceType: ["album", "camera"],
+		success: (res) => {
+			const filePath = res.tempFilePaths?.[0];
+			if (filePath) uploadAvatarFile(filePath);
+		},
+	});
+}
+
+async function uploadAvatarFile(filePath) {
+	if (avatarUploading.value) return;
+	avatarUploading.value = true;
+	const previousAvatar = userInfo.avatar;
+	userInfo.avatar = filePath;
+	try {
+		const result = await uploadUserAvatar(filePath);
+		const avatarUrl = resolveAvatarUrl(result);
+		if (!avatarUrl) throw new Error("头像上传失败");
+		userInfo.avatar = avatarUrl;
+	} catch (error) {
+		userInfo.avatar = previousAvatar;
+		uni.showToast({
+			title: error.message || "头像上传失败",
+			icon: "none",
+		});
+	} finally {
+		avatarUploading.value = false;
+	}
+}
 
 /**
  * @description: 保存用户信息
  * @return {*}
  */
-const handleSave = () => {
-	// 将本地修改后的数据更新到store
-	userStore.setProfile(userInfo.value);
-	// 关闭modal
-	handleClose();
-	// 显示保存成功提示
-	uni.showToast({
-		title: "保存成功",
-		icon: "success"
-	});
+const handleSave = async () => {
+	if (saving.value || avatarUploading.value) return;
+	const nickName = userInfo.nickName.trim();
+	if (!nickName) {
+		uni.showToast({
+			title: "请输入用户名",
+			icon: "none",
+		});
+		return;
+	}
+
+	saving.value = true;
+	try {
+		const payload = {
+			avatar: userInfo.avatar,
+			nickName,
+			gender: userInfo.gender,
+			userType: userInfo.userType,
+		};
+		const result = await updateUserProfile(payload);
+		userStore.setProfile(normalizeProfile(result, payload));
+		emit("close");
+		uni.showToast({
+			title: "保存成功",
+			icon: "success",
+		});
+	} catch (error) {
+		uni.showToast({
+			title: error.message || "保存失败",
+			icon: "none",
+		});
+	} finally {
+		saving.value = false;
+	}
 };
+
+function resolveAvatarUrl(result = {}) {
+	const data = result.data || result;
+	return data.url || data.path || data.avatar || data.imageUrl || "";
+}
+
+function normalizeProfile(result = {}, fallback = {}) {
+	const data = result.data || result;
+	const source = data.profile || data.user || data;
+	return {
+		...userStore.profile,
+		...fallback,
+		...source,
+		uuId: source.uuId || source.uuid || userStore.profile.uuId,
+		uuid: source.uuid || source.uuId || userStore.profile.uuid,
+		phone: source.phone ?? userStore.profile.phone,
+		binding: source.binding ?? userStore.profile.binding,
+		createTime: source.createTime ?? userStore.profile.createTime,
+	};
+}
 </script>
 
 <style scoped lang="scss">
@@ -146,5 +248,22 @@ const handleSave = () => {
 .change-avatar {
 	margin-top: 5px;
 	color: $tinge-color;
+}
+
+.avatar-picker {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	line-height: 1.2;
+	background: transparent;
+	border: 0;
+
+	&::after {
+		border: 0;
+	}
 }
 </style>
