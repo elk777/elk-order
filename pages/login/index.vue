@@ -108,6 +108,7 @@ import { COLOURS } from "@/config/index.js";
 import { login } from "@/apis/login.js";
 import { completeLogin, redirectAfterLogin } from "@/utils/auth.js";
 import { getWechatLoginCode, getWechatUserProfile } from "@/utils/wechatAuth.js";
+import { consumePendingInvite, getPendingInvite } from "@/utils/invite.js";
 
 const isAgreed = ref(false);
 const showOtherLogin = ref(false);
@@ -281,15 +282,21 @@ const submitLogin = async (data) => {
 			return;
 		}
 
-		// 3. 写入登录态，关闭弹层并提示用户。
+		// 3. 写入登录态并关闭弹层。
 		completeLogin(token, profile);
 		closeOtherLogin();
-		uni.showToast({
-			title: "登录成功",
-			icon: "success",
-		});
 
-		// 4. 等成功提示展示后，回到用户原本要进入的页面。
+		// 4. 有待处理邀请码时优先消费并展示绑定结果，否则提示登录成功。
+		if (getPendingInvite()) {
+			await consumePendingInvite();
+		} else {
+			uni.showToast({
+				title: "登录成功",
+				icon: "success",
+			});
+		}
+
+		// 5. 等提示展示后，回到用户原本要进入的页面。
 		setTimeout(() => {
 			redirectAfterLogin();
 		}, 500);
