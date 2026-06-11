@@ -43,9 +43,13 @@ export function useBodyMode() {
 	const show = () => {
 		isBody.value = true;
 	};
+	const hide = () => {
+		isBody.value = false;
+	};
 	return {
 		isBody,
 		cut,
 		show,
+		hide,
 	}
 }

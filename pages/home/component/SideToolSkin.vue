@@ -40,6 +40,8 @@
 		useSkinPop
 	} from '@/hooks/home/sideTool.js';
 	import {
+		HOME_SKIN_MEDIA_TYPES,
+		HOME_SKIN_VIDEO_LIMIT_SECONDS,
 		useHomeSkin
 	} from '@/hooks/home/useHomeSkin.js';
 
@@ -64,10 +66,25 @@
 
 	async function handleUpload() {
 		if (uploading.value) return;
-		const skin = await homeSkin.chooseCustomSkin();
+		const mediaType = await chooseUploadType();
+		if (!mediaType) return;
+
+		const skin = await homeSkin.chooseCustomSkin(mediaType);
 		if (skin) {
 			close();
 		}
+	}
+
+	function chooseUploadType() {
+		return new Promise((resolve) => {
+			uni.showActionSheet({
+				itemList: ['上传图片', `上传视频（${HOME_SKIN_VIDEO_LIMIT_SECONDS}秒内）`],
+				success: (res) => {
+					resolve(res.tapIndex === 1 ? HOME_SKIN_MEDIA_TYPES.VIDEO : HOME_SKIN_MEDIA_TYPES.IMAGE);
+				},
+				fail: () => resolve(''),
+			});
+		});
 	}
 </script>
 

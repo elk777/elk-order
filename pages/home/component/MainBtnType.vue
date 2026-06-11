@@ -47,11 +47,14 @@
 		useUserStore
 	} from '@/stores/user.js'
 	import { requireLogin } from '@/utils/auth.js';
+	import { updateUserProfile } from '@/apis/user.js';
 	const userStore = useUserStore()
 	const uToastRef = ref(null)
 
 	const show = ref(false)
 	const typeName = ref('');
+	// 防止网络往返期间重复触发切换请求；不直接禁用卡片以保留交互样式。
+	const switching = ref(false);
 
 	const btnTypes = ref([{
 			id: 0,
@@ -73,12 +76,12 @@
 		}
 	])
 	/**
-	 * @description: 角色切换事件
-	 * @param {:type} item: 按钮详细内容
-	 * @return {:type}
+	 * @description: 角色切换事件：先调后端 PATCH /users/me，成功后再更新本地 profile，失败保留原状态。
+	 * @param {Object} item 按钮详细内容
+	 * @return {void}
 	 */
 	const handelRoleCut = (item) => {
-		return requireLogin(() => {
+		return requireLogin(async () => {
 			if (userStore.userType === item.typeID) {
 				uToastRef.value.show({
 					type: 'default',
@@ -87,9 +90,43 @@
 				})
 				return true
 			}
-			show.value = true;
-			typeName.value = item.type;
-			userStore.setUserType(item.typeID);
+
+			// 入口处 guard，避免一次切换未完成时再次发起请求。
+			if (switching.value) {
+				return true;
+			}
+			switching.value = true;
+
+			try {
+				// 请求层对业务错误码（code !== 200）正常 resolve，需显式判 code 而非依赖 throw（参考 utils/invite.js）。
+				const res = await updateUserProfile({ userType: item.typeID });
+				if (res?.code !== 200) {
+					uni.showToast({
+						title: res?.message || '切换失败',
+						icon: 'none',
+					});
+					return true;
+				}
+
+				// 兼容请求层是否已脱壳：优先使用 res.data，回落到 res 本身；
+				// 强制带上本次切换的 userType，确保后端缺字段时 setProfile 也能同步顶层 userType ref。
+				const data = res.data || res;
+				userStore.setProfile({
+					...userStore.profile,
+					...data,
+					userType: item.typeID,
+				});
+				typeName.value = item.type;
+				show.value = true;
+			} catch (error) {
+				// 仅网络/超时等异常进入此分支，本地状态保持原样。
+				uni.showToast({
+					title: error?.message || '切换失败',
+					icon: 'none',
+				});
+			} finally {
+				switching.value = false;
+			}
 			return true;
 		}, {
 			message: '请先登录后选择身份',
