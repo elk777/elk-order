@@ -1,7 +1,7 @@
 <!--
  * @Author: elk
  * @Date: 2026-02-28 13:02:01
- * @LastEditors: elk 
+ * @LastEditors: elk
  * @LastEditTime: 2026-03-13 17:28:34
  * @FilePath: /hkt-applet/pages/my/component/IntegralDetail.vue
  * @Description: 积分详细模块
@@ -19,10 +19,14 @@
 				</up-tabs>
 				<up-divider></up-divider>
 				<view class="integral-detail-content">
-					<view class="integral-content-item pubFlex" v-for="item in integralContentItems" :key="item.value">
+					<view v-if="!integralContentItems.length" class="integral-empty pubColumnFlex">
+						<up-icon name="empty-data" size="46" color="#dadbde"></up-icon>
+						<view class="integral-empty-text">暂无积分记录</view>
+					</view>
+					<view class="integral-content-item pubFlex" v-for="item in integralContentItems" :key="item.id">
 						<view class="interal-item-left">
-							<view class="integral-detail-content-title publcTextSize">{{ item.name }}</view>
-							<view class="integral-detail-content-time publcLabelSize">{{ item.time }}</view>
+							<view class="integral-detail-content-title publcTextSize">{{ item.sourceDesc || item.source }}</view>
+							<view class="integral-detail-content-time publcLabelSize">{{ formatTime(item.createTime) }}</view>
 						</view>
 						<view class="interal-item-right font-weight-600">
 							<view
@@ -31,10 +35,10 @@
 									add: item.type === 1,
 									subtract: item.type === 0,
 								}"
-								>{{ amountDetail(item.type) }}{{ item.amount }}</view
 							>
+								{{ amountDetail(item.type) }}{{ item.amount }}
+							</view>
 						</view>
-						<!-- <up-divider></up-divider> -->
 					</view>
 				</view>
 			</view>
@@ -48,9 +52,9 @@ export default {
 };
 </script>
 <script setup>
-import { ref, computed } from "vue";
-import { useUserStore } from "@/stores/user.js";
+import { ref, computed, watch } from "vue";
 import { COLOURS } from "@/config/index.js";
+import { getPointsRecords } from "@/apis/points.js";
 
 const props = defineProps({
 	show: {
@@ -93,20 +97,17 @@ const gainOptions = ref([
 // 积分详细选项卡：active
 const active = ref(2);
 
-// 原始积分详细内容项（作为数据源）
-const originalIntegralContentItems = [
-	{ name: "签到", time: "2026-02-28 13:02:01", amount: 5, type: 1 },
-	{ name: "注册奖励", time: "2026-02-28 13:02:01", amount: 5, type: 1 },
-	{ name: "AI识别菜谱", time: "2026-02-28 13:02:01", amount: 5, type: 0 },
-	{ name: "AI识别菜谱", time: "2026-02-28 13:02:01", amount: 5, type: 0 },
-	{ name: "AI识别菜谱", time: "2026-02-28 13:02:01", amount: 5, type: 0 },
-	{ name: "AI识别菜谱", time: "2026-02-28 13:02:01", amount: 5, type: 0 },
-	{ name: "AI识别菜谱", time: "2026-02-28 13:02:01", amount: 5, type: 0 },
-	{ name: "AI识别菜谱-max", time: "2026-02-28 13:02:01", amount: 5, type: 0 },
-];
-
 // 积分详细内容项（用于显示）
-const integralContentItems = ref([...originalIntegralContentItems]);
+const integralContentItems = ref([]);
+
+watch(
+	() => props.show,
+	(show) => {
+		if (show) {
+			loadRecords();
+		}
+	},
+);
 
 /**
  * @description: 选项卡切换事件
@@ -114,17 +115,32 @@ const integralContentItems = ref([...originalIntegralContentItems]);
  * @return {*}
  */
 const handleChange = (tab) => {
-	// 过滤出当前选项卡的内容项
 	active.value = tab.value;
-	if (tab.value === 2) {
-		// 全部，显示所有数据
-		integralContentItems.value = [...originalIntegralContentItems];
-	} else {
-		// 收入或支出，基于原始数据过滤
-		integralContentItems.value = originalIntegralContentItems.filter((item) => item.type === tab.value);
-	}
-	console.log("🚀 ~ handleChange ~ integralContentItems:", integralContentItems)
+	loadRecords();
 };
+
+async function loadRecords() {
+	try {
+		const res = await getPointsRecords({
+			type: active.value,
+			page: 1,
+			pageSize: 20,
+		});
+		if (res?.code === 200 && res?.data) {
+			integralContentItems.value = res.data.list || [];
+		}
+	} catch (error) {
+		console.warn("[integral-detail] load records failed", error);
+	}
+}
+
+function formatTime(value) {
+	if (!value) return "";
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return String(value);
+	const pad = (num) => String(num).padStart(2, "0");
+	return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
 </script>
 <style lang="scss" scoped>
 .integral-detail-container {
@@ -135,6 +151,14 @@ const handleChange = (tab) => {
 	.integral-detail-content {
 		height: 450px;
 		overflow: auto;
+		.integral-empty {
+			height: 320px;
+			.integral-empty-text {
+				margin-top: 12px;
+				color: $tinge-color;
+				font-size: 26rpx;
+			}
+		}
 		.integral-content-item {
 			justify-content: space-between;
 			padding: 12px 15px;

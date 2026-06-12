@@ -59,7 +59,12 @@
 							</view>
 						</view>
 						<view class="stage-love pubFlex">
-							<Love :isAnimated="false" :size="26" />
+							<Love
+								:isAnimated="true"
+								:size="26"
+								animation-duration="4.2s"
+								animation-distance="-6rpx"
+							/>
 						</view>
 						<view class="food-spark spark-one"></view>
 						<view class="food-spark spark-two"></view>
@@ -151,7 +156,7 @@ import { useBodyMode } from "@/hooks/home/sideTool.js";
 import { getBottomSpacing, getUniTopNavHeight } from "@/utils/tool.js";
 import { useUserStore } from "@/stores/user.js";
 import { requireLogin } from "@/utils/auth.js";
-import { consumePendingInvite, INVITE_QUERY_KEY } from "@/utils/invite.js";
+import { buildInviteShareMessage, consumePendingInvite } from "@/utils/invite.js";
 import { getUserProfile } from "@/apis/user.js";
 
 const userStore = useUserStore();
@@ -233,32 +238,32 @@ const canInviteKeeper = computed(() => userStore.isLogin && !userStore.profile.b
 const orbitFoods = [
 	{
 		id: "breakfast",
-		icon: "/static/images/sort/breakfast.svg",
+		icon: "/static/images/home/orbit-rice.svg",
 		className: "item-breakfast",
 	},
 	{
 		id: "lunch",
-		icon: "/static/images/sort/lunch.svg",
+		icon: "/static/images/home/orbit-noodle.svg",
 		className: "item-lunch",
 	},
 	{
 		id: "supper",
-		icon: "/static/images/sort/supper.svg",
+		icon: "/static/images/home/orbit-bento.svg",
 		className: "item-supper",
 	},
 	{
 		id: "cart",
-		icon: "/static/images/sort/cart.svg",
+		icon: "/static/images/home/orbit-drink.svg",
 		className: "item-cart",
 	},
 	{
 		id: "feed",
-		icon: "/static/images/home/feed.png",
+		icon: "/static/images/home/orbit-pan.svg",
 		className: "item-feed",
 	},
 	{
 		id: "eat",
-		icon: "/static/images/home/eat.svg",
+		icon: "/static/images/home/orbit-dessert.svg",
 		className: "item-eat",
 	},
 ];
@@ -327,13 +332,11 @@ onShow(async () => {
 // 转发分享卡片，携带当前用户邀请码，好友点击进入即可完成相互绑定。
 // 根据点击源（data-role）区分文案：饲养员邀请吃货 / 吃货邀请饲养员；fallback 取当前用户身份。
 onShareAppMessage((res) => {
-	const inviteUid = userStore.profile.uuId || "";
-	const targetRole = res?.target?.dataset?.role || (currentRoleType.value === 1 ? "keeper" : "foodie");
-	const title = targetRole === "keeper" ? "来当我的饲养员，负责今天吃啥～" : "来做我的小吃货，今天我请你吃饭～";
-	return {
-		title,
-		path: `/pages/home/index?${INVITE_QUERY_KEY}=${inviteUid}`,
-	};
+	return buildInviteShareMessage({
+		uuid: userStore.profile.uuid,
+		userType: currentRoleType.value,
+		targetRole: res?.target?.dataset?.role,
+	});
 });
 
 function handleInvite() {
@@ -588,8 +591,7 @@ function getDiningStartDate() {
 	width: 68rpx;
 	height: 68rpx;
 	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.82);
-	box-shadow: 0 10rpx 22rpx rgba(255, 92, 141, 0.18);
+	background: transparent;
 	transform: translate(-50%, -50%);
 }
 
@@ -608,8 +610,8 @@ function getDiningStartDate() {
 }
 
 .orbit-item image {
-	width: 44rpx;
-	height: 44rpx;
+	width: 52rpx;
+	height: 52rpx;
 }
 
 .item-breakfast {

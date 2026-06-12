@@ -13,7 +13,7 @@ import { computed, ref, watch } from "vue";
 const DEFAULT_PROFILE = {
 	avatar: "",
 	nickName: "",
-	uuId: "",
+	uuid: "",
 	phone: "",
 	gender: null,
 	userType: null,
@@ -22,6 +22,17 @@ const DEFAULT_PROFILE = {
 };
 
 const MOCK_TOKENS = ["elk"];
+
+function normalizeProfile(v = {}) {
+	const source = v || {};
+	const normalized = {
+		...DEFAULT_PROFILE,
+		...source,
+		uuid: source.uuid || source.uuId || "",
+	};
+	delete normalized.uuId;
+	return normalized;
+}
 
 export const useUserStore = defineStore(
 	"user",
@@ -56,11 +67,22 @@ export const useUserStore = defineStore(
 		 * @return {*}
 		 */
 		const setProfile = (v) => {
-			profile.value = { ...DEFAULT_PROFILE, ...v };
+			profile.value = normalizeProfile(v);
 			if (v?.userType !== undefined) {
 				userType.value = v.userType;
 			}
 		};
+
+		// 兼容旧版本持久化缓存中的 profile.uuId，并迁移到数据库字段名 uuid。
+		watch(
+			profile,
+			(v) => {
+				if (v?.uuId) {
+					profile.value = normalizeProfile(v);
+				}
+			},
+			{ immediate: true },
+		);
 
 		// 清理历史开发阶段写入的假 token，避免未登录时展示 mock 用户资料。
 		watch(

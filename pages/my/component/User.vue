@@ -15,7 +15,7 @@
 			<view v-if="userStore.isLogin" class="user-info">
 				<view class="user-name publcTitleSize">{{ displayName }}</view>
 				<view class="user-account pubFlex">
-					用户ID：<span class="user-account-label font-weight-600">{{ userInfo.uuId }}</span>
+					用户ID：<span class="user-account-label font-weight-600">{{ userInfo.uuid }}</span>
 					<up-icon @click="copyUserId" size="20" :color="COLOURS['theme-color']" name="fingerprint"></up-icon>
 				</view>
 				<view class="user-info-detail pubFlex">
@@ -76,7 +76,7 @@ const showEdit = ref(false);
  * @return {*}
  */
 const copyUserId = () => {
-	if (!userInfo.value.uuId) {
+	if (!userInfo.value.uuid) {
 		uni.showToast({
 			title: "暂无用户ID",
 			icon: "none",
@@ -84,7 +84,7 @@ const copyUserId = () => {
 		return;
 	}
     uni.setClipboardData({
-        data: userInfo.value.uuId,
+        data: userInfo.value.uuid,
         success: () => {
             uni.showToast({
                 title: "复制成功",

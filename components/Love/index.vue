@@ -7,12 +7,12 @@
  * @Description: 通用爱心组件
 -->
 <template>
-	<view class="love-bounce" :class="{ 'love-bounce-dy': isAnimated }">
+	<view class="love-bounce" :class="{ 'love-bounce-dy': isAnimated }" :style="loveStyle">
 		<up-image :width="size" :height="size" :src="imgPath"></up-image>
 	</view>
 </template>
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 const imgPath = ref("/static/images/aixin.png");
 
 const props = defineProps({
@@ -24,14 +24,27 @@ const props = defineProps({
 		type: Boolean,
 		default: true,
 	},
+	animationDuration: {
+		type: String,
+		default: "5s",
+	},
+	animationDistance: {
+		type: String,
+		default: "-10px",
+	},
 });
+
+const loveStyle = computed(() => ({
+	"--love-animation-duration": props.animationDuration,
+	"--love-animation-distance": props.animationDistance,
+}));
 </script>
 <style lang="scss" scoped>
 .love-bounce {
 	margin: 0 30rpx;
 }
 .love-bounce-dy {
-	animation: love-bounce 5s ease-in-out infinite;
+	animation: love-bounce var(--love-animation-duration) ease-in-out infinite;
 }
 @keyframes love-bounce {
 	0%,
@@ -40,7 +53,7 @@ const props = defineProps({
 	}
 
 	50% {
-		transform: translateY(-10px);
+		transform: translateY(var(--love-animation-distance));
 	}
 }
 </style>

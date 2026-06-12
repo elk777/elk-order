@@ -17,6 +17,23 @@ const PENDING_INVITE_KEY = "PENDING_INVITE_UID";
 let consuming = false;
 
 /**
+ * @description: 构建情侣邀请分享卡片，首页和我的页保持同一套邀请文案与路径。
+ * @param {Object} options 邀请参数
+ * @param {string} options.uuid 当前用户公开邀请码
+ * @param {number|null} options.userType 当前用户身份：0 饲养员，1 吃货
+ * @param {string} options.targetRole 目标身份：keeper/foodie
+ * @return {{title: string, path: string}} 分享卡片配置
+ */
+export const buildInviteShareMessage = ({ uuid = "", userType = null, targetRole = "" } = {}) => {
+	const role = targetRole || (userType === 1 ? "keeper" : "foodie");
+	const title = role === "keeper" ? "来当我的饲养员，负责今天吃啥～" : "来做我的小吃货，今天我请你吃饭～";
+	return {
+		title,
+		path: `/pages/home/index?${INVITE_QUERY_KEY}=${uuid}`,
+	};
+};
+
+/**
  * @description: 从页面启动参数中提取并暂存邀请码
  * @param {Object} options 小程序启动参数（含 query）
  * @return {string} 捕获到的邀请码，未捕获返回空串
@@ -64,7 +81,7 @@ export const consumePendingInvite = async () => {
 	}
 
 	// 邀请人点击自己分享的卡片时跳过，避免无谓的“不能绑定自己”请求。
-	if (inviteUid === userStore.profile.uuId) {
+	if (inviteUid === userStore.profile.uuid) {
 		clearPendingInvite();
 		return false;
 	}

@@ -232,7 +232,6 @@ function normalizeProfile(result = {}, fallback = {}) {
 		...userStore.profile,
 		...fallback,
 		...source,
-		uuId: source.uuId || source.uuid || userStore.profile.uuId,
 		uuid: source.uuid || source.uuId || userStore.profile.uuid,
 		phone: source.phone ?? userStore.profile.phone,
 		binding: source.binding ?? userStore.profile.binding,

@@ -68,6 +68,15 @@
 			}
 		},
 		{
+			"path": "pages/my/attendance",
+			"style": {
+				"navigationBarTitleText": "每日签到",
+				"navigationBarBackgroundColor": "#FFF0F6",
+				"navigationBarTextStyle": "black",
+				"backgroundColor": "#FFF7FA"
+			}
+		},
+		{
 			"path": "pages/cart/AffirmOrder",
 			"style": {
 				"navigationBarTitleText": "确认订单"

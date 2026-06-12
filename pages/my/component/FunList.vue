@@ -38,7 +38,7 @@ const funList = ref([
 		name: "每日签到",
 		icon: "order",
 		path: "/pages/my/attendance",
-		open: false,
+		open: true,
 	},
 	{
 		id: 2,
