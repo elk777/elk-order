@@ -1,8 +1,8 @@
 <!--
  * @Author: elk
  * @Date: 2026-02-09 14:03:58
- * @LastEditors: elk
- * @LastEditTime: 2026-02-27 15:25:24
+ * @LastEditors: elk 
+ * @LastEditTime: 2026-06-13 03:32:34
  * @FilePath: /hkt-applet/pages/my/component/FunList.vue
  * @Description: 功能列表模块
 -->
@@ -45,7 +45,7 @@ const funList = ref([
 		name: "烹饪日历",
 		icon: "calendar",
 		path: "/pages/my/calendar",
-		open: false,
+		open: true,
 	},
 	{
 		id: 3,

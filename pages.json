@@ -77,6 +77,15 @@
 			}
 		},
 		{
+			"path": "pages/my/calendar",
+			"style": {
+				"navigationBarTitleText": "烹饪日历",
+				"navigationBarBackgroundColor": "#FFF0F6",
+				"navigationBarTextStyle": "black",
+				"backgroundColor": "#FFF7FA"
+			}
+		},
+		{
 			"path": "pages/cart/AffirmOrder",
 			"style": {
 				"navigationBarTitleText": "确认订单"
