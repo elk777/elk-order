@@ -24,7 +24,9 @@
 		<view class="partner-card">
 			<view class="avatar-block">
 				<view class="avatar-wrapper" :class="{ checked: selfStatus.checked }">
-					<up-avatar shape="circle" :src="selfStatus.avatar" size="68" />
+					<view class="avatar-inner">
+						<up-avatar shape="circle" :src="selfStatus.avatar" size="68" />
+					</view>
 					<view class="status-dot pubFlex" :class="{ active: selfStatus.checked }">
 						<up-icon name="checkmark" size="10" color="#ffffff"></up-icon>
 					</view>
@@ -38,7 +40,9 @@
 			</view>
 			<view class="avatar-block">
 				<view v-if="hasPartner" class="avatar-wrapper" :class="{ checked: partnerStatus.checked }">
-					<up-avatar shape="circle" :src="partnerStatus.avatar" size="68" />
+					<view class="avatar-inner">
+						<up-avatar shape="circle" :src="partnerStatus.avatar" size="68" />
+					</view>
 					<view class="status-dot pubFlex" :class="{ active: partnerStatus.checked }">
 						<up-icon name="checkmark" size="10" color="#ffffff"></up-icon>
 					</view>
@@ -391,6 +395,7 @@ function pad(value) {
 	box-sizing: border-box;
 	padding: 3rpx;
 	background: #ffffff;
+	flex-shrink: 0;
 }
 
 .avatar-wrapper.checked {
@@ -398,9 +403,22 @@ function pad(value) {
 	box-shadow: 0 0 18rpx rgba(255, 92, 141, 0.34);
 }
 
-.avatar-wrapper :deep(.u-avatar) {
+.avatar-inner {
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	overflow: hidden;
+}
+
+.avatar-inner :deep(.u-avatar) {
 	width: 100% !important;
 	height: 100% !important;
+}
+
+.avatar-inner :deep(.u-avatar__image) {
+	width: 100% !important;
+	height: 100% !important;
+	border-radius: 50% !important;
 }
 
 .status-dot {
