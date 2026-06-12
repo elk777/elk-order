@@ -11,7 +11,7 @@
 		<template #body>
 			<view class="fun-list-body">
 				<template v-for="fun in funList" :key="fun.id">
-					<button v-if="fun.type === 'feedback'" class="fun-list-item feedback-button pubFlex" open-type="feedback" hover-class="none">
+					<button v-if="fun.openType" class="fun-list-item open-button pubFlex" :open-type="fun.openType" hover-class="none">
 						<view class="pubFlex">
 							<up-icon :color="COLOURS['theme-color']" :name="fun.icon" size="26" />
 							<view class="fun-list-name publcTextSize">{{ fun.name }}</view>
@@ -61,14 +61,14 @@ const funList = ref([
 		name: "意见反馈",
 		icon: "chat",
 		path: "/pages/my/feedback",
-		type: "feedback",
+		openType: "feedback",
 	},
 	{
 		id: 4,
 		name: "联系客服",
 		icon: "kefu-ermai",
 		path: "/pages/my/contact",
-		open: false,
+		openType: "contact",
 	},
 ]);
 
@@ -111,7 +111,7 @@ const navigateTo = (fun) => {
         border-bottom: none;
     }
 }
-.feedback-button {
+.open-button {
 	margin: 0;
 	border: none;
 	border-radius: 0;
@@ -122,7 +122,7 @@ const navigateTo = (fun) => {
 	line-height: inherit;
 	text-align: left;
 }
-.feedback-button::after {
+.open-button::after {
 	border: none;
 }
 .fun-list-arrow {
