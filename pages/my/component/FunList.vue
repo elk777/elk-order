@@ -10,13 +10,22 @@
 	<up-card class="fun-list-container" :show-head="false" :head-border-bottom="false" :border="false">
 		<template #body>
 			<view class="fun-list-body">
-				<view @click="navigateTo(fun)" class="fun-list-item pubFlex" v-for="fun in funList" :key="fun.id">
-					<view class="pubFlex">
-						<up-icon :color="COLOURS['theme-color']" :name="fun.icon" size="26" />
-						<view class="fun-list-name publcTextSize">{{ fun.name }}</view>
+				<template v-for="fun in funList" :key="fun.id">
+					<button v-if="fun.type === 'feedback'" class="fun-list-item feedback-button pubFlex" open-type="feedback" hover-class="none">
+						<view class="pubFlex">
+							<up-icon :color="COLOURS['theme-color']" :name="fun.icon" size="26" />
+							<view class="fun-list-name publcTextSize">{{ fun.name }}</view>
+						</view>
+						<up-icon name="arrow-right" class="fun-list-arrow" />
+					</button>
+					<view v-else @click="navigateTo(fun)" class="fun-list-item pubFlex">
+						<view class="pubFlex">
+							<up-icon :color="COLOURS['theme-color']" :name="fun.icon" size="26" />
+							<view class="fun-list-name publcTextSize">{{ fun.name }}</view>
+						</view>
+						<up-icon name="arrow-right" class="fun-list-arrow" />
 					</view>
-					<up-icon name="arrow-right" class="fun-list-arrow" />
-				</view>
+				</template>
 			</view>
 		</template>
 	</up-card>
@@ -52,7 +61,7 @@ const funList = ref([
 		name: "意见反馈",
 		icon: "chat",
 		path: "/pages/my/feedback",
-		open: false,
+		type: "feedback",
 	},
 	{
 		id: 4,
@@ -91,6 +100,7 @@ const navigateTo = (fun) => {
 	justify-content: space-between;
 }
 .fun-list-item {
+	width: 100%;
     justify-content: space-between;
 	padding: 20px 0;
 	border-bottom: 1rpx solid $light-color;
@@ -100,6 +110,20 @@ const navigateTo = (fun) => {
     &:last-child {
         border-bottom: none;
     }
+}
+.feedback-button {
+	margin: 0;
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	box-sizing: border-box;
+	color: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	text-align: left;
+}
+.feedback-button::after {
+	border: none;
 }
 .fun-list-arrow {
 	font-size: 32rpx;
