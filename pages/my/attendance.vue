@@ -11,35 +11,53 @@
 				<view class="hero-title">每日一签，情意绵绵</view>
 				<view class="hero-subtitle">两个人都签到，今天的厨房更有仪式感</view>
 			</view>
-			<view class="hero-bubbles">
-				<view class="bubble bubble-left">♡</view>
-				<view class="bubble bubble-right">✓</view>
+			<view class="hero-icons">
+				<view class="hero-icon hero-icon-primary pubFlex">
+					<up-icon name="heart-fill" size="28" color="#ffffff"></up-icon>
+				</view>
+				<view class="hero-icon hero-icon-secondary pubFlex">
+					<up-icon name="checkmark-circle-fill" size="24" color="#ff5c8d"></up-icon>
+				</view>
 			</view>
 		</view>
 
 		<view class="partner-card">
-			<view class="avatar-wrapper" :class="{ checked: selfStatus.checked }">
-				<up-avatar shape="circle" :src="selfStatus.avatar" size="68" />
+			<view class="avatar-block">
+				<view class="avatar-wrapper" :class="{ checked: selfStatus.checked }">
+					<up-avatar shape="circle" :src="selfStatus.avatar" size="68" />
+					<view class="status-dot pubFlex" :class="{ active: selfStatus.checked }">
+						<up-icon name="checkmark" size="10" color="#ffffff"></up-icon>
+					</view>
+				</view>
 			</view>
-			<view class="partner-love pubColumnFlex">
-				<up-icon name="heart-fill" size="22" color="#ff5c8d"></up-icon>
+			<view class="partner-love">
+				<view class="partner-love-icon pubFlex">
+					<up-icon name="heart-fill" size="18" color="#ff5c8d"></up-icon>
+				</view>
 				<view class="partner-days">{{ overview.bothCheckedDays || 0 }}</view>
 			</view>
-			<view v-if="hasPartner" class="avatar-wrapper" :class="{ checked: partnerStatus.checked }">
-				<up-avatar shape="circle" :src="partnerStatus.avatar" size="68" />
-			</view>
-			<view v-else class="avatar-placeholder">
-				<up-icon name="plus-circle" size="40" color="#d4d4d4"></up-icon>
-				<view class="placeholder-text">待绑定</view>
+			<view class="avatar-block">
+				<view v-if="hasPartner" class="avatar-wrapper" :class="{ checked: partnerStatus.checked }">
+					<up-avatar shape="circle" :src="partnerStatus.avatar" size="68" />
+					<view class="status-dot pubFlex" :class="{ active: partnerStatus.checked }">
+						<up-icon name="checkmark" size="10" color="#ffffff"></up-icon>
+					</view>
+				</view>
+				<view v-else class="avatar-placeholder pubFlex">
+					<up-icon name="plus-circle" size="34" color="#c9c9c9"></up-icon>
+				</view>
 			</view>
 		</view>
 
 		<view class="calendar-card">
-			<view class="calendar-head pubFlex">
+			<view class="calendar-head">
 				<view class="month-arrow pubFlex" @click="changeMonth(-1)">
 					<up-icon name="arrow-left" size="16" color="#ff5c8d"></up-icon>
 				</view>
-				<view class="month-title">{{ currentYear }}年{{ currentMonth }}月</view>
+				<view class="month-copy">
+					<view class="month-title">{{ currentYear }}年{{ currentMonth }}月</view>
+					<view class="month-subtitle">点亮每一次同签</view>
+				</view>
 				<view class="month-arrow pubFlex" @click="changeMonth(1)">
 					<up-icon name="arrow-right" size="16" color="#ff5c8d"></up-icon>
 				</view>
@@ -62,14 +80,15 @@
 					}"
 				>
 					<template v-if="day.date">
+						<view class="date-number">{{ day.day }}</view>
 						<view class="heart-mark pubFlex">
 							<up-icon
 								name="heart-fill"
-								size="17"
+								size="13"
 								:color="day.bothChecked ? '#ff5c8d' : (day.selfChecked || day.partnerChecked) ? '#ffaac4' : '#ffd4df'"
 							></up-icon>
 						</view>
-						<view class="date-number">{{ day.day }}</view>
+						<view class="today-tag" v-if="day.isToday">今</view>
 					</template>
 				</view>
 			</view>
@@ -78,7 +97,7 @@
 		<view class="stats-card">
 			<view class="stat-item">
 				<view class="stat-icon pubFlex">
-					<up-icon name="calendar" size="26" color="#ff5c8d"></up-icon>
+					<up-icon name="calendar-fill" size="22" color="#ff5c8d"></up-icon>
 				</view>
 				<view class="stat-content">
 					<view class="stat-value">{{ overview.consecutiveDays || 0 }}</view>
@@ -88,7 +107,7 @@
 			<view class="stat-divider"></view>
 			<view class="stat-item">
 				<view class="stat-icon pubFlex">
-					<up-icon name="checkbox-mark" size="26" color="#ff5c8d"></up-icon>
+					<up-icon name="checkmark-circle-fill" size="22" color="#ff5c8d"></up-icon>
 				</view>
 				<view class="stat-content">
 					<view class="stat-value">{{ overview.monthCheckedDays || 0 }}</view>
@@ -181,6 +200,11 @@ const calendarDays = computed(() => {
 			partnerChecked: !!record.partnerChecked,
 			bothChecked: !!record.selfChecked && !!record.partnerChecked,
 		});
+	}
+
+	const trailingCount = cells.length % 7 === 0 ? 0 : 7 - (cells.length % 7);
+	for (let i = 0; i < trailingCount; i += 1) {
+		cells.push({ key: `tail-${i}`, date: "" });
 	}
 
 	return cells;
@@ -277,89 +301,101 @@ function pad(value) {
 	min-height: 100vh;
 	padding: 28rpx 26rpx 44rpx;
 	box-sizing: border-box;
-	background: linear-gradient(180deg, #fff0f7 0%, #fff9fb 42%, #f7f7f8 100%);
+	background:
+		linear-gradient(140deg, rgba(255, 236, 244, 0.92) 0%, rgba(255, 249, 251, 0.72) 46%, rgba(247, 247, 248, 0.96) 100%),
+		#fff9fb;
 	color: #2b1c25;
 }
 
 .hero {
 	position: relative;
-	min-height: 130rpx;
-	padding: 22rpx 210rpx 18rpx 12rpx;
+	min-height: 132rpx;
+	padding: 18rpx 190rpx 18rpx 4rpx;
 	box-sizing: border-box;
 }
 
 .hero-title {
-	font-size: 38rpx;
+	font-size: 40rpx;
 	font-weight: 900;
 	letter-spacing: 0;
+	line-height: 1.18;
 }
 
 .hero-subtitle {
-	margin-top: 10rpx;
+	margin-top: 12rpx;
 	font-size: 24rpx;
 	color: #7d6472;
 	line-height: 1.45;
 }
 
-.hero-bubbles {
+.hero-icons {
 	position: absolute;
-	top: 10rpx;
-	right: 8rpx;
-	width: 200rpx;
-	height: 130rpx;
-}
-
-.bubble {
-	position: absolute;
-	width: 100rpx;
-	height: 100rpx;
-	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.85);
-	box-shadow: 0 14rpx 32rpx rgba(255, 92, 141, 0.16);
-	color: #ff5c8d;
-	font-size: 44rpx;
-	font-weight: 900;
-	text-align: center;
-	line-height: 100rpx;
-}
-
-.bubble-left {
-	left: 0;
-	bottom: 0;
-}
-
-.bubble-right {
+	top: 8rpx;
 	right: 0;
-	top: 0;
+	width: 178rpx;
+	height: 126rpx;
+}
+
+.hero-icon {
+	position: absolute;
+	box-sizing: border-box;
+	border-radius: 50%;
+	box-shadow: 0 16rpx 34rpx rgba(255, 92, 141, 0.16);
+}
+
+.hero-icon-primary {
+	right: 0;
+	top: 4rpx;
+	width: 92rpx;
+	height: 92rpx;
+	background: linear-gradient(135deg, #ff5c8d 0%, #ff8fad 100%);
+}
+
+.hero-icon-secondary {
+	left: 8rpx;
+	bottom: 0;
+	width: 78rpx;
+	height: 78rpx;
+	border: 2rpx solid rgba(255, 92, 141, 0.1);
+	background: rgba(255, 255, 255, 0.92);
 }
 
 .partner-card,
 .calendar-card {
-	border-radius: 30rpx;
+	border: 2rpx solid rgba(255, 92, 141, 0.08);
+	border-radius: 28rpx;
 	background: rgba(255, 255, 255, 0.96);
-	box-shadow: 0 14rpx 38rpx rgba(255, 92, 141, 0.1);
+	box-shadow: 0 14rpx 34rpx rgba(255, 92, 141, 0.08);
 }
 
 .partner-card {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 28rpx 44rpx;
-	margin: 45rpx 0;
+	padding: 24rpx 44rpx;
+	margin: 18rpx 0;
+}
+
+.avatar-block {
+	display: flex;
+	justify-content: center;
+	width: 120rpx;
 }
 
 .avatar-wrapper {
 	position: relative;
-	width: 68rpx;
-	height: 68rpx;
+	width: 76rpx;
+	height: 76rpx;
 	border-radius: 50%;
+	border: 3rpx solid #f1eef0;
 	box-sizing: border-box;
-	overflow: hidden;
+	padding: 3rpx;
+	background: #ffffff;
 }
 
 .avatar-wrapper.checked {
-	border: 4rpx solid #ff5c8d;
-	box-shadow: 0 0 18rpx rgba(255, 92, 141, 0.4);
+	border-color: #ff5c8d;
+	box-shadow: 0 0 18rpx rgba(255, 92, 141, 0.34);
 }
 
 .avatar-wrapper :deep(.u-avatar) {
@@ -367,65 +403,97 @@ function pad(value) {
 	height: 100% !important;
 }
 
+.status-dot {
+	position: absolute;
+	right: -2rpx;
+	bottom: -2rpx;
+	width: 28rpx;
+	height: 28rpx;
+	border: 3rpx solid #ffffff;
+	border-radius: 50%;
+	background: #d6d6d6;
+	box-sizing: border-box;
+}
+
+.status-dot.active {
+	background: linear-gradient(135deg, #ff5c8d 0%, #ff8fad 100%);
+}
+
 .avatar-placeholder {
+	width: 76rpx;
+	height: 76rpx;
+	border-radius: 50%;
+	background: #f7f7f7;
+	border: 2rpx dashed #d4d4d4;
+	box-sizing: border-box;
+}
+
+.partner-love {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	width: 68rpx;
-	height: 68rpx;
+	min-width: 130rpx;
+}
+
+.partner-love-icon {
+	width: 44rpx;
+	height: 44rpx;
 	border-radius: 50%;
-	background: #f5f5f5;
-	border: 2rpx dashed #d4d4d4;
-}
-
-.placeholder-text {
-	margin-top: 4rpx;
-	font-size: 18rpx;
-	color: #999;
-	transform: scale(0.85);
-}
-
-.partner-love {
-	min-width: 110rpx;
+	background: #fff1f6;
 }
 
 .partner-days {
-	margin-top: 6rpx;
+	margin-top: 4rpx;
 	color: #ff5c8d;
-	font-size: 32rpx;
+	font-size: 34rpx;
 	font-weight: 900;
+	line-height: 1;
+}
+
+.calendar-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 18rpx;
+	padding: 16rpx 4rpx 18rpx;
+	border-bottom: 2rpx solid #fff0f5;
 }
 
 .calendar-card {
 	margin-top: 18rpx;
-	padding: 24rpx 18rpx 26rpx;
-	border: 4rpx solid #ff78a5;
-}
-
-.calendar-head {
-	justify-content: space-between;
-	padding: 0 8rpx 18rpx;
+	padding: 20rpx 18rpx 24rpx;
 }
 
 .month-title {
 	font-size: 34rpx;
 	font-weight: 900;
-	color: #ffffff;
+	color: #2b1c25;
+	line-height: 1.2;
 }
 
-.calendar-head {
-	margin: -24rpx -18rpx 18rpx;
-	padding: 22rpx 30rpx;
-	border-radius: 22rpx 22rpx 38rpx 38rpx;
-	background: linear-gradient(135deg, #ff5c8d, #ff7f9a);
+.month-copy {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	align-items: center;
+	min-width: 0;
+}
+
+.month-subtitle {
+	margin-top: 6rpx;
+	color: #9a7485;
+	font-size: 20rpx;
+	line-height: 1.2;
 }
 
 .month-arrow {
-	width: 52rpx;
-	height: 52rpx;
+	flex-shrink: 0;
+	width: 58rpx;
+	height: 58rpx;
 	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.85);
+	background: #fff3f7;
+	box-shadow: inset 0 0 0 2rpx rgba(255, 92, 141, 0.1);
 }
 
 .week-row,
@@ -435,26 +503,28 @@ function pad(value) {
 }
 
 .week-cell {
-	height: 48rpx;
-	color: #6a2947;
+	height: 42rpx;
+	color: #8a5168;
 	font-size: 25rpx;
 	font-weight: 800;
 	text-align: center;
-	line-height: 48rpx;
+	line-height: 42rpx;
 }
 
 .date-grid {
-	row-gap: 14rpx;
-	margin-top: 6rpx;
+	gap: 10rpx;
+	margin-top: 8rpx;
 }
 
 .date-cell {
 	position: relative;
-	height: 92rpx;
-	margin: 0 5rpx;
-	border: 2rpx solid #ffe1e9;
-	border-radius: 16rpx;
-	background: linear-gradient(180deg, #fff8fb, #ffffff);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 82rpx;
+	border: 2rpx solid #ffe7ee;
+	border-radius: 18rpx;
+	background: #fffafb;
 	box-sizing: border-box;
 	text-align: center;
 }
@@ -465,60 +535,88 @@ function pad(value) {
 }
 
 .date-cell.today {
-	border-color: #ff5c8d;
+	border-color: #ff8eb0;
+	background: #fff3f7;
 }
 
 .date-cell.both {
-	background: linear-gradient(180deg, #fff0f6, #ffffff);
+	border-color: rgba(255, 92, 141, 0.28);
+	background: linear-gradient(180deg, #fff5f8 0%, #ffeaf1 100%);
+	box-shadow: inset 0 -6rpx 14rpx rgba(255, 92, 141, 0.05);
+}
+
+.date-cell.self,
+.date-cell.partner {
+	background: #fff7fa;
 }
 
 .heart-mark {
 	position: absolute;
-	top: -15rpx;
-	left: 50%;
-	transform: translateX(-50%);
-	width: 42rpx;
-	height: 38rpx;
+	left: 8rpx;
+	top: 8rpx;
+	width: 24rpx;
+	height: 24rpx;
 }
 
 .date-number {
-	padding-top: 30rpx;
 	font-size: 26rpx;
 	font-weight: 800;
+	color: #2b1c25;
+	line-height: 1;
 }
 
 .date-cell.today .date-number {
 	color: #ff5c8d;
 }
 
+.today-tag {
+	position: absolute;
+	right: 9rpx;
+	bottom: 8rpx;
+	width: 28rpx;
+	height: 28rpx;
+	border-radius: 50%;
+	background: #ffffff;
+	color: #ff5c8d;
+	font-size: 17rpx;
+	font-weight: 800;
+	line-height: 28rpx;
+}
+
 .stats-card {
 	display: flex;
 	align-items: center;
-	justify-content: space-around;
+	justify-content: space-between;
 	margin-top: 18rpx;
-	padding: 24rpx 30rpx;
-	border-radius: 30rpx;
+	padding: 22rpx 28rpx;
+	border: 2rpx solid rgba(255, 92, 141, 0.08);
+	border-radius: 26rpx;
 	background: rgba(255, 255, 255, 0.96);
-	box-shadow: 0 14rpx 38rpx rgba(255, 92, 141, 0.1);
+	box-shadow: 0 14rpx 34rpx rgba(255, 92, 141, 0.08);
 }
 
 .stat-item {
 	display: flex;
 	align-items: center;
-	gap: 12rpx;
+	flex: 1;
+	min-width: 0;
+	gap: 14rpx;
 }
 
 .stat-icon {
-	width: 48rpx;
-	height: 48rpx;
+	flex-shrink: 0;
+	width: 54rpx;
+	height: 54rpx;
 	border-radius: 50%;
-	background: linear-gradient(135deg, #fff0f6, #ffffff);
+	background: linear-gradient(135deg, #fff0f6 0%, #ffffff 100%);
+	box-shadow: inset 0 0 0 2rpx rgba(255, 92, 141, 0.08);
 }
 
 .stat-content {
 	display: flex;
 	flex-direction: column;
-	gap: 4rpx;
+	gap: 6rpx;
+	min-width: 0;
 }
 
 .stat-value {
@@ -531,12 +629,13 @@ function pad(value) {
 .stat-label {
 	font-size: 22rpx;
 	color: #8c6376;
-	line-height: 1;
+	line-height: 1.2;
 }
 
 .stat-divider {
 	width: 2rpx;
-	height: 44rpx;
+	height: 50rpx;
+	margin: 0 22rpx;
 	background: linear-gradient(180deg, rgba(255, 92, 141, 0), rgba(255, 92, 141, 0.2), rgba(255, 92, 141, 0));
 }
 
@@ -549,9 +648,9 @@ function pad(value) {
 .primary-action,
 .secondary-action {
 	flex: 1;
-	height: 92rpx;
+	height: 86rpx;
 	border-radius: 999rpx;
-	font-size: 30rpx;
+	font-size: 29rpx;
 	font-weight: 900;
 }
 
