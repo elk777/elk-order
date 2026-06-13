@@ -57,6 +57,13 @@ import { ref, onMounted } from "vue";
 import { COLOURS } from "@/config/index.js";
 import EditCate from "./component/EditCate.vue";
 import { useAuthGuard } from "@/hooks/useAuthGuard.js";
+import {
+	getRecipeCategories,
+	createRecipeCategory,
+	updateRecipeCategory,
+	deleteRecipeCategory,
+	reorderRecipeCategories,
+} from "@/api/recipes.js";
 
 useAuthGuard();
 
@@ -67,10 +74,41 @@ const editCate = ref("editCate");
 const editId = ref("");
 const listLoading = ref(true);
 
-onMounted(() => {
-	// 后续联调后端时替换为真实分类列表接口。
-	listLoading.value = false;
+const isSuccessResponse = (res) => res && res.code === 200;
+const getResponseMessage = (res, fallback) => res?.message || fallback;
+const getListData = (data) => {
+	return Array.isArray(data) ? data : data?.list || data?.items || data?.categories || [];
+};
+
+onMounted(async () => {
+	await loadCategories();
 });
+
+/**
+ * @description: 加载分类列表
+ * @return {*}
+ */
+const loadCategories = async () => {
+	try {
+		listLoading.value = true;
+		const res = await getRecipeCategories();
+		const list = getListData(res?.data);
+		if (isSuccessResponse(res) && Array.isArray(list)) {
+			classifyList.value = list;
+		} else {
+			throw new Error(getResponseMessage(res, "加载分类列表失败"));
+		}
+	} catch (error) {
+		console.error("加载分类列表失败:", error);
+		uni.showToast({
+			title: error.message || "加载分类列表失败",
+			icon: "none",
+		});
+	} finally {
+		listLoading.value = false;
+	}
+};
+
 /**
  * @description: 打开编辑分类组件
  * @return {*}
@@ -87,7 +125,7 @@ const openEditCate = (id, name) => {
  * @description: 添加分类
  * @return {*}
  */
-const addClassify = () => {
+const addClassify = async () => {
 	// 先判断是否有分类名称
 	if (!classifyName.value) {
 		uni.showToast({
@@ -96,29 +134,61 @@ const addClassify = () => {
 		});
 		return;
 	}
-	classifyList.value.push({
-		id: classifyList.value.length + 1,
-		name: classifyName.value,
-		order: classifyList.value.length + 1,
-	});
-	// 调用changeList函数更新列表
-	changeList();
-	// 清空分类名称输入框
-	classifyName.value = "";
+
+	try {
+		const res = await createRecipeCategory({ name: classifyName.value });
+		if (!isSuccessResponse(res)) {
+			throw new Error(getResponseMessage(res, "添加分类失败"));
+		}
+		if (!res.data) {
+			throw new Error("添加分类失败");
+		}
+		// 将新分类添加到列表
+		classifyList.value.push(res.data);
+		// 调用changeList函数更新拖拽组件
+		changeList();
+		// 清空分类名称输入框
+		classifyName.value = "";
+		uni.showToast({
+			title: "添加成功",
+			icon: "success",
+		});
+	} catch (error) {
+		console.error("添加分类失败:", error);
+		uni.showToast({
+			title: error.message || "添加分类失败",
+			icon: "none",
+		});
+	}
 };
 /**
  * @description: 编辑分类
- * @param {*} id - 分类id
+ * @param {*} name - 分类名称
  * @return {*}
  */
-const editClassify = (name) => {
-	// 找到要编辑的分类
-	let classify = classifyList.value.find((item) => item.id === editId.value);
-	if (classify) {
-		// 更新分类名称
-		classify.name = name;
-		// 调用changeList函数更新列表
-		changeList();
+const editClassify = async (name) => {
+	try {
+		const res = await updateRecipeCategory(editId.value, { name });
+		if (!isSuccessResponse(res)) {
+			throw new Error(getResponseMessage(res, "编辑分类失败"));
+		}
+		// 找到要编辑的分类，更新本地列表
+		let classify = classifyList.value.find((item) => item.id === editId.value);
+		if (classify) {
+			classify.name = name;
+			// 调用changeList函数更新拖拽组件
+			changeList();
+		}
+		uni.showToast({
+			title: "编辑成功",
+			icon: "success",
+		});
+	} catch (error) {
+		console.error("编辑分类失败:", error);
+		uni.showToast({
+			title: error.message || "编辑分类失败",
+			icon: "none",
+		});
 	}
 };
 /**
@@ -132,12 +202,28 @@ const deleteClassify = (id) => {
 		title: "确认删除",
 		content: "确定删除该分类吗？",
 		confirmColor: COLOURS["theme-color"],
-		success: (res) => {
+		success: async (res) => {
 			if (res.confirm) {
-				// 过滤出不等于id的元素
-				classifyList.value = classifyList.value.filter((item) => item.id !== id);
-				// 调用changeList函数更新列表
-				changeList();
+				try {
+					const response = await deleteRecipeCategory(id);
+					if (!isSuccessResponse(response)) {
+						throw new Error(getResponseMessage(response, "删除分类失败"));
+					}
+					// 过滤出不等于id的元素
+					classifyList.value = classifyList.value.filter((item) => item.id !== id);
+					// 调用changeList函数更新拖拽组件
+					changeList();
+					uni.showToast({
+						title: "删除成功",
+						icon: "success",
+					});
+				} catch (error) {
+					console.error("删除分类失败:", error);
+					uni.showToast({
+						title: error.message || "删除分类失败",
+						icon: "none",
+					});
+				}
 			}
 		},
 	});
@@ -159,6 +245,27 @@ const changeList = () => {
 	// 如果新增或者删除了数据，请调用此函数
 	let list = classifyList.value;
 	myDrop.value.initList(list, true);
+	// 拖拽排序后，同步到后端
+	saveReorder();
+};
+
+/**
+ * @description: 保存分类排序到后端
+ * @return {*}
+ */
+const saveReorder = async () => {
+	if (classifyList.value.length === 0) return;
+
+	try {
+		const items = classifyList.value.map((item, index) => ({
+			id: item.id,
+			sortOrder: index + 1,
+		}));
+		await reorderRecipeCategories(items);
+	} catch (error) {
+		console.error("排序失败:", error);
+		// 排序是辅助功能，静默处理错误
+	}
 };
 </script>
 <style lang="scss" scoped>

@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, toRefs, onMounted } from "vue";
+import { ref, toRefs, onMounted } from "vue";
 import SerialStyle from "./SerialStyle.vue";
 // 这里的ingerList不能通过 let ingerProps = ingerProps.ingerList 接一下会失去响应式
 const ingerProps = defineProps({

@@ -27,8 +27,14 @@
 		<view class="mdy upload-btn-container" style="width: 100%">
 			<view class="font-weight-600 step-title">步骤图片</view>
 			<!-- 引入通用上传组件 -->
-			<Upload :action="uploadAction" v-model:fileList="step.stepImg" :maxCount="1" :autoUpload="false"
-				><view class="upload-slot pubColumnFlex">
+			<Upload
+				v-model:fileList="step.stepImg"
+				:maxCount="1"
+				@after-read="(file) => handleStepImageUpload(file, step)"
+				accept="image"
+				:sizeType="['compressed']"
+			>
+				<view class="upload-slot pubColumnFlex">
 					<up-icon name="camera-fill" size="24" :color="COLOURS['theme-color']"></up-icon>
 					<view>上传步骤图片</view>
 				</view>
@@ -52,17 +58,61 @@ export default {
 };
 </script>
 <script setup>
-import { ref, defineProps, toRefs, onMounted } from "vue";
+import { ref, toRefs, onMounted } from "vue";
 import { COLOURS } from "@/config/index.js";
 // 引入通用上传组件
 import Upload from "@/components/Upload/index.vue";
 import SerialStyle from "./SerialStyle.vue";
+// 引入菜谱图片上传 API
+import { uploadRecipeImage } from "@/api/recipes.js";
+
 const stepProps = defineProps({
 	stepList: {
 		type: Array,
 		required: true,
 	},
 });
+
+/**
+ * @description: 处理步骤图片上传
+ * @param {Object} file - 上传的文件对象
+ * @param {Object} step - 当前步骤对象
+ */
+const handleStepImageUpload = async (file, step) => {
+	const filePath = file.url || file.path;
+
+	if (!filePath) {
+		uni.showToast({ title: "图片路径无效", icon: "none" });
+		return;
+	}
+
+	try {
+		uni.showLoading({ title: "上传中...", mask: true });
+
+		const res = await uploadRecipeImage(filePath);
+
+		if (res.code === 200 && res.data && res.data.url) {
+			// 更新步骤图片列表中的 URL
+			const lastIndex = step.stepImg.length - 1;
+			if (lastIndex >= 0) {
+				step.stepImg[lastIndex].url = res.data.url;
+				step.stepImg[lastIndex].status = "success";
+			}
+
+			uni.showToast({ title: "上传成功", icon: "success" });
+		} else {
+			throw new Error(res.message || "上传失败");
+		}
+	} catch (error) {
+		console.error("步骤图片上传失败:", error);
+		uni.showToast({ title: error.message || "上传失败", icon: "none" });
+
+		// 上传失败，移除最后一个文件
+		step.stepImg.pop();
+	} finally {
+		uni.hideLoading();
+	}
+};
 </script>
 
 <style scoped lang="scss">

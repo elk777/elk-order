@@ -29,7 +29,7 @@
 	</view>
 </template>
 <script setup>
-import { ref, defineEmits } from "vue";
+import { ref } from "vue";
 import { COLOURS } from "@/config/index.js";
 
 // 定义组件事件
