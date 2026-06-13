@@ -7,28 +7,29 @@
  * @Description: 首页-中心内容mini版 - 通过侧边按钮切换模式
  *               左槽=饲养员位 / 右槽=吃货位（与首页 stage 上半区方位一致）。
  *               未登录：左右两侧都用 DefaultInviteAvatar；
- *               已登录：当前用户对应位渲染真实头像，对方位用 DefaultInviteAvatar。
+ *               已登录未绑定：当前用户对应位渲染真实头像，对方位用 DefaultInviteAvatar；
+ *               已绑定：根据首页传入的情侣角色槽位渲染双方头像。
 -->
 <template>
 	<view class="body-mini pubFlex">
 		<view class="kind-head-img">
 			<up-image
-				v-if="isKeeperSlotActive"
+				v-if="keeperDisplay.showAvatar"
 				shape="circle"
 				width="30px"
 				height="30px"
-				:src="currentAvatar"
+				:src="keeperDisplay.avatar"
 			></up-image>
 			<DefaultInviteAvatar v-else />
 		</view>
 		<Love :isAnimated="false" :size="20" />
 		<view class="kind-head-img">
 			<up-image
-				v-if="isFoodieSlotActive"
+				v-if="foodieDisplay.showAvatar"
 				shape="circle"
 				width="30px"
 				height="30px"
-				:src="currentAvatar"
+				:src="foodieDisplay.avatar"
 			></up-image>
 			<DefaultInviteAvatar v-else />
 		</view>
@@ -40,6 +41,17 @@ import { computed } from "vue";
 import Love from "@/components/Love/index.vue";
 import DefaultInviteAvatar from "@/components/DefaultInviteAvatar/index.vue";
 import { useUserStore } from "@/stores/user.js";
+
+const props = defineProps({
+	binding: {
+		type: Boolean,
+		default: false,
+	},
+	roleSlots: {
+		type: Object,
+		default: null,
+	},
+});
 
 const userStore = useUserStore();
 const defaultAvatar = "/static/images/head.jpeg";
@@ -58,6 +70,16 @@ const isFoodieSlotActive = computed(
 const currentAvatar = computed(
 	() => userStore.profile.avatar || defaultAvatar,
 );
+
+const keeperDisplay = computed(() => ({
+	showAvatar: props.binding ? true : isKeeperSlotActive.value,
+	avatar: props.roleSlots?.keeper?.avatar || (isKeeperSlotActive.value ? currentAvatar.value : defaultAvatar),
+}));
+
+const foodieDisplay = computed(() => ({
+	showAvatar: props.binding ? true : isFoodieSlotActive.value,
+	avatar: props.roleSlots?.foodie?.avatar || (isFoodieSlotActive.value ? currentAvatar.value : defaultAvatar),
+}));
 </script>
 
 <style lang="scss" scoped>

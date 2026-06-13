@@ -6,6 +6,7 @@
  */
 
 import { bindCouple } from "@/apis/couples.js";
+import { getUserProfile } from "@/apis/user.js";
 import { useUserStore } from "@/stores/user.js";
 
 // 分享链接携带的邀请码 query 参数名
@@ -104,9 +105,20 @@ export const consumePendingInvite = async () => {
 			return false;
 		}
 
-		// 绑定成功后同步本地绑定状态，触发首页角色徽章刷新。
-		userStore.setProfile({ ...userStore.profile, binding: true });
+		// 绑定成功后刷新用户资料，确保所有字段同步最新状态。
 		clearPendingInvite();
+		try {
+			const profileRes = await getUserProfile();
+			if (profileRes?.code === 200 && profileRes?.data) {
+				userStore.setProfile(profileRes.data);
+			} else {
+				// API 刷新失败时，手动更新 binding 状态作为降级方案。
+				userStore.setProfile({ ...userStore.profile, binding: true });
+			}
+		} catch (error) {
+			console.warn("绑定成功但刷新资料失败，手动同步 binding 状态:", error);
+			userStore.setProfile({ ...userStore.profile, binding: true });
+		}
 		uni.showToast({
 			title: "绑定成功",
 			icon: "success",

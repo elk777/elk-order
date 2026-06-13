@@ -27,10 +27,10 @@
 						<view class="role-node keeper-node" @click="handleStageRole(stageRoles.keeper)">
 							<view
 								class="role-avatar pubFlex"
-								:class="{ 'role-avatar-invite': !stageRoles.keeper.active }"
+								:class="{ 'role-avatar-invite': !stageRoles.keeper.active && !userStore.profile.binding }"
 							>
 								<up-image
-									v-if="stageRoles.keeper.active"
+									v-if="stageRoles.keeper.showAvatar"
 									shape="circle"
 									width="52px"
 									height="52px"
@@ -72,10 +72,10 @@
 						<view class="role-node foodie-node" @click="handleStageRole(stageRoles.foodie)">
 							<view
 								class="role-avatar pubFlex"
-								:class="{ 'role-avatar-invite': !stageRoles.foodie.active }"
+								:class="{ 'role-avatar-invite': !stageRoles.foodie.active && !userStore.profile.binding }"
 							>
 								<up-image
-									v-if="stageRoles.foodie.active"
+									v-if="stageRoles.foodie.showAvatar"
 									shape="circle"
 									width="52px"
 									height="52px"
@@ -112,7 +112,10 @@
 						<view class="slogan-subtitle">{{ welcomeText }}</view>
 					</view>
 					<view v-if="!isStageVisible" class="relationship-mini">
-						<MainBodyMiniVue />
+						<MainBodyMiniVue
+							:binding="userStore.profile.binding"
+							:role-slots="coupleRoleSlots"
+						/>
 					</view>
 				</view>
 
@@ -141,7 +144,7 @@
 </template>
 
 <script setup>
-import { computed, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { onShow, onShareAppMessage } from "@dcloudio/uni-app";
 import dayjs from "dayjs";
 import Tabbar from "@/components/Tabbar/index.vue";
@@ -158,6 +161,8 @@ import { useUserStore } from "@/stores/user.js";
 import { requireLogin } from "@/utils/auth.js";
 import { buildInviteShareMessage, consumePendingInvite } from "@/utils/invite.js";
 import { getUserProfile } from "@/apis/user.js";
+import { getActiveCouple } from "@/apis/couples.js";
+import { buildCoupleRoleSlots, ROLE_LABELS, ROLE_TYPES } from "@/utils/coupleDisplay.js";
 
 const userStore = useUserStore();
 const homeSkin = useHomeSkin();
@@ -167,6 +172,7 @@ const bodyMode = useBodyMode();
 const isStageVisible = bodyMode.isBody;
 const defaultAvatar = "/static/images/head.jpeg";
 const weekDays = ["日", "一", "二", "三", "四", "五", "六"];
+const coupleInfo = ref(null);
 
 const layoutStyle = computed(() => {
 	const safeTop = getCapsuleSafeBottom() + 10;
@@ -206,25 +212,36 @@ const diningMemory = computed(() => {
 const showDiningMemory = computed(() => userStore.isLogin && isStageVisible.value);
 
 const currentRoleType = computed(() => (userStore.isLogin ? userStore.userType : null));
+const coupleRoleSlots = computed(() => buildCoupleRoleSlots({
+	coupleInfo: coupleInfo.value,
+	currentUser: userStore.profile,
+	currentRoleType: currentRoleType.value,
+	defaultAvatar,
+}));
 
 const stageRoles = computed(() => {
-	const avatar = userStore.profile.avatar || defaultAvatar;
 	const isLoggedIn = userStore.isLogin;
-	const isKeeper = currentRoleType.value === 0;
-	const isFoodie = currentRoleType.value === 1;
+	const isKeeper = currentRoleType.value === ROLE_TYPES.keeper;
+	const isFoodie = currentRoleType.value === ROLE_TYPES.foodie;
+	const isBound = !!userStore.profile.binding;
+	const hasCoupleInfo = !!(coupleRoleSlots.value && isBound);
+	const keeperSlot = coupleRoleSlots.value?.keeper;
+	const foodieSlot = coupleRoleSlots.value?.foodie;
 
 	return {
 		keeper: {
-			type: 0,
+			type: ROLE_TYPES.keeper,
 			active: isKeeper,
-			avatar,
-			label: isKeeper ? "我是饲养员" : isLoggedIn ? "邀请饲养员" : "饲养员",
+			showAvatar: isKeeper || isBound,
+			avatar: hasCoupleInfo ? keeperSlot.avatar : (isKeeper ? userStore.profile.avatar || defaultAvatar : defaultAvatar),
+			label: isKeeper ? "我是饲养员" : (isBound ? ROLE_LABELS[ROLE_TYPES.keeper] : isLoggedIn ? "邀请饲养员" : ROLE_LABELS[ROLE_TYPES.keeper]),
 		},
 		foodie: {
-			type: 1,
+			type: ROLE_TYPES.foodie,
 			active: isFoodie,
-			avatar,
-			label: isFoodie ? "我是吃货" : isLoggedIn ? "邀请吃货" : "吃货",
+			showAvatar: isFoodie || isBound,
+			avatar: hasCoupleInfo ? foodieSlot.avatar : (isFoodie ? userStore.profile.avatar || defaultAvatar : defaultAvatar),
+			label: isFoodie ? "我是吃货" : (isBound ? ROLE_LABELS[ROLE_TYPES.foodie] : isLoggedIn ? "邀请吃货" : ROLE_LABELS[ROLE_TYPES.foodie]),
 		},
 	};
 });
@@ -318,7 +335,14 @@ onShow(async () => {
 			const res = await getUserProfile();
 			// 请求层对业务错误码（code !== 200）正常 resolve，需显式判 code。
 			if (res?.code === 200 && res?.data) {
+				console.log("[home] 刷新用户资料:", {
+					binding: res.data.binding,
+					userType: res.data.userType,
+					uuid: res.data.uuid
+				});
 				userStore.setProfile(res.data);
+			} else {
+				console.warn("[home] 用户资料响应异常:", res);
 			}
 		} catch (error) {
 			// 刷新失败保持本地缓存即可，避免每次 onShow 都用 toast 打扰用户。
@@ -326,7 +350,21 @@ onShow(async () => {
 		}
 	}
 	// 已登录用户从分享卡片进入首页时，尝试消费暂存的邀请码完成绑定。
-	consumePendingInvite();
+	await consumePendingInvite();
+
+	// 加载情侣信息
+	if (userStore.isLogin && userStore.profile.binding) {
+		try {
+			const res = await getActiveCouple();
+			if (res?.code === 200 && res?.data) {
+				coupleInfo.value = res.data;
+			}
+		} catch (error) {
+			console.warn("[home] load couple failed", error);
+		}
+	} else {
+		coupleInfo.value = null;
+	}
 });
 
 // 转发分享卡片，携带当前用户邀请码，好友点击进入即可完成相互绑定。
@@ -349,7 +387,7 @@ function handleInvite() {
 function handleStageRole(role) {
 	return requireLogin(
 		() => {
-			if (role.active) return true;
+			if (role.active || userStore.profile.binding) return true;
 			handleInvite();
 			return true;
 		},

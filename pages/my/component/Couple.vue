@@ -36,9 +36,9 @@
 						shape="circle"
 						width="55px"
 						height="55px"
-						:src="feederAvatar"
+						:src="leftRole?.avatar || defaultAvatar"
 					></up-image>
-					<view class="couple-body-name">饲养员</view>
+					<view class="couple-body-name">{{ leftRole?.label || '' }}</view>
 				</view>
 				<view class="couple-body-love">
 					<Love :isAnimated="true" :size="25" />
@@ -48,9 +48,9 @@
 						shape="circle"
 						width="55px"
 						height="55px"
-						:src="foodieAvatar"
+						:src="rightRole?.avatar || defaultAvatar"
 					></up-image>
-					<view class="couple-body-name">吃货</view>
+					<view class="couple-body-name">{{ rightRole?.label || '' }}</view>
 				</view>
 			</view>
 		</template>
@@ -62,6 +62,7 @@ import { useUserStore } from "@/stores/user.js";
 import { COLOURS } from "@/config/index.js";
 import { requireLogin } from "@/utils/auth.js";
 import { getActiveCouple } from "@/apis/couples.js";
+import { buildCoupleRoleSlots, ROLE_LABELS, ROLE_TYPES } from "@/utils/coupleDisplay.js";
 
 import Love from "@/components/Love/index.vue";
 
@@ -74,8 +75,52 @@ const loadingCouple = ref(false);
 const currentRoleType = computed(() => (userStore.isLogin ? userStore.userType : null));
 const inviteTargetRole = computed(() => (currentRoleType.value === 1 ? "keeper" : "foodie"));
 const canShareInvite = computed(() => userStore.isLogin && !userInfo.value.binding && !!userInfo.value.uuid);
-const feederAvatar = computed(() => coupleInfo.value?.feeder?.avatar || defaultAvatar);
-const foodieAvatar = computed(() => coupleInfo.value?.foodie?.avatar || defaultAvatar);
+const coupleRoleSlots = computed(() => buildCoupleRoleSlots({
+	coupleInfo: coupleInfo.value,
+	currentUser: userInfo.value,
+	currentRoleType: currentRoleType.value,
+	defaultAvatar,
+}));
+
+const currentUserRole = computed(() => {
+	if (currentRoleType.value === ROLE_TYPES.foodie) {
+		return {
+			avatar: userInfo.value.avatar || defaultAvatar,
+			label: ROLE_LABELS[ROLE_TYPES.foodie],
+		};
+	}
+
+	return {
+		avatar: userInfo.value.avatar || defaultAvatar,
+		label: ROLE_LABELS[ROLE_TYPES.keeper],
+	};
+});
+
+const partnerRole = computed(() => {
+	if (currentRoleType.value === ROLE_TYPES.foodie) {
+		return {
+			avatar: coupleRoleSlots.value?.keeper?.avatar || defaultAvatar,
+			label: ROLE_LABELS[ROLE_TYPES.keeper],
+		};
+	}
+
+	return {
+		avatar: coupleRoleSlots.value?.foodie?.avatar || defaultAvatar,
+		label: ROLE_LABELS[ROLE_TYPES.foodie],
+	};
+});
+
+const leftRole = computed(() => {
+	if (!userInfo.value.binding) return null;
+	if (!coupleRoleSlots.value) return currentUserRole.value;
+	return currentRoleType.value === ROLE_TYPES.foodie ? coupleRoleSlots.value.foodie : coupleRoleSlots.value.keeper;
+});
+
+const rightRole = computed(() => {
+	if (!userInfo.value.binding) return null;
+	if (!coupleRoleSlots.value) return partnerRole.value;
+	return currentRoleType.value === ROLE_TYPES.foodie ? coupleRoleSlots.value.keeper : coupleRoleSlots.value.foodie;
+});
 
 const handleBindClick = () => {
 	requireLogin(() => {
