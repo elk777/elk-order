@@ -102,10 +102,13 @@ import { useRecipeStore } from "@/stores/recipe.js";
 import { COLOURS } from "@/config/index.js";
 import { formatDate } from "@/utils/tool.js";
 import { useAuthGuard } from "@/hooks/useAuthGuard.js";
+import { createOrder } from "@/api/orders.js";
+import { useOrderStore } from "@/stores/order.js";
 
 useAuthGuard();
 
 const recipeStore = useRecipeStore();
+const orderStore = useOrderStore();
 const cartList = computed(() => recipeStore.cartList);
 
 // 计算总价
@@ -180,48 +183,56 @@ const submitOrder = async () => {
 		});
 		return;
 	}
+
 	submitting.value = true;
 	try {
 		// 构建订单数据
+		// 后端需要的格式: { cartList: [{ id, quantity }], dineWay, reservationDate?, reservationTime?, remark? }
 		const orderData = {
-			cartList: cartList.value,
-			totalPrice: totalPrice.value,
-			totalQuantity: cartList.value.reduce((sum, item) => sum + item.quantity, 0),
-			dineWay: selectedTime.value,
-			remark: orderRemark.value,
+			cartList: cartList.value.map((item) => ({
+				id: String(item.id), // 菜谱ID
+				recipeId: String(item.id), // 菜谱ID（兼容后端两种字段）
+				quantity: item.quantity,
+			})),
+			dineWay: selectedTime.value, // '立即就餐' 或 '预约就餐'
+			remark: orderRemark.value || "",
 		};
 
 		// 预约就餐时添加额外参数
 		if (timeValue.value === 1) {
-			orderData.reservationDate = formattedDate.value;
-			orderData.reservationTime = selectedDinnerTime.value;
+			orderData.reservationDate = formattedDate.value; // YYYY-MM-DD 格式
+			orderData.reservationTime = selectedDinnerTime.value; // 早餐/午餐/晚餐
 		}
 
 		console.log("🚀 ~ submitOrder ~ orderData:", orderData);
-		return;
+
 		// 调用提交订单接口
-		// const result = await api.submitOrder(orderData);
-		// 模拟提交成功
-		setTimeout(() => {
+		const result = await createOrder(orderData);
+
+		if (result.code === 200) {
 			uni.showToast({
 				title: "订单提交成功",
 				icon: "success",
 			});
 
 			// 清空购物车
-			recipeStore.clearCart();
+			await recipeStore.clearCart();
+			orderStore.orderSort = 1;
+			orderStore.orderStatus = 0;
 
 			// 跳转到订单列表页面
 			setTimeout(() => {
-				uni.navigateTo({
+				uni.switchTab({
 					url: "/pages/order/index",
 				});
 			}, 1500);
-		}, 1500);
+		} else {
+			throw new Error(result.message || "订单提交失败");
+		}
 	} catch (error) {
 		console.error("提交订单失败:", error);
 		uni.showToast({
-			title: "提交订单失败，请重试",
+			title: error.message || "提交订单失败，请重试",
 			icon: "none",
 		});
 	} finally {
@@ -230,7 +241,14 @@ const submitOrder = async () => {
 };
 
 // 页面初始化
-onMounted(() => {
+onMounted(async () => {
+	// 从后端加载购物车数据
+	try {
+		await recipeStore.loadCartList();
+	} catch (error) {
+		console.error("加载购物车失败:", error);
+	}
+
 	// 检查购物车是否为空
 	if (cartList.value.length === 0) {
 		uni.showToast({

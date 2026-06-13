@@ -30,7 +30,8 @@
 		{
 			"path": "pages/sort/index",
 			"style": {
-				"navigationStyle": "custom"
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true
 			}
 		},
 		{

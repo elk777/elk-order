@@ -17,7 +17,7 @@
 						<view class="quantity-display">x{{ item.quantity }}</view>
 					</template>
 					<template v-else>
-						<up-number-box v-model="item.quantity" @change="valChange"></up-number-box>
+						<up-number-box v-model="item.quantity" @change="(event) => valChange(item, event)"></up-number-box>
 					</template>
 				</view>
 			</view>
@@ -28,7 +28,7 @@
 	</view>
 </template>
 <script setup>
-import { computed, watch } from "vue";
+import { computed } from "vue";
 import { COLOURS } from "@/config/index.js";
 import { useRecipeStore } from "@/stores/recipe.js";
 
@@ -50,6 +50,19 @@ const cartList = computed(() => recipeStore.cartList);
 const deleteCart = (item) => {
     recipeStore.deleteCart(item);
 }
+
+const valChange = async (item, event) => {
+	const quantity = event?.value ?? event;
+	try {
+		await recipeStore.updateCartQuantity(item, quantity);
+	} catch (error) {
+		uni.showToast({
+			title: error?.message || "更新购物车数量失败",
+			icon: "none",
+		});
+		await recipeStore.loadCartList();
+	}
+};
 </script>
 <style lang="scss" scoped>
 .cart-list-container {
