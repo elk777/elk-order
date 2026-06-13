@@ -60,22 +60,16 @@ const ORDER_STATUS_INFO =  [
 		value: 1,
 		label: '待接单',
 		color: 'primary',
-		submit: '开始接单',
-		close: '拒绝接单',
 	},
 	{
 		value: 2,
 		label: '已接单',
 		color: 'warning',
-		submit: '开始烹饪',
-		close: '取消订单',
 	},
 	{
 		value: 3,
 		label: '烹饪中',
 		color: 'error',
-		submit: '完成烹饪',
-		close: '取消订单',
 	},
 	{
 		value: 4,
@@ -89,10 +83,64 @@ const ORDER_STATUS_INFO =  [
 	},
 ]
 
+const ORDER_VIEW_TYPE = {
+	KITCHEN: 0,
+	MINE: 1,
+}
+
+const ORDER_ACTION_TYPE = {
+	REJECT: 'reject',
+	ACCEPT: 'accept',
+	START_COOKING: 'startCooking',
+	COMPLETE_COOKING: 'completeCooking',
+	CANCEL: 'cancel',
+	REORDER: 'reorder',
+}
+
+const ORDER_ACTIONS_BY_VIEW = {
+	[ORDER_VIEW_TYPE.KITCHEN]: {
+		1: [
+			{ type: ORDER_ACTION_TYPE.REJECT, text: '拒绝接单', nextStatus: 5, confirmText: '确认拒绝这个订单吗？' },
+			{ type: ORDER_ACTION_TYPE.ACCEPT, text: '开始接单', nextStatus: 2, primary: true, color: 'primary' },
+		],
+		2: [
+			{ type: ORDER_ACTION_TYPE.CANCEL, text: '取消订单', nextStatus: 5, confirmText: '确认取消这个订单吗？' },
+			{ type: ORDER_ACTION_TYPE.START_COOKING, text: '开始烹饪', nextStatus: 3, primary: true, color: 'warning' },
+		],
+		3: [
+			{ type: ORDER_ACTION_TYPE.CANCEL, text: '取消订单', nextStatus: 5, confirmText: '确认取消这个订单吗？' },
+			{ type: ORDER_ACTION_TYPE.COMPLETE_COOKING, text: '完成烹饪', nextStatus: 4, primary: true, color: 'error' },
+		],
+	},
+	[ORDER_VIEW_TYPE.MINE]: {
+		1: [
+			{ type: ORDER_ACTION_TYPE.CANCEL, text: '取消订单', nextStatus: 5, confirmText: '确认取消这个订单吗？' },
+		],
+		2: [
+			{ type: ORDER_ACTION_TYPE.CANCEL, text: '取消订单', nextStatus: 5, confirmText: '确认取消这个订单吗？' },
+		],
+		4: [
+			{ type: ORDER_ACTION_TYPE.REORDER, text: '再来一单', primary: true, color: COLOURS['theme-color'] },
+		],
+		5: [
+			{ type: ORDER_ACTION_TYPE.REORDER, text: '再来一单', primary: true, color: COLOURS['theme-color'] },
+		],
+	},
+}
+
+function getOrderActions(viewType, status) {
+	const viewActions = ORDER_ACTIONS_BY_VIEW[Number(viewType)] || {}
+	return viewActions[Number(status)] || []
+}
+
 export {
 	BASE_URL,
 	APP_ID,
 	TABBAR_DATA,
 	COLOURS,
-	ORDER_STATUS_INFO
+	ORDER_STATUS_INFO,
+	ORDER_VIEW_TYPE,
+	ORDER_ACTION_TYPE,
+	ORDER_ACTIONS_BY_VIEW,
+	getOrderActions
 }

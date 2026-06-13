@@ -36,17 +36,20 @@
 				<view class="order-footer-left">
 					{{ order.orderTime }}
 				</view>
-				<OrderButton :status="order.orderStatus" />
+				<OrderButton :order-id="order.id" :status="order.orderStatus" :view-type="orderStore.orderSort" />
 			</view>
 		</template>
 	</up-card>
 </template>
 <script setup>
 import { COLOURS } from "@/config/index.js";
+import { useOrderStore } from "@/stores/order.js";
 import CateList from "@/components/CateList/index.vue";
 import OrderRemark from "./OrderRemark.vue";
 import OrderButton from "./OrderButton.vue";
 import OrderStatus from "./OrderStatus.vue";
+
+const orderStore = useOrderStore();
 
 const props = defineProps({
 	order: {

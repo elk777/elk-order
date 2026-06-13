@@ -35,6 +35,7 @@
 </template>
 
 <script setup>
+import { onShow } from "@dcloudio/uni-app";
 import Tabbar from "@/components/Tabbar/index.vue";
 import NavbarMini from "@/components/NavbarMini/index.vue";
 import OrderClassification from "./component/OrderClassification.vue";
@@ -43,8 +44,10 @@ import OrderList from "./component/OrderList.vue";
 import EmptyState from "@/components/EmptyState/index.vue";
 import { goLogin } from "@/utils/auth.js";
 import { useUserStore } from "@/stores/user.js";
+import { useOrderStore } from "@/stores/order.js";
 
 const userStore = useUserStore();
+const orderStore = useOrderStore();
 
 const handleLoginClick = () => {
 	goLogin({
@@ -52,6 +55,12 @@ const handleLoginClick = () => {
 		message: "请先登录后查看订单",
 	});
 };
+
+onShow(() => {
+	if (userStore.isLogin) {
+		orderStore.getOrderList(true);
+	}
+});
 </script>
 
 <style lang="scss" scoped>

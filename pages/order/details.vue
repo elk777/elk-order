@@ -96,8 +96,17 @@
 
 
         <!-- 底部按钮 -->
-         <view :style="{ paddingBottom: bottomSpacing + 'px' }" class="bottom-button-container">
-            <OrderButton :status="orderStore.orderDetails.orderStatus" />
+         <view
+            v-if="orderStore.orderDetails && detailActions.length"
+            :style="{ paddingBottom: bottomSpacing + 'px' }"
+            class="bottom-button-container"
+         >
+            <OrderButton
+				:order-id="orderStore.orderDetails.id"
+				:status="orderStore.orderDetails.orderStatus"
+				:view-type="orderStore.orderSort"
+				block
+			/>
          </view>
 
 	</view>
@@ -105,8 +114,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { COLOURS } from "@/config/index.js";
-import { getBottomSpacing } from '@/utils/tool.js'
+import { COLOURS, getOrderActions } from "@/config/index.js";
+import { getBottomSpacing } from "@/utils/tool.js";
 import { useOrderStore } from "@/stores/order.js";
 import { usePageParams } from "@/hooks/usePageTitle.js";
 
@@ -121,7 +130,11 @@ useAuthGuard();
 const params = usePageParams();
 const loading = ref(true);
 
-const bottomSpacing = computed(() => getBottomSpacing() - 50)
+const bottomSpacing = computed(() => getBottomSpacing() - 50);
+const detailActions = computed(() => {
+	if (!orderStore.orderDetails) return [];
+	return getOrderActions(orderStore.orderSort, orderStore.orderDetails.orderStatus);
+});
 
 // 计算订单 ID
 const orderId = computed(() => params.value.id);
@@ -147,13 +160,14 @@ const currentStep = computed(() => {
 // 获取订单详情
 const getOrderDetails = async (id) => {
 	loading.value = true;
+	orderStore.orderDetails = null;
 	try {
 		// 确保订单列表已加载
 		if (orderStore.orderList.length === 0) {
-			await orderStore.getOrderList();
+			await orderStore.getOrderList(true);
 		}
 		// 根据 ID 获取订单详情
-		orderStore.getOrderById(id);
+		await orderStore.getOrderById(id);
 	} catch (error) {
 		console.error("获取订单详情失败:", error);
 	} finally {
