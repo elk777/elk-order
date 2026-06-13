@@ -13,9 +13,8 @@
 </template>
 
 <script setup>
-	import { defineProps } from 'vue'
 	import { getUniTopNavHeight } from '@/utils/tool.js'
-	
+
 	const props = defineProps({
 		title: {
 			type: String,
