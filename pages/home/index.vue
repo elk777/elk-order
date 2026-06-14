@@ -49,22 +49,26 @@
 							></button>
 						</view>
 						<view class="food-orbit">
-							<view
-								class="orbit-item pubFlex"
-								:class="item.className"
-								v-for="item in orbitFoods"
-								:key="item.id"
-							>
-								<image :src="item.icon" mode="aspectFit" />
+							<view class="orbit-spin">
+								<view
+									class="orbit-item"
+									:class="item.className"
+									v-for="item in orbitFoods"
+									:key="item.id"
+								>
+									<view class="orbit-item-inner pubFlex">
+										<image :src="item.icon" mode="aspectFit" />
+									</view>
+								</view>
 							</view>
-						</view>
-						<view class="stage-love pubFlex">
-							<Love
-								:isAnimated="true"
-								:size="26"
-								animation-duration="4.2s"
-								animation-distance="-6rpx"
-							/>
+							<view class="stage-love pubFlex">
+								<Love
+									:isAnimated="true"
+									:size="26"
+									animation-duration="4.2s"
+									animation-distance="-6rpx"
+								/>
+							</view>
 						</view>
 						<view class="food-spark spark-one"></view>
 						<view class="food-spark spark-two"></view>
@@ -526,8 +530,8 @@ function getDiningStartDate() {
 	position: absolute;
 	left: 0;
 	right: 0;
-	top: 35%;
-	height: 700rpx;
+	top: 39%;
+	height: 660rpx;
 	transform: translateY(-40%);
 }
 
@@ -541,13 +545,13 @@ function getDiningStartDate() {
 }
 
 .keeper-node {
-	left: 42rpx;
-	top: 0rpx;
+	left: 38rpx;
+	top: 4rpx;
 }
 
 .foodie-node {
-	right: 30rpx;
-	bottom: 8rpx;
+	right: 26rpx;
+	bottom: 70rpx;
 }
 
 // 透明转发按钮覆盖整个吃货节点，点击直接拉起微信好友面板。
@@ -600,16 +604,18 @@ function getDiningStartDate() {
 
 .food-orbit {
 	position: absolute;
-	left: 145rpx;
-	right: 80rpx;
-	top: 170rpx;
-	height: 320rpx;
+	left: 178rpx;
+	right: 112rpx;
+	top: 144rpx;
+	height: 292rpx;
 	z-index: 2;
 	border-radius: 50%;
 	border: 4rpx solid rgba(255, 218, 153, 0.7);
 	border-left-color: transparent;
 	transform: rotate(-25deg);
+	transform-origin: center;
 	box-shadow: 0 0 32rpx rgba(255, 134, 126, 0.22);
+	animation: orbitBreath 5.6s ease-in-out infinite;
 }
 
 .food-orbit::before {
@@ -621,16 +627,25 @@ function getDiningStartDate() {
 	border-left-color: transparent;
 }
 
+.orbit-spin {
+	position: absolute;
+	inset: 0;
+	z-index: 3;
+	transform-origin: center;
+	animation: orbitClockwise 20s linear infinite;
+}
+
 .stage-love {
 	position: absolute;
 	left: 50%;
-	top: 54%;
-	z-index: 4;
+	top: 50%;
+	z-index: 5;
 	width: 68rpx;
 	height: 68rpx;
 	border-radius: 50%;
 	background: transparent;
-	transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%) rotate(25deg);
+	pointer-events: none;
 }
 
 .stage-love :deep(.love-bounce) {
@@ -639,12 +654,18 @@ function getDiningStartDate() {
 
 .orbit-item {
 	position: absolute;
+	width: 76rpx;
+	height: 76rpx;
+	transform: translate(-50%, -50%);
+}
+
+.orbit-item-inner {
 	width: 68rpx;
 	height: 68rpx;
 	border-radius: 50%;
 	background: rgba(255, 255, 255, 0.78);
 	box-shadow: 0 9rpx 24rpx rgba(133, 76, 60, 0.14);
-	transform: rotate(21deg);
+	animation: orbitCounter 20s linear infinite;
 }
 
 .orbit-item image {
@@ -653,33 +674,33 @@ function getDiningStartDate() {
 }
 
 .item-breakfast {
-	left: 94rpx;
-	top: -28rpx;
+	left: 19%;
+	top: 18%;
 }
 
 .item-lunch {
-	left: 40rpx;
-	bottom: 64rpx;
+	left: 20%;
+	top: 76%;
 }
 
 .item-supper {
-	right: 16rpx;
-	top: 64rpx;
+	left: 82%;
+	top: 22%;
 }
 
 .item-cart {
-	right: 80rpx;
-	bottom: -12rpx;
+	left: 82%;
+	top: 76%;
 }
 
 .item-feed {
-	left: 182rpx;
-	top: 30rpx;
+	left: 48%;
+	top: 10%;
 }
 
 .item-eat {
-	right: 150rpx;
-	bottom: 64rpx;
+	left: 50%;
+	top: 88%;
 }
 
 .food-spark {
@@ -692,32 +713,83 @@ function getDiningStartDate() {
 	box-shadow:
 		22rpx -16rpx 0 rgba(255, 255, 255, 0.68),
 		-18rpx 20rpx 0 rgba(255, 255, 255, 0.52);
+	animation: sparkTwinkle 3.6s ease-in-out infinite;
 }
 
 .spark-one {
-	left: 304rpx;
-	top: 188rpx;
+	left: 330rpx;
+	top: 164rpx;
 }
 
 .spark-two {
-	right: 188rpx;
-	top: 296rpx;
+	right: 212rpx;
+	top: 264rpx;
+	animation-delay: -1.2s;
 }
 
 .spark-three {
-	right: 84rpx;
-	bottom: 138rpx;
+	right: 92rpx;
+	bottom: 168rpx;
+	animation-delay: -2.1s;
+}
+
+@keyframes orbitBreath {
+	0%,
+	100% {
+		transform: rotate(-25deg) scale(1);
+	}
+
+	50% {
+		transform: rotate(-25deg) scale(1.015);
+	}
+}
+
+@keyframes orbitClockwise {
+	from {
+		transform: rotate(0deg);
+	}
+
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes orbitCounter {
+	0% {
+		transform: rotate(25deg) scale(1);
+	}
+
+	50% {
+		transform: rotate(-155deg) scale(1.04);
+	}
+
+	100% {
+		transform: rotate(-335deg) scale(1);
+	}
+}
+
+@keyframes sparkTwinkle {
+	0%,
+	100% {
+		opacity: 0.72;
+		transform: scale(0.9);
+	}
+
+	50% {
+		opacity: 1;
+		transform: scale(1.18);
+	}
 }
 
 .home-main {
 	position: relative;
-	top: -45rpx;
+	top: -22rpx;
 	z-index: 3;
-	margin-top: -40rpx;
+	margin-top: -22rpx;
 	flex: 0 0 auto;
 	padding: 0 24rpx 24rpx;
 	box-sizing: border-box;
-	background: linear-gradient(180deg, transparent 0, transparent 210rpx, #fff8f2 210rpx, #fffaf7 100%);
+	background: linear-gradient(180deg, transparent 0, transparent 176rpx, #fff8f2 176rpx, #fffaf7 100%);
 }
 
 .home-slogan,
@@ -729,15 +801,16 @@ function getDiningStartDate() {
 
 .dining-memory-card {
 	position: absolute;
-	left: 35rpx;
-	bottom: calc(120rpx + var(--home-skin-extension));
+	left: 42rpx;
+	bottom: calc(116rpx + var(--home-skin-extension));
 	z-index: 2;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	width: 330rpx;
+	width: 360rpx;
 	color: #ffffff;
+	text-align: center;
 	text-shadow: 0 4rpx 14rpx rgba(92, 66, 66, 0.26);
 	pointer-events: none;
 }
@@ -756,7 +829,7 @@ function getDiningStartDate() {
 }
 
 .memory-number {
-	font-size: 82rpx;
+	font-size: 78rpx;
 	font-weight: 800;
 }
 
@@ -779,7 +852,7 @@ function getDiningStartDate() {
 	justify-content: space-between;
 	width: 100%;
 	// min-height: 88rpx;
-	padding: 0 0 18rpx;
+	padding: 0 0 16rpx;
 	box-sizing: border-box;
 	// overflow: hidden;
 }
