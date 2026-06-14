@@ -116,7 +116,7 @@ const cateLoading = ref(true);
 
 //计算属性： 根据用户类型判断图标icon的展示 0 是饲养员 1 是吃货
 const isFeeder = computed(() => {
-	return userStore.userType === 0;
+	return userStore.isLogin && userStore.userType === 0;
 });
 
 const recipeTotal = computed(() => {

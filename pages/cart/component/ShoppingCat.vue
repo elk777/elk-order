@@ -8,7 +8,7 @@
 -->
 
 <template>
-	<view class="cat-container" :style="{ bottom: getBottomSpacing() + 'px' }">
+	<view v-if="userStore.isLogin" class="cat-container" :style="{ bottom: getBottomSpacing() + 'px' }">
 		<!-- 饲养员 - 吃货 -->
 		<view class="cat-breeder pubFlex">
 			<view @click="handelCart" class="cat-breeder-left pubFlex">

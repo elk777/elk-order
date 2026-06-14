@@ -22,7 +22,7 @@
 			<CateTab ref="cateTabRef" />
 		</view>
 
-		<ShoppingCat />
+		<ShoppingCat v-if="userStore.isLogin" />
 		<Tabbar :current="1" />
 	</view>
 </template>
@@ -44,7 +44,7 @@ const cateTabRef = ref(null);
 
 // 计算属性：根据用户类型判断是否为饲养员（0=饲养员, 1=吃货）
 const isFeeder = computed(() => {
-	return userStore.userType === 0;
+	return userStore.isLogin && userStore.userType === 0;
 });
 
 /**

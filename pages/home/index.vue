@@ -107,6 +107,15 @@
 					</view>
 					<view class="memory-date">{{ diningMemory.dateText }}</view>
 				</view>
+				<view v-else-if="showGuestMemory" class="guest-memory-card" @click="handleGuestMemoryLogin">
+					<view class="guest-card-title">等你来开饭</view>
+					<view class="guest-card-subtitle">登录后记录一起吃饭的每一天</view>
+					<view class="guest-card-dots">
+						<view></view>
+						<view></view>
+						<view></view>
+					</view>
+				</view>
 			</view>
 
 			<view class="home-main">
@@ -214,6 +223,7 @@ const diningMemory = computed(() => {
 });
 
 const showDiningMemory = computed(() => userStore.isLogin && isStageVisible.value);
+const showGuestMemory = computed(() => !userStore.isLogin && isStageVisible.value);
 
 const currentRoleType = computed(() => (userStore.isLogin ? userStore.userType : null));
 const coupleRoleSlots = computed(() => buildCoupleRoleSlots({
@@ -385,6 +395,12 @@ function handleInvite() {
 	uni.showToast({
 		title: "邀请功能准备中",
 		icon: "none",
+	});
+}
+
+function handleGuestMemoryLogin() {
+	return requireLogin(() => true, {
+		message: "请先登录后记录吃饭天数",
 	});
 }
 
@@ -787,7 +803,7 @@ function getDiningStartDate() {
 	z-index: 3;
 	margin-top: -22rpx;
 	flex: 0 0 auto;
-	padding: 0 24rpx 24rpx;
+	padding: 0 24rpx 42rpx;
 	box-sizing: border-box;
 	background: linear-gradient(180deg, transparent 0, transparent 176rpx, #fff8f2 176rpx, #fffaf7 100%);
 }
@@ -813,6 +829,51 @@ function getDiningStartDate() {
 	text-align: center;
 	text-shadow: 0 4rpx 14rpx rgba(92, 66, 66, 0.26);
 	pointer-events: none;
+}
+
+.guest-memory-card {
+	position: absolute;
+	left: 54rpx;
+	bottom: calc(116rpx + var(--home-skin-extension));
+	z-index: 2;
+	width: 362rpx;
+	padding: 24rpx 28rpx 22rpx;
+	box-sizing: border-box;
+	border-radius: 22rpx;
+	background: rgba(255, 255, 255, 0.48);
+	box-shadow: 0 12rpx 30rpx rgba(100, 72, 72, 0.12);
+	backdrop-filter: blur(14rpx);
+}
+
+.guest-card-title {
+	color: #4a332f;
+	font-size: 30rpx;
+	font-weight: 800;
+	line-height: 1.28;
+	text-shadow: 0 2rpx 8rpx rgba(255, 255, 255, 0.5);
+}
+
+.guest-card-subtitle {
+	margin-top: 8rpx;
+	color: #a66668;
+	font-size: 23rpx;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+.guest-card-dots {
+	display: flex;
+	align-items: center;
+	margin-top: 16rpx;
+}
+
+.guest-card-dots view {
+	width: 10rpx;
+	height: 10rpx;
+	margin-right: 10rpx;
+	border-radius: 50%;
+	background: #ff5c8d;
+	opacity: 0.88;
 }
 
 .memory-label {
