@@ -7,13 +7,14 @@
  * @Description: 文件内容描述语
 -->
 <template>
-	<view class="navbarmini-container pdx-15" :style="{paddingTop: getUniTopNavHeight() + 'px', height: getUniTopNavHeight() * 2 + 'px'  }">
+	<view class="navbarmini-container pdx-15" :style="navbarStyle">
 		<view v-if="title" class="navbarmini-title publcTitleSize">{{props.title}}</view>
 	</view>
 </template>
 
 <script setup>
-	import { getUniTopNavHeight } from '@/utils/tool.js'
+	import { computed } from "vue";
+	import { getCustomNavbarHeight, getUniTopNavHeight } from "@/utils/tool.js";
 
 	const props = defineProps({
 		title: {
@@ -21,12 +22,20 @@
 			default: ''
 		}
 	})
+
+	const navbarStyle = computed(() => ({
+		paddingTop: `${getUniTopNavHeight()}px`,
+		height: `${getCustomNavbarHeight()}px`,
+	}));
 	
 </script>
 
 <style lang="scss" scoped>
 	.navbarmini-container {
 		width: 100%;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
 		background: linear-gradient(135deg, #FFE6EA 0%, #FFF5F5 100%);
 		/* 假设包裹“发现”文字和下方椭圆的容器类为 discovery-wrapper */
 		.navbarmini-title {

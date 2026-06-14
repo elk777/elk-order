@@ -14,8 +14,33 @@
  */
 export const getUniTopNavHeight = () => {
 	const systemInfo = uni.getSystemInfoSync();
-	return systemInfo.statusBarHeight
+	return systemInfo.statusBarHeight || 0
 }
+
+/**
+ * @description: 获取微信胶囊按钮安全底部位置，缺失时回退到状态栏高度
+ * @return {number} 顶部安全内容底部位置(px)
+ */
+export const getCapsuleSafeBottom = () => {
+	try {
+		const menuButton = uni.getMenuButtonBoundingClientRect?.();
+		if (menuButton?.bottom) return menuButton.bottom;
+	} catch {
+		// 非微信小程序或部分端无胶囊 API，使用保守高度兜底。
+	}
+
+	return getUniTopNavHeight() + 54;
+}
+
+/**
+ * @description: 获取自定义导航区域总高度
+ * @param {number} extraBottom 胶囊底部以下的额外留白(px)
+ * @return {number} 导航总高度(px)
+ */
+export const getCustomNavbarHeight = (extraBottom = 12) => {
+	return getCapsuleSafeBottom() + extraBottom;
+}
+
 /**
  * @description: 获取tabbar高度(默认50)和底部安全高度(动态)
  * @param {:type} 

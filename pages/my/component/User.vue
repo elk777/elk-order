@@ -115,17 +115,31 @@ const handleLoginClick = () => {
 .user-container {
 	justify-content: space-between;
 	padding: 0 15px;
+	box-sizing: border-box;
+	.user-info-left {
+		flex: 1;
+		min-width: 0;
+		justify-content: flex-start;
+	}
 	.user-avatar {
+		flex-shrink: 0;
 		margin-right: 10px;
 	}
 	.user-info {
+		flex: 1;
 		min-width: 0;
 		.user-account {
 			color: $tinge-color;
+			justify-content: flex-start;
+			flex-wrap: wrap;
 			margin: 3px 0;
 			.user-account-label {
 				color: $theme-color;
                 margin-right: 10px;
+				max-width: 260rpx;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
 			}
 		}
 		.user-info-detail {
@@ -158,6 +172,10 @@ const handleLoginClick = () => {
 			height: 30px;
 			margin: 0;
 		}
+	}
+	.user-info-right {
+		flex-shrink: 0;
+		margin-left: 12px;
 	}
 }
 </style>

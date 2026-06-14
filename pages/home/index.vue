@@ -169,7 +169,7 @@ import DefaultInviteAvatar from "@/components/DefaultInviteAvatar/index.vue";
 import Love from "@/components/Love/index.vue";
 import { useHomeSkin } from "@/hooks/home/useHomeSkin.js";
 import { useBodyMode } from "@/hooks/home/sideTool.js";
-import { getBottomSpacing, getUniTopNavHeight } from "@/utils/tool.js";
+import { getBottomSpacing, getCapsuleSafeBottom } from "@/utils/tool.js";
 import { useUserStore } from "@/stores/user.js";
 import { requireLogin } from "@/utils/auth.js";
 import { buildInviteShareMessage, consumePendingInvite } from "@/utils/invite.js";
@@ -432,17 +432,6 @@ function handleQuickAction(item) {
 	}
 
 	uni.navigateTo({ url: item.url });
-}
-
-function getCapsuleSafeBottom() {
-	try {
-		const menuButton = uni.getMenuButtonBoundingClientRect?.();
-		if (menuButton?.bottom) return menuButton.bottom;
-	} catch {
-		// 部分端没有胶囊 API，回退到状态栏高度。
-	}
-
-	return getUniTopNavHeight() + 54;
 }
 
 function getDiningStartDate() {
