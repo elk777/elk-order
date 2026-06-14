@@ -18,7 +18,7 @@
 				@tap.stop="handleClickAction(action)"
 				plain
 				shape="circle"
-				size="small"
+				:size="block ? 'normal' : 'small'"
 				:type="resolveButtonType(action)"
 				:color="resolveButtonColor(action)"
 				:loading="loadingAction === action.type"
@@ -143,5 +143,18 @@ const handleClickAction = async (action) => {
 .order-button-container--block .order-button-item {
 	flex: 1;
 	width: auto;
+	min-width: 0;
+}
+
+.order-button-container--block .order-button-item :deep(.u-button) {
+	height: 88rpx;
+	font-size: 28rpx;
+	font-weight: 700;
+}
+
+.order-button-container--block .order-button-item :deep(.u-button--info) {
+	color: #8b8b8b;
+	border-color: #eeeeee;
+	background-color: #ffffff;
 }
 </style>

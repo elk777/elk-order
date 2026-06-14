@@ -7,39 +7,45 @@
  * @Description: 订单项组件
 -->
 <template>
-	<up-card @click="handleClickOrder">
-		<template #head>
-			<view class="order-header-container pubFlex">
-				<view class="order-header-left pubFlex">
+	<view class="order-card" @tap="handleClickOrder">
+		<view class="order-card-accent"></view>
+		<view class="order-header-container">
+			<view class="order-header-left">
+				<view class="order-avatar-wrap">
 					<up-image
-						width="45"
-						height="45"
+						width="44"
+						height="44"
 						shape="circle"
 						:src="order.userAvatar"
 						mode="aspectFill"
 						class="order-avatar"
 					></up-image>
-					<view :style="{ color: COLOURS['theme-color'] }" class="order-user-name font-weight-600">{{
-						order.orderUser
-					}}</view>
 				</view>
-				<OrderStatus :status="order.orderStatus" />
+				<view :style="{ color: COLOURS['theme-color'] }" class="order-user-name font-weight-600">{{
+					order.orderUser || "匿名吃货"
+				}}</view>
 			</view>
-		</template>
-		<template #body>
-			<CateList :imageSize="50" :cateList="order.orderList" readonly></CateList>
-			<up-divider />
-			<OrderRemark :remark="order.remark" />
-		</template>
-		<template #foot>
-			<view class="order-footer-container pubFlex">
-				<view class="order-footer-left">
-					{{ order.orderTime }}
-				</view>
+			<OrderStatus :status="order.orderStatus" />
+		</view>
+
+		<view class="order-body-container">
+			<view class="order-dishes-panel">
+				<CateList :imageSize="52" :cateList="order.orderList" readonly></CateList>
+			</view>
+			<view class="order-remark-panel">
+				<OrderRemark :remark="order.remark" />
+			</view>
+		</view>
+
+		<view class="order-footer-container">
+			<view class="order-footer-left">
+				{{ order.orderTime }}
+			</view>
+			<view class="order-actions">
 				<OrderButton :order-id="order.id" :status="order.orderStatus" :view-type="orderStore.orderSort" />
 			</view>
-		</template>
-	</up-card>
+		</view>
+	</view>
 </template>
 <script setup>
 import { COLOURS } from "@/config/index.js";
@@ -71,15 +77,164 @@ const handleClickOrder = () => {
 
 </script>
 <style lang="scss" scoped>
-.order-header-container {
-	justify-content: space-between;
-	.order-header-left {
-		.order-user-name {
-			margin-left: 10px;
-		}
-	}
+.order-card {
+	position: relative;
+	overflow: hidden;
+	box-sizing: border-box;
+	margin: 20rpx 24rpx 0;
+	border-radius: 16rpx;
+	background: #ffffff;
+	border: 1rpx solid rgba(255, 92, 141, 0.12);
+	box-shadow: 0 12rpx 30rpx rgba(40, 40, 48, 0.06);
 }
-.order-footer-container {
+
+.order-card-accent {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 6rpx;
+	background: linear-gradient(90deg, #ff5c8d, #ffb6ca);
+}
+
+.order-header-container {
+	display: flex;
+	align-items: center;
 	justify-content: space-between;
+	padding: 28rpx 24rpx 22rpx;
+	background: linear-gradient(90deg, #fff5f8 0%, #ffffff 70%);
+	border-bottom: 1rpx solid #f4f4f4;
+}
+
+.order-header-left {
+	display: flex;
+	align-items: center;
+	flex: 1;
+	min-width: 0;
+	margin-right: 16rpx;
+}
+
+.order-avatar-wrap {
+	flex-shrink: 0;
+	padding: 4rpx;
+	border-radius: 50%;
+	background: #ffffff;
+	box-shadow: 0 8rpx 20rpx rgba(255, 92, 141, 0.14);
+}
+
+.order-user-name {
+	margin-left: 18rpx;
+	font-size: 30rpx;
+	line-height: 1.3;
+	max-width: 320rpx;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.order-header-container :deep(.order-status-container) {
+	flex-shrink: 0;
+	padding: 8rpx 18rpx;
+	font-size: 26rpx;
+	line-height: 1.25;
+}
+
+.order-body-container {
+	padding: 20rpx 22rpx 18rpx;
+}
+
+.order-dishes-panel {
+	padding: 18rpx 20rpx;
+	border-radius: 14rpx;
+	background: #fafafa;
+	border: 1rpx solid #f0f0f0;
+}
+
+.order-dishes-panel :deep(.cate-list-container:last-child .cate-list-item) {
+	margin-bottom: 0;
+}
+
+.order-dishes-panel :deep(.cate-list-item) {
+	align-items: center;
+}
+
+.order-dishes-panel :deep(.item-left-content) {
+	margin-left: 18rpx;
+}
+
+.order-dishes-panel :deep(.cate-list-item-name) {
+	font-size: 30rpx;
+	line-height: 1.35;
+	font-weight: 700;
+	color: #555555;
+}
+
+.order-dishes-panel :deep(.quantity-display) {
+	margin-top: 8rpx;
+	font-size: 26rpx;
+	color: #7d7d7d;
+}
+
+.order-remark-panel {
+	margin-top: 18rpx;
+	border-radius: 14rpx;
+	background: #fff7fa;
+	border: 1rpx solid #ffe2eb;
+}
+
+.order-remark-panel :deep(.order-remark-container) {
+	padding: 18rpx 20rpx;
+	align-items: flex-start;
+}
+
+.order-remark-panel :deep(.order-remark-title) {
+	flex-shrink: 0;
+	font-size: 27rpx;
+	line-height: 1.45;
+	color: #555555;
+}
+
+.order-remark-panel :deep(.order-remark-content) {
+	margin-left: 16rpx;
+	font-size: 27rpx;
+	line-height: 1.45;
+	font-weight: 600;
+	word-break: break-word;
+}
+
+.order-footer-container {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 18rpx 22rpx 20rpx;
+	border-top: 1rpx solid #f4f4f4;
+	background: #ffffff;
+}
+
+.order-footer-left {
+	flex: 1;
+	min-width: 0;
+	font-size: 26rpx;
+	line-height: 1.4;
+	color: #9b9b9b;
+	font-weight: 600;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.order-actions {
+	flex-shrink: 0;
+	margin-left: 20rpx;
+}
+
+.order-actions :deep(.order-button-item) {
+	width: 110px;
+}
+
+.order-actions :deep(.u-button) {
+	height: 64rpx;
+	font-size: 24rpx;
+	font-weight: 600;
 }
 </style>
