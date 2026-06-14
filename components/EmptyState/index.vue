@@ -73,6 +73,8 @@ const emit = defineEmits(["action"]);
 
 <style lang="scss" scoped>
 .empty-state {
+	position: relative;
+	z-index: 1;
 	width: 100%;
 	box-sizing: border-box;
 	align-items: center;
@@ -81,11 +83,12 @@ const emit = defineEmits(["action"]);
 }
 
 .empty-state-icon {
-	width: 128rpx;
-	height: 128rpx;
-	margin-bottom: 32rpx;
+	width: 132rpx;
+	height: 132rpx;
+	margin-bottom: 34rpx;
 	justify-content: center;
 	border-radius: 50%;
+	box-shadow: 0 12rpx 30rpx rgba(255, 92, 141, 0.08);
 }
 
 .empty-state-title {
@@ -105,6 +108,9 @@ const emit = defineEmits(["action"]);
 }
 
 .empty-state-btn {
-	width: 320rpx;
+	width: 100%;
+	max-width: 520rpx;
+	height: 88rpx;
+	box-shadow: 0 12rpx 24rpx rgba(255, 92, 141, 0.16);
 }
 </style>

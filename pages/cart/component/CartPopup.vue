@@ -7,21 +7,28 @@
  * @Description: 购物车弹窗组件
 -->
 <template>
-	<view class="cart-popup-container">
-		<up-popup v-model:show="isShow" :overlay="true">
+	<view v-if="shouldRender" class="cart-popup-container" :class="{ 'cart-popup-container--active': isActive }">
+		<view class="cart-sheet" @tap.stop="noop">
+			<view class="cart-sheet-grabber"></view>
 			<view class="popup-header pubFlex">
-				<view class="header-title publcTextSize">已选商品</view>
-				<view v-if="cartShow" @click="clearCart" class="header-btn pubFlex">
-					<up-icon name="trash" size="24" :color="COLOURS['theme-color']"></up-icon>
-					清空
+				<view class="header-copy">
+					<view class="header-title">已选商品</view>
+					<view class="header-desc">共 {{ recipeStore.cartTotal }} 份，确认后可申请投喂</view>
+				</view>
+				<view v-if="cartShow" @tap="clearCart" class="header-btn pubFlex">
+					<up-icon name="trash" size="18" :color="COLOURS['theme-color']"></up-icon>
+					<text>清空</text>
 				</view>
 			</view>
-			<up-divider></up-divider>
 			<view class="popup-content">
-				<CartList v-if="cartShow" />
-				<up-empty iconSize="75" v-else mode="car" />
+				<scroll-view v-if="cartShow" scroll-y class="cart-scroll" :style="{ height: cartScrollHeight }">
+					<CartList />
+				</scroll-view>
+				<view v-else class="cart-empty">
+					<up-empty iconSize="75" mode="car" />
+				</view>
 			</view>
-		</up-popup>
+		</view>
 	</view>
 </template>
 <script>
@@ -31,26 +38,68 @@ export default {
 };
 </script>
 <script setup>
-import { computed } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import { COLOURS } from "@/config/index.js";
 import { useRecipeStore } from "@/stores/recipe.js";
 import CartList from "./CartList.vue";
 const recipeStore = useRecipeStore();
-const emit = defineEmits(["update:show", "close"]);
+const HIDE_ANIMATION_MS = 220;
+let hideTimer = null;
 const props = defineProps({
 	show: {
 		type: Boolean,
 		default: false,
 	},
 });
-const isShow = computed({
-	get: () => props.show,
-	set: (val) => {
-		emit("update:show", val);
-	},
-});
+const shouldRender = ref(props.show);
+const isActive = ref(false);
 const cartShow = computed(() => recipeStore.cartTotal > 0);
+const cartScrollHeight = computed(() => {
+	const itemCount = Math.max(recipeStore.cartList.length, 1);
+	const height = Math.min(itemCount * 168, 460);
+	return `${height}rpx`;
+});
+const noop = () => {};
 
+watch(
+	() => props.show,
+	(show) => {
+		if (hideTimer) {
+			clearTimeout(hideTimer);
+			hideTimer = null;
+		}
+
+		if (show) {
+			shouldRender.value = true;
+			isActive.value = false;
+			nextTick(() => {
+				if (props.show) {
+					isActive.value = true;
+				}
+			});
+			return;
+		}
+
+		if (!shouldRender.value) {
+			isActive.value = false;
+			return;
+		}
+
+		isActive.value = false;
+		hideTimer = setTimeout(() => {
+			shouldRender.value = false;
+			hideTimer = null;
+		}, HIDE_ANIMATION_MS);
+	},
+	{ immediate: true },
+);
+
+onBeforeUnmount(() => {
+	if (hideTimer) {
+		clearTimeout(hideTimer);
+		hideTimer = null;
+	}
+});
 
 /**
  * @description: 清空购物车
@@ -67,33 +116,103 @@ const clearCart = () => {
 		},
 	});
 };
-/**
- * @description: 关闭弹窗
- * @return {*}
- */
-const closePopup = () => {
-	isShow.value = false;
-	emit("close");
-};
 </script>
 <style lang="scss" scoped>
 .cart-popup-container {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: calc(100% + 10rpx);
+	z-index: 20;
+	pointer-events: none;
+
+	.cart-sheet {
+		position: relative;
+		z-index: 1;
+		width: 100%;
+		max-height: 48vh;
+		overflow: hidden;
+		box-sizing: border-box;
+		border: 1rpx solid rgba(255, 92, 141, 0.1);
+		border-radius: 34rpx;
+		background:
+			linear-gradient(180deg, rgba(255, 245, 248, 0.98) 0%, #ffffff 42%),
+			#ffffff;
+		box-shadow: 0 20rpx 52rpx rgba(31, 31, 31, 0.14);
+		opacity: 0;
+		pointer-events: auto;
+		transform: translateY(28rpx) scale(0.98);
+		transform-origin: bottom center;
+		transition:
+			opacity 220ms ease,
+			transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	.cart-sheet-grabber {
+		width: 72rpx;
+		height: 8rpx;
+		margin: 16rpx auto 8rpx;
+		border-radius: 999rpx;
+		background: rgba(255, 92, 141, 0.18);
+	}
+
 	.popup-header {
-		padding: 0px 15px;
+		padding: 8rpx 28rpx 18rpx;
 		justify-content: space-between;
+
+		.header-copy {
+			min-width: 0;
+		}
+
 		.header-title {
+			color: #252525;
+			font-size: 30rpx;
+			font-weight: 700;
+			line-height: 42rpx;
+		}
+
+		.header-desc {
+			margin-top: 4rpx;
 			color: $tinge-color;
+			font-size: 23rpx;
+			line-height: 32rpx;
 		}
+
 		.header-btn {
+			flex-shrink: 0;
+			height: 52rpx;
+			margin-left: 18rpx;
+			padding: 0 18rpx;
+			border-radius: 999rpx;
+			background: #fff0f5;
 			color: $theme-color;
+			font-size: 24rpx;
+			font-weight: 600;
+
+			text {
+				margin-left: 6rpx;
+			}
 		}
 	}
-	:deep(.u-divider) {
-		margin-top: -10px;
-		margin-bottom: 10px;
+
+	.popup-content {
+		padding: 0 20rpx 22rpx;
+		box-sizing: border-box;
 	}
-	:deep(.u-transition) {
-		bottom: 155px !important;
+
+	.cart-scroll {
+		max-height: calc(48vh - 138rpx);
+	}
+
+	.cart-empty {
+		padding: 38rpx 0 52rpx;
+	}
+}
+
+.cart-popup-container--active {
+	.cart-sheet {
+		opacity: 1;
+		transform: translateY(0) scale(1);
 	}
 }
 </style>

@@ -8,18 +8,19 @@
 -->
 
 <template>
-	<view v-if="userStore.isLogin" class="cat-container" :style="{ bottom: getBottomSpacing() + 'px' }">
+	<view v-if="userStore.isLogin" class="cat-container" :style="{ bottom: getBottomSpacing() + 10 + 'px' }" @tap.stop="noop">
+		<view v-if="showCart" class="cat-outside-mask" @tap="closeCartPopup" @touchmove.stop.prevent="noop"></view>
 		<!-- 饲养员 - 吃货 -->
-		<view class="cat-breeder pubFlex">
-			<view @click="handelCart" class="cat-breeder-left pubFlex">
-				<up-icon size="30" :name="userStore.userType ? cartPath : storePath"></up-icon>
-				<view class="cart-name">
-					{{ cartName }}<span class="cart-number">{{ total }}</span></view
-				>
+		<view class="cat-breeder pubFlex" @tap.stop="handleBarTap">
+			<view @tap.stop="handelCart" class="cat-breeder-left pubFlex">
+				<view class="cart-icon pubFlex">
+					<up-icon size="26" :name="userStore.userType ? cartPath : storePath"></up-icon>
+				</view>
+				<view class="cart-name">{{ cartName }}<span class="cart-number">{{ total }}</span></view>
 			</view>
 			<view v-if="!userStore.userType" class="cat-breeder-right pubFlex">
-				<view style="margin: 0 15px">
-					<up-button @click="handelAddRedact" shape="circle" :color="COLOURS['theme-color']"
+				<view class="cart-action-wrap" @tap.stop="noop">
+					<up-button class="cart-action-btn" @click="handelAddRedact" shape="circle" :color="COLOURS['theme-color']"
 						>添加菜谱</up-button
 					>
 				</view>
@@ -28,14 +29,14 @@
 				</view> -->
 			</view>
 			<view v-else class="cat-breeder-right pubFlex">
-				<view style="margin: 0 15px">
-					<up-button @click="handelApplyFeed" shape="circle" color="#FF5C8D">申请投喂</up-button>
+				<view class="cart-action-wrap" @tap.stop="noop">
+					<up-button class="cart-action-btn" @click="handelApplyFeed" shape="circle" color="#FF5C8D">申请投喂</up-button>
 				</view>
 			</view>
 		</view>
 
 		<!-- 购物车弹窗 -->
-		<CartPopup v-model:show="showCart" @close="closeCartPopup" ref="cartPopup" />
+		<CartPopup :show="showCart" ref="cartPopup" />
 	</view>
 </template>
 
@@ -54,6 +55,7 @@ const recipeStore = useRecipeStore();
 // 购物车弹窗是否显示
 const showCart = ref(false);
 
+const noop = () => {};
 
 // 购物车名称
 const cartName = computed(() => {
@@ -74,6 +76,13 @@ const cartPath = ref(`/static/images/sort/cart.svg`);
 const closeCartPopup = () => {
 	showCart.value = false;
 };
+
+const handleBarTap = () => {
+	if (showCart.value) {
+		closeCartPopup();
+	}
+};
+
 /**
  * @description: 购物车按钮事件
  * @return {*}
@@ -89,7 +98,7 @@ const handelCart = () => {
 				});
 				return;
 			}
-			showCart.value = true;
+			showCart.value = !showCart.value;
 			return;
 		}
 	});
@@ -116,6 +125,7 @@ const handelAddRedact = () => {
  */
 const handelApplyFeed = () => {
 	const url = "/pages/cart/AffirmOrder";
+	closeCartPopup();
 	// 购物车为空时，提醒用户
 	if (total.value === 0) {
 		uni.showToast({
@@ -134,30 +144,87 @@ const handelApplyFeed = () => {
 		redirect: url,
 	});
 };
+
+defineExpose({
+	closeCartPopup,
+});
 </script>
 
 <style lang="scss" scoped>
 .cat-container {
 	position: fixed;
-	width: 100%;
-	height: 70px;
-	line-height: 70px;
-	background-color: #fff;
-	box-shadow: #f0f0f0 0px 0px 20px 10px;
+	left: 22rpx;
+	right: 22rpx;
+	z-index: 9;
+	height: 72px;
+	box-sizing: border-box;
+	padding: 12rpx 14rpx;
+	border: 1rpx solid rgba(255, 92, 141, 0.1);
+	border-radius: 32rpx;
+	background: rgba(255, 255, 255, 0.96);
+	box-shadow: 0 16rpx 42rpx rgba(31, 31, 31, 0.1);
+	backdrop-filter: blur(10px);
+
+	.cat-outside-mask {
+		position: fixed;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 1;
+		background: rgba(255, 255, 255, 0.01);
+	}
+
 	.cat-breeder-left {
-		margin-left: 15px;
-		.cart-name {
-			margin-left: 15px;
+		flex: 1;
+		min-width: 0;
+		justify-content: flex-start;
+		padding-left: 8rpx;
+		box-sizing: border-box;
+
+		.cart-icon {
+			width: 54rpx;
+			height: 54rpx;
+			flex-shrink: 0;
+			border-radius: 18rpx;
+			background: #fff0f5;
 		}
+
+		.cart-name {
+			margin-left: 18rpx;
+			color: #252525;
+			font-size: 28rpx;
+			font-weight: 700;
+			white-space: nowrap;
+		}
+
 		.cart-number {
+			margin-left: 10rpx;
 			font-size: 42rpx;
 			font-weight: 600;
 			color: $theme-color;
 		}
 	}
+
 	.cat-breeder {
+		position: relative;
+		z-index: 3;
 		width: 100%;
+		height: 100%;
 		justify-content: space-between;
+	}
+
+	.cat-breeder-right {
+		flex-shrink: 0;
+	}
+
+	.cart-action-wrap {
+		margin-left: 16rpx;
+	}
+
+	.cart-action-btn {
+		min-width: 156rpx;
+		height: 58rpx;
 	}
 }
 </style>

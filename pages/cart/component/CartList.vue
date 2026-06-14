@@ -7,22 +7,26 @@
  * @Description: 购物车列表组件
 -->
 <template>
-	<view v-for="item in cartList" :key="item.id" class="cart-list-container">
-		<view class="cart-list-item pubFlex">
-			<view class="cart-item-left pubFlex">
-				<up-image :radius="5" width="100" height="100" :src="item.cover" mode="aspectFill"></up-image>
-				<view class="pubColumnFlex item-left-content">
-					<view class="cart-list-item-name">{{ item.name }}</view>
-					<template v-if="readonly">
-						<view class="quantity-display">x{{ item.quantity }}</view>
-					</template>
-					<template v-else>
-						<up-number-box v-model="item.quantity" @change="(event) => valChange(item, event)"></up-number-box>
-					</template>
+	<view class="cart-list-wrap">
+		<view v-for="item in cartList" :key="item.id" class="cart-list-container">
+			<view class="cart-list-item pubFlex">
+				<view class="cart-item-left pubFlex">
+					<up-image class="cart-cover" :radius="12" width="112rpx" height="112rpx" :src="item.cover || defaultCover" mode="aspectFill"></up-image>
+					<view class="item-left-content">
+						<view class="cart-list-item-name">{{ item.name }}</view>
+						<template v-if="readonly">
+							<view class="quantity-display">x{{ item.quantity }}</view>
+						</template>
+						<template v-else>
+							<view class="quantity-control">
+								<up-number-box v-model="item.quantity" @change="(event) => valChange(item, event)"></up-number-box>
+							</view>
+						</template>
+					</view>
 				</view>
-			</view>
-			<view v-if="!readonly" class="cart-item-right">
-				<up-icon @click="deleteCart(item)" name="trash" size="24" :color="COLOURS['theme-color']"></up-icon>
+				<view v-if="!readonly" @click="deleteCart(item)" class="cart-item-right pubFlex">
+					<up-icon name="trash" size="21" :color="COLOURS['theme-color']"></up-icon>
+				</view>
 			</view>
 		</view>
 	</view>
@@ -32,15 +36,16 @@ import { computed } from "vue";
 import { COLOURS } from "@/config/index.js";
 import { useRecipeStore } from "@/stores/recipe.js";
 
-const props = defineProps({
+defineProps({
 	readonly: {
 		type: Boolean,
-		default: false
-	}
+		default: false,
+	},
 });
 
 const recipeStore = useRecipeStore();
 const cartList = computed(() => recipeStore.cartList);
+const defaultCover = "/static/images/head.jpeg";
 
 /**
  * @description: 删除购物车项
@@ -48,8 +53,8 @@ const cartList = computed(() => recipeStore.cartList);
  * @return {*}
  */
 const deleteCart = (item) => {
-    recipeStore.deleteCart(item);
-}
+	recipeStore.deleteCart(item);
+};
 
 const valChange = async (item, event) => {
 	const quantity = event?.value ?? event;
@@ -65,22 +70,100 @@ const valChange = async (item, event) => {
 };
 </script>
 <style lang="scss" scoped>
+.cart-list-wrap {
+	width: 100%;
+	box-sizing: border-box;
+}
+
 .cart-list-container {
-    padding: 0px 15px;
-    .cart-list-item {
-        justify-content: space-between;
-        margin-bottom: 20px;
-        .item-left-content {
-            margin-left: 20px;
-            align-items: start;
-        }
-    }
+	padding: 0 0 16rpx;
+
+	&:last-child {
+		padding-bottom: 0;
+	}
+
+	.cart-list-item {
+		justify-content: space-between;
+		padding: 18rpx;
+		box-sizing: border-box;
+		border-radius: 26rpx;
+		background: #ffffff;
+		box-shadow: 0 10rpx 26rpx rgba(31, 31, 31, 0.06);
+	}
+
+	.cart-item-left {
+		flex: 1;
+		min-width: 0;
+		justify-content: flex-start;
+	}
+
+	.cart-cover {
+		flex-shrink: 0;
+		overflow: hidden;
+	}
+
+	.item-left-content {
+		flex: 1;
+		min-width: 0;
+		margin-left: 20rpx;
+	}
+
+	.cart-list-item-name {
+		max-width: 100%;
+		overflow: hidden;
+		color: #252525;
+		font-size: 29rpx;
+		font-weight: 700;
+		line-height: 40rpx;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.quantity-control {
+		margin-top: 18rpx;
+
+		:deep(.u-number-box__minus),
+		:deep(.u-number-box__plus),
+		:deep(.u-number-box__input) {
+			background: #f7f8fa;
+		}
+
+		:deep(.u-number-box__minus),
+		:deep(.u-number-box__plus) {
+			width: 52rpx;
+			height: 44rpx;
+			border-radius: 12rpx;
+		}
+
+		:deep(.u-number-box__input) {
+			width: 56rpx !important;
+			height: 44rpx !important;
+			margin: 0 4rpx;
+			border-radius: 12rpx;
+			color: #252525;
+			font-weight: 600;
+		}
+	}
+
+	.cart-item-right {
+		width: 50rpx;
+		height: 50rpx;
+		flex-shrink: 0;
+		margin-left: 18rpx;
+		border-radius: 50%;
+		background: #fff5f8;
+	}
 }
 
 .quantity-display {
-    font-size: 28rpx;
-    color: #666666;
-    margin-top: 10rpx;
-    font-weight: 500;
+	display: inline-flex;
+	align-items: center;
+	margin-top: 16rpx;
+	padding: 4rpx 16rpx;
+	border-radius: 999rpx;
+	background: #fff5f8;
+	color: $theme-color;
+	font-size: 26rpx;
+	font-weight: 600;
 }
 </style>
