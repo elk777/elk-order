@@ -212,7 +212,8 @@ class Http {
             }
 
             // 拼接 URL 参数
-            const fullUrl = buildUrl(this.baseURL + reqConfig.url, reqConfig.params)
+            const fullUrl = buildUrl(resolveRequestUrl(this.baseURL, reqConfig.url), reqConfig.params)
+            reqConfig.fullUrl = fullUrl
 
             // 构建请求头
             const headers = buildHeaders()
@@ -283,7 +284,7 @@ class Http {
             const cost = Date.now() - startTime
             log(id, url, 'fail', cost, reqConfig, err)
 
-            let finalErr = err.code ? err : createError(-1, err.message || '网络异常', id, err)
+            let finalErr = err.code ? err : createError(-1, getNetworkErrorMessage(err, this.baseURL), id, err)
             for (const fn of errorInterceptors) {
               finalErr = await fn(finalErr)
             }
@@ -362,6 +363,22 @@ function buildUrl(url, params = {}) {
 
   if (!query) return url
   return url + (url.includes('?') ? '&' : '?') + query
+}
+
+/** 拼接请求地址，兼容调用方传入完整 URL */
+function resolveRequestUrl(baseURL, url) {
+  if (/^https?:\/\//i.test(url)) return url
+  return `${baseURL.replace(/\/$/, '')}/${String(url).replace(/^\//, '')}`
+}
+
+/** 生成真机调试时更可操作的网络错误提示 */
+function getNetworkErrorMessage(err, baseURL) {
+  const message = err?.errMsg || err?.message || ''
+  if (/ERR_ADDRESS_UNREACHABLE|ADDRESS_UNREACHABLE/i.test(message)) {
+    return `无法连接后端服务，请确认手机和电脑在同一网络，并检查服务地址：${baseURL}`
+  }
+  if (/timeout/i.test(message)) return '请求超时，请检查网络或后端服务'
+  return message || '网络异常'
 }
 
 /** 解析 uni.request 返回的响应 */
@@ -481,7 +498,7 @@ function createError(code, message, traceId, raw) {
 function log(traceId, url, status, cost, req, res) {
   if (process.env.NODE_ENV === 'production') return
   const emoji = status === 'success' ? '✅' : '❌'
-  const reqStr = req ? `\n  req: ${JSON.stringify({ method: req.method, url: req.url, data: req.data })}` : ''
+  const reqStr = req ? `\n  req: ${JSON.stringify({ method: req.method, url: req.fullUrl || req.url, data: req.data })}` : ''
   const resStr = res ? `\n  res: ${JSON.stringify(res).slice(0, 300)}` : ''
   console.log(`[request] ${emoji} ${url} | ${cost}ms | ${traceId}${reqStr}${resStr}`)
 }
