@@ -24,6 +24,7 @@
 				<view :style="{ color: COLOURS['theme-color'] }" class="order-user-name font-weight-600">{{
 					order.orderUser || "匿名吃货"
 				}}</view>
+				<view v-if="order.orderNo" class="order-no">#{{ order.orderNo }}</view>
 			</view>
 			<OrderStatus :status="order.orderStatus" />
 		</view>
@@ -81,11 +82,11 @@ const handleClickOrder = () => {
 	position: relative;
 	overflow: hidden;
 	box-sizing: border-box;
-	margin: 20rpx 24rpx 0;
-	border-radius: 16rpx;
+	margin: 0;
+	border-radius: 28rpx;
 	background: #ffffff;
-	border: 1rpx solid rgba(255, 92, 141, 0.12);
-	box-shadow: 0 12rpx 30rpx rgba(40, 40, 48, 0.06);
+	border: 1rpx solid rgba(255, 92, 141, 0.1);
+	box-shadow: 0 14rpx 34rpx rgba(31, 31, 31, 0.07);
 }
 
 .order-card-accent {
@@ -93,17 +94,16 @@ const handleClickOrder = () => {
 	top: 0;
 	left: 0;
 	right: 0;
-	height: 6rpx;
-	background: linear-gradient(90deg, #ff5c8d, #ffb6ca);
+	height: 8rpx;
+	background: linear-gradient(90deg, #ff5c8d, rgba(255, 182, 202, 0.46));
 }
 
 .order-header-container {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 28rpx 24rpx 22rpx;
-	background: linear-gradient(90deg, #fff5f8 0%, #ffffff 70%);
-	border-bottom: 1rpx solid #f4f4f4;
+	padding: 30rpx 24rpx 22rpx;
+	background: linear-gradient(135deg, #fff7fa 0%, #ffffff 72%);
 }
 
 .order-header-left {
@@ -126,8 +126,24 @@ const handleClickOrder = () => {
 	margin-left: 18rpx;
 	font-size: 30rpx;
 	line-height: 1.3;
-	max-width: 320rpx;
+	max-width: 260rpx;
 	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.order-no {
+	max-width: 150rpx;
+	flex-shrink: 1;
+	margin-left: 12rpx;
+	padding: 4rpx 12rpx;
+	overflow: hidden;
+	border-radius: 999rpx;
+	background: rgba(255, 92, 141, 0.08);
+	color: #9a9a9a;
+	font-size: 22rpx;
+	font-weight: 600;
+	line-height: 30rpx;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
@@ -140,14 +156,13 @@ const handleClickOrder = () => {
 }
 
 .order-body-container {
-	padding: 20rpx 22rpx 18rpx;
+	padding: 0 22rpx 18rpx;
 }
 
 .order-dishes-panel {
-	padding: 18rpx 20rpx;
-	border-radius: 14rpx;
-	background: #fafafa;
-	border: 1rpx solid #f0f0f0;
+	padding: 18rpx 0;
+	border-bottom: 1rpx solid #f5f5f5;
+	background: #ffffff;
 }
 
 .order-dishes-panel :deep(.cate-list-container:last-child .cate-list-item) {
@@ -166,7 +181,7 @@ const handleClickOrder = () => {
 	font-size: 30rpx;
 	line-height: 1.35;
 	font-weight: 700;
-	color: #555555;
+	color: #303030;
 }
 
 .order-dishes-panel :deep(.quantity-display) {
@@ -176,14 +191,13 @@ const handleClickOrder = () => {
 }
 
 .order-remark-panel {
-	margin-top: 18rpx;
-	border-radius: 14rpx;
+	margin-top: 2rpx;
+	border-radius: 20rpx;
 	background: #fff7fa;
-	border: 1rpx solid #ffe2eb;
 }
 
 .order-remark-panel :deep(.order-remark-container) {
-	padding: 18rpx 20rpx;
+	padding: 16rpx 18rpx;
 	align-items: flex-start;
 }
 
@@ -206,8 +220,7 @@ const handleClickOrder = () => {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 18rpx 22rpx 20rpx;
-	border-top: 1rpx solid #f4f4f4;
+	padding: 0 22rpx 22rpx;
 	background: #ffffff;
 }
 
@@ -229,7 +242,7 @@ const handleClickOrder = () => {
 }
 
 .order-actions :deep(.order-button-item) {
-	width: 110px;
+	width: 104px;
 }
 
 .order-actions :deep(.u-button) {

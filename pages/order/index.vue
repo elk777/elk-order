@@ -7,7 +7,7 @@
  * @Description: 订单页面
 -->
 <template>
-	<view class="order-container">
+	<view class="order-container" :class="{ 'order-container--guest': !userStore.isLogin }" :style="layoutStyle">
 		<NavbarMini :title="'订单'" />
 		<view class="order-body">
 			<template v-if="userStore.isLogin">
@@ -18,23 +18,27 @@
 				<!-- 订单列表组件 -->
 				<OrderList />
 			</template>
-			<EmptyState
-				v-else
-				icon="order"
-				title="登录后查看订单记录"
-				desc="厨房订单、我的订单和进度状态会统一展示在这里。"
-				actionText="去登录"
-				actionIcon="account"
-				minHeight="calc(100vh - 12vh - 120rpx)"
-				padding="160rpx 64rpx 180rpx"
-				@action="handleLoginClick"
-			/>
+			<view v-else class="order-guest-panel" @touchmove.stop.prevent="noop">
+				<EmptyState
+					icon="order"
+					title="登录后查看订单记录"
+					desc="厨房订单、我的订单和进度状态会统一展示在这里。"
+					actionText="去登录"
+					actionIcon="account"
+					minHeight="100%"
+					padding="86rpx 48rpx 96rpx"
+					descMaxWidth="500rpx"
+					iconBgColor="linear-gradient(145deg, #fff0f5 0%, #ffffff 100%)"
+					@action="handleLoginClick"
+				/>
+			</view>
 		</view>
 		<Tabbar :current="2" />
 	</view>
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import Tabbar from "@/components/Tabbar/index.vue";
 import NavbarMini from "@/components/NavbarMini/index.vue";
@@ -45,9 +49,15 @@ import EmptyState from "@/components/EmptyState/index.vue";
 import { goLogin } from "@/utils/auth.js";
 import { useUserStore } from "@/stores/user.js";
 import { useOrderStore } from "@/stores/order.js";
+import { getBottomSpacing, getCustomNavbarHeight } from "@/utils/tool.js";
 
 const userStore = useUserStore();
 const orderStore = useOrderStore();
+const layoutStyle = computed(() => ({
+	"--order-bottom-space": `${getBottomSpacing()}px`,
+	"--order-navbar-height": `${getCustomNavbarHeight()}px`,
+}));
+const noop = () => {};
 
 const handleLoginClick = () => {
 	goLogin({
@@ -65,14 +75,64 @@ onShow(() => {
 
 <style lang="scss" scoped>
 .order-container {
-	position: relative;
+	min-height: 100vh;
 	box-sizing: border-box;
+	overflow-x: hidden;
+	padding-bottom: calc(var(--order-bottom-space) + 86px);
+	background:
+		linear-gradient(180deg, #fff5f8 0, #f8f8f8 220rpx),
+		#f8f8f8;
+
 	.order-body {
 		width: 100%;
-		height: 100%;
-		position: absolute;
-		top: 12vh;
+		box-sizing: border-box;
+		padding: 0 22rpx;
 	}
 }
 
+.order-container--guest {
+	height: 100vh;
+	min-height: 100vh;
+	overflow: hidden;
+	padding-bottom: var(--order-bottom-space);
+
+	.order-body {
+		height: calc(100vh - var(--order-navbar-height) - var(--order-bottom-space));
+		overflow: hidden;
+	}
+
+	.order-guest-panel {
+		position: relative;
+		height: 100%;
+		overflow: hidden;
+		box-sizing: border-box;
+		border: 1rpx solid rgba(255, 92, 141, 0.08);
+		border-radius: 36rpx;
+		background:
+			radial-gradient(circle at 18% 10%, rgba(255, 92, 141, 0.08), transparent 34%),
+			linear-gradient(180deg, #ffffff 0%, #fffafd 100%);
+		box-shadow: 0 18rpx 42rpx rgba(255, 92, 141, 0.08);
+		touch-action: none;
+	}
+
+	.order-guest-panel::before,
+	.order-guest-panel::after {
+		content: "";
+		position: absolute;
+		width: 220rpx;
+		height: 220rpx;
+		border-radius: 50%;
+		background: rgba(255, 92, 141, 0.06);
+	}
+
+	.order-guest-panel::before {
+		top: -90rpx;
+		right: -70rpx;
+	}
+
+	.order-guest-panel::after {
+		left: -90rpx;
+		bottom: -80rpx;
+	}
+}
 </style>
