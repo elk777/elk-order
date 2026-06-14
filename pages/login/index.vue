@@ -11,7 +11,7 @@
 		<view class="login-top">
 			<view class="brand-area">
 				<view class="logo-frame">
-					<image class="brand-logo" src="/static/logo.png" mode="aspectFit" />
+					<image class="brand-logo" src="/static/logo.jpg" mode="aspectFit" />
 				</view>
 				<view class="brand-name">偏爱厨房</view>
 				<view class="brand-desc">把家常饭，留给偏爱的人</view>

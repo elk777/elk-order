@@ -18,8 +18,8 @@
     "name": "暖厨偏爱",
     "type": "preset",
     "mediaType": "image",
-    "url": "/static/images/home/wallpapers/warm-kitchen.png",
-    "thumb": "/static/images/home/wallpapers/warm-kitchen.png"
+    "url": "/static/images/home/wallpapers/warm-kitchen.jpg",
+    "thumb": "/static/images/home/wallpapers/warm-kitchen.jpg"
   },
   "message": "ok"
 }

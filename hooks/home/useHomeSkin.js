@@ -22,32 +22,36 @@ export const HOME_WALLPAPERS = [
 		name: '暖厨偏爱',
 		type: 'preset',
 		mediaType: HOME_SKIN_MEDIA_TYPES.IMAGE,
-		path: '/static/images/home/wallpapers/warm-kitchen.png',
-		thumb: '/static/images/home/wallpapers/warm-kitchen.png',
+		path: '/static/images/home/wallpapers/warm-kitchen.jpg',
+		thumb: '/static/images/home/wallpapers/warm-kitchen.jpg',
+		legacyPath: '/static/images/home/wallpapers/warm-kitchen.png',
 	},
 	{
 		id: 'couple-table',
 		name: '双人餐桌',
 		type: 'preset',
 		mediaType: HOME_SKIN_MEDIA_TYPES.IMAGE,
-		path: '/static/images/home/wallpapers/couple-table.png',
-		thumb: '/static/images/home/wallpapers/couple-table.png',
+		path: '/static/images/home/wallpapers/couple-table.jpg',
+		thumb: '/static/images/home/wallpapers/couple-table.jpg',
+		legacyPath: '/static/images/home/wallpapers/couple-table.png',
 	},
 	{
 		id: 'order-note',
 		name: '点餐小票',
 		type: 'preset',
 		mediaType: HOME_SKIN_MEDIA_TYPES.IMAGE,
-		path: '/static/images/home/wallpapers/order-note.png',
-		thumb: '/static/images/home/wallpapers/order-note.png',
+		path: '/static/images/home/wallpapers/order-note.jpg',
+		thumb: '/static/images/home/wallpapers/order-note.jpg',
+		legacyPath: '/static/images/home/wallpapers/order-note.png',
 	},
 	{
 		id: 'morning-bento',
 		name: '早安便当',
 		type: 'preset',
 		mediaType: HOME_SKIN_MEDIA_TYPES.IMAGE,
-		path: '/static/images/home/wallpapers/morning-bento.png',
-		thumb: '/static/images/home/wallpapers/morning-bento.png',
+		path: '/static/images/home/wallpapers/morning-bento.jpg',
+		thumb: '/static/images/home/wallpapers/morning-bento.jpg',
+		legacyPath: '/static/images/home/wallpapers/morning-bento.png',
 	},
 ]
 
@@ -202,7 +206,10 @@ function normalizeSkin(input) {
 		return createCustomSkin(data)
 	}
 
-	const preset = HOME_WALLPAPERS.find((item) => item.id === data.id || item.path === data.path || item.path === data.url)
+	const preset = HOME_WALLPAPERS.find((item) => {
+		const skinPath = data.path || data.url
+		return item.id === data.id || item.path === skinPath || item.legacyPath === skinPath
+	})
 	if (preset) {
 		return { ...preset }
 	}
