@@ -12,76 +12,81 @@
 		<up-skeleton v-if="loading" :loading="true" :animate="true" rows="8" rowsHeight="50" :title="true"></up-skeleton>
 
 		<!-- 菜谱内容 -->
-		<view v-else>
+		<view v-else class="details-content">
 			<!-- 菜谱标题 -->
 			<view class="cate-details-image">
 				<!-- 图片 -->
-				<up-image width="100%" height="300px" :src="cateDetails.image" mode="aspectFill" />
+				<up-image class="hero-image" width="100%" height="320px" :src="cateDetails.image" mode="aspectFill" />
 				<!-- 一个上下渐变的背景 由白到黑 -->
 				<view class="cate-details-bg"></view>
 				<!-- 菜谱标识  制作时间 简易程度 在标题图片上面 -->
 				<view class="cate-details-info">
 					<view class="cate-details-title font-weight-600">{{ cateDetails.name }}</view>
-					<view class="pubFlex cate-details-info-item">
-						<view class="cate-details-time pubFlex">
-							<up-icon name="clock" size="22" color="#FF5C8D" />
+					<view class="cate-details-info-item">
+						<view class="meta-pill pubFlex">
+							<up-icon name="clock" size="18" color="#FF5C8D" />
 							<view class="cate-d-i-i-label">{{ cateDetails.time }}</view>
 						</view>
-						<view class="cate-details-level pubFlex">
-							<up-icon name="coupon" size="22" color="#FF5C8D" />
+						<view class="meta-pill pubFlex">
+							<up-icon name="coupon" size="18" color="#FF5C8D" />
 							<view class="cate-d-i-i-label">{{ cateDetails.level }}</view>
 						</view>
 					</view>
 				</view>
 			</view>
-			<!-- 食材清单详情 -->
-			<view class="cate-details-ingredients w-100">
-				<view class="pubFlex" style="justify-content: space-between">
-					<DetailsTitle title="食材清单" />
-					<view v-if="cateDetails.ingredients.length > 0" @click="visible = true" class="pubFlex detail-title-copy">
-						<up-icon name="order" size="22" :color="COLOURS['theme-color']" />
-						生成购物清单</view
-					>
-				</view>
-				<view class="cate-ingre-content">
-					<view
-						v-if="cateDetails.ingredients.length === 0"
-						class="publcTextSize"
-						style="padding: 20px 0; text-align: center; color: #909399;"
-					>
-						暂无食材清单
-					</view>
-					<view
-						v-else
-						class="cate-ingre-item publcTextSize pubFlex"
-						v-for="(item, index) in cateDetails.ingredients"
-						:key="index"
-					>
-						<view class="item-name">
-							{{ item.name }}
-						</view>
-						<view class="item-amount">
-							{{ item.amount }}
+			<view class="details-body">
+				<!-- 食材清单详情 -->
+				<view class="cate-details-ingredients w-100">
+					<view class="detail-section-head pubFlex">
+						<DetailsTitle title="食材清单" />
+						<view v-if="cateDetails.ingredients.length > 0" @click="visible = true" class="pubFlex detail-title-copy">
+							<up-icon name="order" size="18" :color="COLOURS['theme-color']" />
+							<view>生成购物清单</view>
 						</view>
 					</view>
-				</view>
-			</view>
-			<!-- 制作步骤详情 -->
-			<view class="cate-details-ingredients w-100">
-				<DetailsTitle title="制作步骤" />
-				<view class="cate-ingre-content">
-					<view
-						v-if="cateDetails.steps.length === 0"
-						class="publcTextSize"
-						style="padding: 20px 0; text-align: center; color: #909399;"
-					>
-						暂无制作步骤
+					<view class="cate-ingre-content">
+						<view
+							v-if="cateDetails.ingredients.length === 0"
+							class="empty-text publcTextSize"
+						>
+							暂无食材清单
+						</view>
+						<view
+							v-else
+							class="cate-ingre-item publcTextSize"
+							v-for="(item, index) in cateDetails.ingredients"
+							:key="index"
+						>
+							<view class="item-name-wrap">
+								<view class="item-dot"></view>
+								<view class="item-name">
+									{{ item.name }}
+								</view>
+							</view>
+							<view class="item-amount">
+								{{ item.amount }}
+							</view>
+						</view>
 					</view>
-					<view v-else class="cate-steps" v-for="(step, index) in cateDetails.steps" :key="index">
-						<SerialStyle :index="index" :size="45" :fontSize="18" />
-						<view class="w-100">
-							<view style="margin-bottom: 10px">{{ step.describe }}</view>
-							<up-album v-if="step.images && step.images.length > 0" :rowCount="1" :urls="step.images" singleMode="aspectFill"></up-album>
+				</view>
+				<!-- 制作步骤详情 -->
+				<view class="cate-details-ingredients w-100">
+					<view class="detail-section-head pubFlex">
+						<DetailsTitle title="制作步骤" />
+					</view>
+					<view class="cate-ingre-content">
+						<view
+							v-if="cateDetails.steps.length === 0"
+							class="empty-text publcTextSize"
+						>
+							暂无制作步骤
+						</view>
+						<view v-else class="cate-steps" v-for="(step, index) in cateDetails.steps" :key="index">
+							<SerialStyle :index="index" :size="44" :fontSize="17" />
+							<view class="step-card w-100">
+								<view class="step-desc">{{ step.describe }}</view>
+								<up-album v-if="step.images && step.images.length > 0" :rowCount="1" :urls="step.images" singleMode="aspectFill"></up-album>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -226,66 +231,202 @@ onMounted(() => {
 <style lang="scss" scoped>
 .cate-details-container {
 	width: 100%;
-	height: 100vh;
-	background-color: $light-color;
+	min-height: 100vh;
+	overflow-x: hidden;
+	padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+	background:
+		linear-gradient(180deg, #fff5f8 0, #f8f8f8 360rpx),
+		#f8f8f8;
+
+	.details-content {
+		width: 100%;
+	}
+
 	.cate-details-image {
 		position: relative;
+		height: 320px;
+		overflow: hidden;
+		background: #f0f0f0;
 	}
+
 	.cate-details-bg {
 		position: absolute;
 		bottom: 0;
 		left: 0;
 		width: 100%;
-		height: 85px;
-		background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.8) 100%);
+		height: 190px;
+		background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.72) 100%);
 	}
+
 	.cate-details-info {
 		position: absolute;
-		left: 20px;
-		bottom: 15px;
+		right: 28rpx;
+		bottom: 34rpx;
+		left: 28rpx;
 		color: #fff;
-		width: 100%;
+
 		.cate-details-info-item {
-			margin-top: 10px;
-			width: 280rpx;
-			justify-content: space-between;
+			display: flex;
+			align-items: center;
+			margin-top: 18rpx;
+
 			.cate-d-i-i-label {
-				margin-left: 5px;
+				margin-left: 8rpx;
 			}
 		}
+
 		.cate-details-title {
-			font-size: 24px;
+			font-size: 27px;
+			line-height: 1.2;
+			text-shadow: 0 6rpx 18rpx rgba(0, 0, 0, 0.28);
 		}
-		.cate-details-time {
-			font-size: 16px;
+
+		.meta-pill {
+			min-width: 0;
+			height: 54rpx;
+			box-sizing: border-box;
+			padding: 0 16rpx;
+			border: 1rpx solid rgba(255, 255, 255, 0.26);
+			border-radius: 999rpx;
+			background: rgba(255, 255, 255, 0.9);
+			color: #303133;
+			font-size: 14px;
+			font-weight: 600;
+			backdrop-filter: blur(8px);
 		}
-		.cate-details-level {
-			font-size: 16px;
+
+		.meta-pill + .meta-pill {
+			margin-left: 14rpx;
 		}
+	}
+
+	.details-body {
+		position: relative;
+		z-index: 1;
+		box-sizing: border-box;
+		width: 100%;
+		margin-top: -26rpx;
+		padding: 0 22rpx;
 	}
 
 	.cate-details-ingredients {
 		box-sizing: border-box;
-		margin-top: 15px;
-		padding: 20px;
-		background-color: #ffffff;
+		margin-bottom: 22rpx;
+		padding: 26rpx;
+		border: 1rpx solid rgba(255, 92, 141, 0.08);
+		border-radius: 16rpx;
+		background: rgba(255, 255, 255, 0.98);
+		box-shadow: 0 16rpx 36rpx rgba(255, 92, 141, 0.07);
+
+		.detail-section-head {
+			justify-content: space-between;
+			align-items: center;
+		}
+
 		.cate-ingre-content {
-			margin-top: 20px;
+			margin-top: 24rpx;
+
 			.cate-ingre-item {
+				display: flex;
+				align-items: center;
 				justify-content: space-between;
-				padding: 12px 0;
-				border-bottom: 1px solid $gray-color;
+				box-sizing: border-box;
+				min-height: 72rpx;
+				padding: 18rpx 0;
+				border-bottom: 1rpx solid #eef0f4;
+				color: #303133;
 			}
+
+			.cate-ingre-item:last-child {
+				border-bottom: 0;
+			}
+		}
+
+		.empty-text {
+			padding: 34rpx 0;
+			text-align: center;
+			color: #909399;
 		}
 
 		.cate-steps {
 			display: flex;
-			margin-bottom: 30px;
+			align-items: flex-start;
+			margin-bottom: 22rpx;
 		}
+
+		.cate-steps:last-child {
+			margin-bottom: 0;
+		}
+
 		.detail-title-copy {
-			padding: 5px 10px;
-			border-radius: 30px;
-			background-color: $light-color;
+			flex-shrink: 0;
+			height: 58rpx;
+			box-sizing: border-box;
+			padding: 0 18rpx;
+			border-radius: 999rpx;
+			background: #fff2f6;
+			color: #303133;
+			font-size: 14px;
+			font-weight: 600;
+		}
+
+		.detail-title-copy > view {
+			margin-left: 8rpx;
+		}
+
+		.item-name-wrap {
+			display: flex;
+			align-items: center;
+			min-width: 0;
+		}
+
+		.item-dot {
+			flex-shrink: 0;
+			width: 12rpx;
+			height: 12rpx;
+			margin-right: 14rpx;
+			border-radius: 50%;
+			background: $theme-color;
+			box-shadow: 0 0 0 8rpx rgba(255, 92, 141, 0.08);
+		}
+
+		.item-name {
+			min-width: 0;
+			overflow: hidden;
+			color: #303133;
+			font-size: 16px;
+			font-weight: 600;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.item-amount {
+			flex-shrink: 0;
+			max-width: 220rpx;
+			margin-left: 18rpx;
+			overflow: hidden;
+			color: #202124;
+			font-size: 16px;
+			font-weight: 700;
+			text-align: right;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.step-card {
+			box-sizing: border-box;
+			padding: 20rpx;
+			border: 1rpx solid #eef0f4;
+			border-radius: 16rpx;
+			background: #fbfbfc;
+		}
+
+		.step-desc {
+			margin-bottom: 16rpx;
+			color: #303133;
+			font-size: 15px;
+			font-weight: 600;
+			line-height: 1.65;
 		}
 	}
 
@@ -294,11 +435,17 @@ onMounted(() => {
 	}
 	:deep(.u-album__row__wrapper > image) {
 		width: 100% !important;
-		height: 200px !important;
-		border-radius: 15px !important;
+		height: 210px !important;
+		border-radius: 16rpx !important;
 	}
 }
 .copy-ingre-content {
 	color: $tinge-color;
+
+	.copy-ingre-item {
+		justify-content: flex-start;
+		padding: 10rpx 0;
+		color: #303133;
+	}
 }
 </style>

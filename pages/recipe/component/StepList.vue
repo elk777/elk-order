@@ -9,22 +9,22 @@
 <template>
 	<view v-for="(step, index) in stepProps.stepList" :key="step.id" class="stepitem-container">
 		<!-- 1 序号 步骤x  删除按钮 -->
-		<view class="stepitem-content-title" style="width: 100%">
+		<view class="stepitem-content-title">
 			<view class="title-content-container">
-				<SerialStyle :index="index" :size="45" :fontSize="16" />
-				<view class="publcTitleSize"> 步骤{{ index + 1 }} </view>
+				<SerialStyle :index="index" :size="42" :fontSize="16" />
+				<view class="step-name">步骤{{ index + 1 }}</view>
 			</view>
-			<view @click="$emit('removeStep', step.id)" v-if="stepProps.stepList.length > 1">
+			<view class="step-remove pubFlex" @click="$emit('removeStep', step.id)" v-if="stepProps.stepList.length > 1">
 				<up-icon name="trash-fill" :color="COLOURS['theme-color']" size="24"></up-icon>
 			</view>
 		</view>
 		<!-- 2 步骤描述 多行输入框 -->
-		<view class="mdy" style="width: 100%">
+		<view class="mdy step-block">
 			<view class="font-weight-600 step-title">步骤描述</view>
 			<up-textarea v-model="step.stepDesc" placeholder="请输入步骤描述" :height="100" count></up-textarea>
 		</view>
 		<!-- 3 步骤照片 上传步骤照片 -->
-		<view class="mdy upload-btn-container" style="width: 100%">
+		<view class="mdy upload-btn-container">
 			<view class="font-weight-600 step-title">步骤图片</view>
 			<!-- 引入通用上传组件 -->
 			<Upload
@@ -35,13 +35,15 @@
 				:sizeType="['compressed']"
 			>
 				<view class="upload-slot pubColumnFlex">
-					<up-icon name="camera-fill" size="24" :color="COLOURS['theme-color']"></up-icon>
+					<view class="upload-slot__icon pubFlex">
+						<up-icon name="camera-fill" size="22" :color="COLOURS['theme-color']"></up-icon>
+					</view>
 					<view>上传步骤图片</view>
 				</view>
 			</Upload>
 		</view>
 		<!-- 4 小提示 注意事项 单行输入框 -->
-		<view class="mdy" style="width: 100%">
+		<view class="mdy step-block">
 			<view class="font-weight-600 step-title">小贴士</view>
 			<u-input
 				v-model="step.stepTip"
@@ -58,7 +60,6 @@ export default {
 };
 </script>
 <script setup>
-import { ref, toRefs, onMounted } from "vue";
 import { COLOURS } from "@/config/index.js";
 // 引入通用上传组件
 import Upload from "@/components/Upload/index.vue";
@@ -117,27 +118,91 @@ const handleStepImageUpload = async (file, step) => {
 
 <style scoped lang="scss">
 .stepitem-container {
-	margin-top: 12px;
-	padding: 12px;
-	border-radius: 10px;
-	border: 1px solid #f0f0f0;
-	background-color: #fafafa;
+	width: 100%;
+	box-sizing: border-box;
+	margin-top: 18rpx;
+	padding: 20rpx;
+	border: 1rpx solid #f0f1f5;
+	border-radius: 16rpx;
+	background: #fbfbfc;
+
 	.stepitem-content-title {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		width: 100%;
+
 		.title-content-container {
 			display: flex;
+			align-items: center;
+			min-width: 0;
 		}
 	}
+
+	.step-name {
+		color: #202124;
+		font-size: 16px;
+		font-weight: 700;
+	}
+
+	.step-remove {
+		flex-shrink: 0;
+		width: 62rpx;
+		height: 62rpx;
+		border-radius: 50%;
+		background: #fff2f6;
+	}
+
 	.mdy {
-		margin: 15px 0;
+		width: 100%;
+		margin-top: 20rpx;
 	}
+
+	.step-block {
+		box-sizing: border-box;
+		padding: 16rpx;
+		border-radius: 16rpx;
+		background: #ffffff;
+	}
+
 	.step-title {
-		margin-bottom: 10px;
+		margin-bottom: 12rpx;
+		color: #303133;
+		font-size: 14px;
 	}
+
 	.upload-btn-container {
 		color: $tinge-color;
+	}
+
+	.upload-slot {
+		min-height: 160rpx;
+		box-sizing: border-box;
+		border: 1rpx dashed rgba(255, 92, 141, 0.26);
+		border-radius: 16rpx;
+		background: #fff8fa;
+		color: #707070;
+		font-size: 14px;
+	}
+
+	.upload-slot__icon {
+		width: 56rpx;
+		height: 56rpx;
+		margin-bottom: 10rpx;
+		border-radius: 50%;
+		background: #ffffff;
+	}
+
+	:deep(.u-textarea) {
+		border: 1rpx solid #eef0f4 !important;
+		border-radius: 14rpx;
+		background: #fbfbfc;
+	}
+
+	:deep(.u-input) {
+		min-height: 68rpx;
+		border-radius: 14rpx;
+		background: #fbfbfc;
 	}
 }
 </style>

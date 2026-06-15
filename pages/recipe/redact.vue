@@ -8,11 +8,15 @@
 -->
 <template>
 	<view class="recipe-redact-container">
-		<view class="redact-form pubColumnFlex">
-			<view class="publcTitleSize from-title">基本信息</view>
+		<view class="redact-form redact-form--basic pubColumnFlex">
+			<view class="section-head">
+				<view class="publcTitleSize from-title">基本信息</view>
+				<view class="section-badge">必填</view>
+			</view>
 			<view class="cover">
-				<view style="margin: 15px 0px 10px;">菜谱封面</view>
+				<view class="field-label">菜谱封面</view>
 				<Upload
+					class="cover-upload"
 					style="width: 100%"
 					v-model:fileList="form.basicForm.images"
 					:maxCount="1"
@@ -21,19 +25,21 @@
 					name="images"
 					accept="image"
 					:sizeType="['compressed']"
-					:slotStyle="{ height: '250px' }"
-					:previewStyle="{ height: '250px' }"
+					:slotStyle="{ height: '340rpx' }"
+					:previewStyle="{ height: '340rpx' }"
 				>
 					<view class="upload-slot pubColumnFlex">
-						<up-icon name="camera-fill" size="24" :color="COLOURS['theme-color']"></up-icon>
-						<view>上传菜谱封面</view>
+						<view class="upload-slot__icon pubFlex">
+							<up-icon name="camera-fill" size="24" :color="COLOURS['theme-color']"></up-icon>
+						</view>
+						<view class="upload-slot__text">上传菜谱封面</view>
 					</view>
 				</Upload>
 			</view>
 			<view class="form">
-				<up-form ref="basicForm" :borderBottom="true" :model="form.basicForm" labelWidth="auto" :rules="rules">
+				<up-form ref="basicForm" :borderBottom="true" :model="form.basicForm" labelWidth="92" :rules="rules">
 					<up-form-item :borderBottom="true" :required="true" label="菜谱名称" prop="name">
-						<up-input v-model="form.basicForm.name" border="none"></up-input>
+						<up-input v-model="form.basicForm.name" border="none" placeholder="给它起个名字"></up-input>
 					</up-form-item>
 					<up-form-item :borderBottom="true" :required="true" label="菜谱分类" prop="categoryId">
 						<view @click="showCategoryPicker" class="category-select">
@@ -43,14 +49,17 @@
 						</view>
 					</up-form-item>
 					<up-form-item label="菜谱描述" prop="describe">
-						<up-textarea v-model="form.basicForm.describe" placeholder="发挥你的想象吧~"></up-textarea>
+						<up-textarea v-model="form.basicForm.describe" placeholder="发挥你的想象吧~" :height="92"></up-textarea>
 					</up-form-item>
 				</up-form>
 			</view>
 		</view>
 		<view class="redact-form pubColumnFlex">
-			<view class="pubFlex from-title">
-				<view class="publcTitleSize from-title">食材清单</view>
+			<view class="section-head section-head--row">
+				<view class="section-title-group pubFlex">
+					<view class="publcTitleSize from-title">食材清单</view>
+					<view class="section-count">{{ form.ingreList.length }}项</view>
+				</view>
 				<view class="form-button">
 					<up-button
 						@click="handelAddInger"
@@ -62,13 +71,16 @@
 					>
 				</view>
 			</view>
-			<view class="form">
+			<view class="form list-form">
 				<IngreIList @remove-inger="removeIngreItem" :ingerList="form.ingreList" />
 			</view>
 		</view>
 		<view class="redact-form pubColumnFlex">
-			<view class="pubFlex from-title">
-				<view class="publcTitleSize from-title">制作步骤</view>
+			<view class="section-head section-head--row">
+				<view class="section-title-group pubFlex">
+					<view class="publcTitleSize from-title">制作步骤</view>
+					<view class="section-count">{{ form.stepList.length }}步</view>
+				</view>
 				<view class="form-button">
 					<up-button
 						@click="handelAddStep"
@@ -80,12 +92,12 @@
 					>
 				</view>
 			</view>
-			<view class="form">
+			<view class="form list-form">
 				<StepList @remove-step="removeStepItem" :stepList="form.stepList" />
 			</view>
 		</view>
-		<view style="height: 100px"></view>
-		<BottomBtn @submit="handelSubmit" :loading="loading" />
+		<view class="bottom-spacer"></view>
+		<BottomBtn @submit="handelSubmit" @cancel="handleCancel" :loading="loading" />
 
 		<!-- 分类选择器 -->
 		<up-picker
@@ -318,6 +330,17 @@ const handelAddStep = () => {
 	addStepItem()
 };
 
+const handleCancel = () => {
+	const pages = getCurrentPages();
+	if (pages.length > 1) {
+		uni.navigateBack();
+		return;
+	}
+	uni.switchTab({
+		url: "/pages/sort/index",
+	});
+};
+
 /**
  * @description: 图片上传后的处理函数
  * @param {Object} file - 上传的文件对象
@@ -474,32 +497,134 @@ const handelSubmit = () => {
 </script>
 
 <style lang="scss" scoped>
-
 .recipe-redact-container {
 	width: 100%;
-	height: 100vh;
+	min-height: 100vh;
 	box-sizing: border-box;
-	padding: 15px;
+	padding: 24rpx 22rpx calc(148rpx + env(safe-area-inset-bottom));
+	background:
+		linear-gradient(180deg, #fff5f8 0, #f8f8f8 320rpx),
+		#f8f8f8;
+
 	.redact-form {
-		padding: 18px;
-		margin-bottom: 18px;
-		border-radius: 15px;
-		background-color: #fff;
-		.from-title {
-			width: 100%;
-			justify-content: space-between;
-			text-align: left;
-		}
-		.cover {
-			width: 100%;
-			color: #303133;
-		}
-		.form-button {
-			width: 150px;
-		}
-		.form {
-			width: 100%;
-		}
+		align-items: stretch;
+		width: 100%;
+		box-sizing: border-box;
+		padding: 26rpx;
+		margin-bottom: 22rpx;
+		border: 1rpx solid rgba(255, 92, 141, 0.08);
+		border-radius: 16rpx;
+		background: rgba(255, 255, 255, 0.96);
+		box-shadow: 0 16rpx 36rpx rgba(255, 92, 141, 0.07);
+	}
+
+	.redact-form--basic {
+		padding-bottom: 20rpx;
+	}
+
+	.section-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		margin-bottom: 22rpx;
+	}
+
+	.section-head--row {
+		margin-bottom: 8rpx;
+	}
+
+	.section-title-group {
+		justify-content: flex-start;
+		min-width: 0;
+	}
+
+	.from-title {
+		width: auto;
+		color: #202124;
+		font-size: 18px;
+		line-height: 1.25;
+		text-align: left;
+	}
+
+	.section-badge,
+	.section-count {
+		flex-shrink: 0;
+		box-sizing: border-box;
+		border-radius: 999rpx;
+		color: $theme-color;
+		font-size: 12px;
+		font-weight: 600;
+		line-height: 1;
+		background: #fff2f6;
+	}
+
+	.section-badge {
+		padding: 10rpx 16rpx;
+	}
+
+	.section-count {
+		margin-left: 12rpx;
+		padding: 8rpx 14rpx;
+	}
+
+	.cover {
+		width: 100%;
+		margin-bottom: 10rpx;
+		color: #303133;
+	}
+
+	.field-label {
+		margin-bottom: 14rpx;
+		color: #303133;
+		font-size: 15px;
+		font-weight: 600;
+	}
+
+	.cover-upload {
+		display: block;
+		overflow: hidden;
+		border-radius: 16rpx;
+	}
+
+	.upload-slot {
+		width: 100%;
+		min-height: 340rpx;
+		box-sizing: border-box;
+		border: 2rpx dashed rgba(255, 92, 141, 0.24);
+		border-radius: 16rpx;
+		background:
+			linear-gradient(180deg, rgba(255, 245, 248, 0.88), rgba(255, 255, 255, 0.94));
+		color: #707070;
+	}
+
+	.upload-slot__icon {
+		width: 64rpx;
+		height: 64rpx;
+		margin-bottom: 14rpx;
+		border-radius: 50%;
+		background: #ffffff;
+		box-shadow: 0 10rpx 24rpx rgba(255, 92, 141, 0.12);
+	}
+
+	.upload-slot__text {
+		color: #303133;
+		font-size: 15px;
+		font-weight: 600;
+	}
+
+	.form,
+	.list-form {
+		width: 100%;
+	}
+
+	.form {
+		margin-top: 8rpx;
+	}
+
+	.form-button {
+		flex-shrink: 0;
+		width: 166rpx;
 	}
 
 	.category-select {
@@ -507,17 +632,52 @@ const handelSubmit = () => {
 		align-items: center;
 		justify-content: space-between;
 		width: 100%;
-		padding: 10px 0;
+		box-sizing: border-box;
+		min-height: 78rpx;
+		padding: 0 2rpx;
 
 		.category-value {
 			color: #303133;
 			font-size: 15px;
+			font-weight: 500;
 		}
 
 		.category-placeholder {
-			color: #909399;
+			color: #b7bbc3;
 			font-size: 15px;
 		}
+	}
+
+	.bottom-spacer {
+		height: 24rpx;
+	}
+
+	:deep(.u-form-item__body) {
+		padding: 18rpx 0;
+	}
+
+	:deep(.u-form-item__body__left__content__label) {
+		color: #303133;
+		font-size: 15px;
+		font-weight: 600;
+	}
+
+	:deep(.u-input__content__field-wrapper__field) {
+		color: #303133;
+		font-size: 15px;
+	}
+
+	:deep(.u-textarea) {
+		box-sizing: border-box;
+		border: 1rpx solid #eef0f4 !important;
+		border-radius: 14rpx;
+		background: #fbfbfc;
+	}
+
+	:deep(.u-button) {
+		height: 66rpx;
+		font-size: 14px;
+		font-weight: 600;
 	}
 }
 </style>
