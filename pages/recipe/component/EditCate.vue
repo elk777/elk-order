@@ -9,6 +9,7 @@
 <template>
 	<view class="edit-cate-container">
 		<up-modal
+			class="edit-cate-modal"
 			:show="show"
 			title="编辑分类"
 			:confirmColor="COLOURS['theme-color']"
@@ -19,9 +20,9 @@
             @close="close"
 		>
 			<template #default>
-				<view class="pubColumnFlex">
-					<view style="width: 100%; margin: 0 auto">
-						<up-input v-model="classifyName" placeholder="请输入分类名称" clearable />
+				<view class="edit-cate-content">
+					<view class="edit-cate-input">
+						<up-input v-model="classifyName" placeholder="请输入分类名称" border="none" clearable />
 					</view>
 				</view>
 			</template>
@@ -45,15 +46,16 @@ const show = ref(false);
  */
 const confirm = () => {
     // 先判断是否有分类名称
-    if (!classifyName.value) {
+    const name = classifyName.value.trim();
+    if (!name) {
         uni.showToast({
             title: "请输入分类名称",
             icon: "none",
         });
         return;
-    }
+	}
 	// 调用添加分类的方法
-	emit("editClassify", classifyName.value);
+	emit("editClassify", name);
 	// 清空分类名称
 	classifyName.value = "";
     // 关闭弹窗
@@ -81,5 +83,42 @@ defineExpose({
 .edit-cate-container {
     width: 100%;
     height: 100%;
+
+	.edit-cate-content {
+		box-sizing: border-box;
+		width: 100%;
+		padding: 8rpx 18rpx 18rpx;
+	}
+
+	.edit-cate-input {
+		box-sizing: border-box;
+		width: 100%;
+		height: 82rpx;
+		padding: 0 20rpx;
+		border: 1rpx solid #eef0f4;
+		border-radius: 14rpx;
+		background: #fbfbfc;
+	}
+
+	:deep(.u-modal) {
+		border-radius: 18rpx;
+		overflow: hidden;
+	}
+
+	:deep(.u-modal__title) {
+		color: #303133;
+		font-size: 18px;
+		font-weight: 700;
+	}
+
+	:deep(.u-input) {
+		height: 80rpx;
+	}
+
+	:deep(.u-input__content__field-wrapper__field) {
+		color: #303133;
+		font-size: 15px;
+		font-weight: 600;
+	}
 }
 </style>
