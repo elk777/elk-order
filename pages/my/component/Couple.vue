@@ -7,10 +7,18 @@
  * @Description: 情侣信息模块
 -->
 <template>
-	<up-card class="couple-container" :head-border-bottom="false" :border="false">
+	<up-card
+		class="couple-container"
+		margin="0"
+		border-radius="16"
+		:head-border-bottom="false"
+		:border="false"
+	>
 		<template #head>
 			<view class="couple-relation pubFlex">
-				<up-icon size="24" name="heart" :color="COLOURS['theme-color']"></up-icon>
+				<view class="couple-title-icon pubFlex">
+					<up-icon size="21" name="heart" :color="COLOURS['theme-color']"></up-icon>
+				</view>
 				<view class="couple-relation-text publcTitleSize">情侣关系</view>
 			</view>
 		</template>
@@ -32,24 +40,28 @@
 			</view>
 			<view v-else class="couple-body-binding pubFlex">
 				<view class="couple-body-item pubColumnFlex">
-					<up-image
-						shape="circle"
-						width="55px"
-						height="55px"
-						:src="leftRole?.avatar || defaultAvatar"
-					></up-image>
+					<view class="couple-avatar-wrap">
+						<up-image
+							shape="circle"
+							width="62px"
+							height="62px"
+							:src="leftRole?.avatar || defaultAvatar"
+						></up-image>
+					</view>
 					<view class="couple-body-name">{{ leftRole?.label || '' }}</view>
 				</view>
-				<view class="couple-body-love">
-					<Love :isAnimated="true" :size="25" />
+				<view class="couple-body-love pubFlex">
+					<Love :isAnimated="true" :size="28" />
 				</view>
 				<view class="couple-body-item pubColumnFlex">
-					<up-image
-						shape="circle"
-						width="55px"
-						height="55px"
-						:src="rightRole?.avatar || defaultAvatar"
-					></up-image>
+					<view class="couple-avatar-wrap">
+						<up-image
+							shape="circle"
+							width="62px"
+							height="62px"
+							:src="rightRole?.avatar || defaultAvatar"
+						></up-image>
+					</view>
 					<view class="couple-body-name">{{ rightRole?.label || '' }}</view>
 				</view>
 			</view>
@@ -170,20 +182,66 @@ defineExpose({
 });
 </script>
 <style lang="scss" scoped>
-.couple-relation {
-	justify-content: start;
-	.couple-relation-text {
-		margin-left: 5px;
+.couple-container {
+	display: block;
+	margin-bottom: 22rpx;
+
+	:deep(.couple-container.u-card) {
+		border: 1rpx solid rgba(255, 92, 141, 0.08);
+		border-radius: 16rpx !important;
+		box-shadow: 0 16rpx 36rpx rgba(255, 92, 141, 0.07);
+	}
+
+	:deep(.u-card) {
+		border: 1rpx solid rgba(255, 92, 141, 0.08);
+		border-radius: 16rpx !important;
+		box-shadow: 0 16rpx 36rpx rgba(255, 92, 141, 0.07);
+	}
+
+	:deep(.u-card__head) {
+		padding: 24rpx 26rpx 8rpx !important;
+	}
+
+	:deep(.u-card__body) {
+		padding: 20rpx 26rpx 30rpx !important;
 	}
 }
-.couple-body {
-	justify-content: start;
-	.couple-body-text {
-		margin-bottom: 20px;
+
+.couple-relation {
+	justify-content: flex-start;
+
+	.couple-title-icon {
+		width: 42rpx;
+		height: 42rpx;
+		border-radius: 50%;
+		background: #fff2f6;
 	}
+
+	.couple-relation-text {
+		margin-left: 10rpx;
+		color: #202124;
+		font-size: 18px;
+	}
+}
+
+.couple-body {
+	min-height: 190rpx;
+	justify-content: center;
+	border-radius: 16rpx;
+	background: linear-gradient(180deg, #fff8fa 0%, #ffffff 100%);
+
+	.couple-body-text {
+		margin-bottom: 22rpx;
+		color: #707070;
+		font-size: 14px;
+		font-weight: 600;
+	}
+
 	.couple-invite-action {
 		position: relative;
+		min-width: 240rpx;
 	}
+
 	.couple-share-btn {
 		position: absolute;
 		inset: 0;
@@ -200,19 +258,40 @@ defineExpose({
 		}
 	}
 }
+
 .couple-body-binding {
 	justify-content: center;
+
 	.couple-body-love {
-		margin: 0 30px;
+		width: 128rpx;
+		height: 128rpx;
+		margin: 0 36rpx;
+		border-radius: 50%;
+		background: linear-gradient(180deg, #fff5f8, #ffffff);
 	}
+
 	.couple-body-item {
+		min-width: 160rpx;
+
+		.couple-avatar-wrap {
+			padding: 6rpx;
+			border-radius: 50%;
+			background: #fff2f6;
+			box-shadow: 0 12rpx 26rpx rgba(255, 92, 141, 0.1);
+		}
+
 		.couple-body-name {
-			margin-top: 30rpx;
+			min-width: 96rpx;
+			box-sizing: border-box;
+			margin-top: 22rpx;
+			padding: 8rpx 26rpx;
+			border-radius: 999rpx;
 			background-color: $theme-color;
-			text-align: center;
-			border-radius: 25rpx;
-			padding: 5rpx 25rpx;
 			color: #fff;
+			font-size: 15px;
+			font-weight: 700;
+			text-align: center;
+			box-shadow: 0 8rpx 18rpx rgba(255, 92, 141, 0.16);
 		}
 	}
 }

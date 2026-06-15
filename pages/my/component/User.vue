@@ -15,8 +15,11 @@
 			<view v-if="userStore.isLogin" class="user-info">
 				<view class="user-name publcTitleSize">{{ displayName }}</view>
 				<view class="user-account pubFlex">
-					用户ID：<span class="user-account-label font-weight-600">{{ userInfo.uuid }}</span>
-					<up-icon @click="copyUserId" size="20" :color="COLOURS['theme-color']" name="fingerprint"></up-icon>
+					<view class="user-account-prefix">用户ID</view>
+					<view class="user-account-label font-weight-600">{{ userInfo.uuid }}</view>
+					<view class="copy-id-btn pubFlex" @click="copyUserId">
+						<up-icon size="18" :color="COLOURS['theme-color']" name="fingerprint"></up-icon>
+					</view>
 				</view>
 				<view class="user-info-detail pubFlex">
 					<view v-if="genderText" class="user-info-detail-item">{{ genderText }}</view>
@@ -38,7 +41,9 @@
 			</view>
 		</view>
 		<view v-if="userStore.isLogin" class="user-info-right">
-			<up-icon @click="handleClickSetting" size="30" :color="COLOURS['theme-color']" name="setting"></up-icon>
+			<view class="setting-btn pubFlex" @click="handleClickSetting">
+				<up-icon size="28" :color="COLOURS['theme-color']" name="setting"></up-icon>
+			</view>
 		</view>
 	</view>
 
@@ -114,68 +119,125 @@ const handleLoginClick = () => {
 <style lang="scss" scoped>
 .user-container {
 	justify-content: space-between;
-	padding: 0 15px;
+	padding: 10rpx 26rpx 0;
 	box-sizing: border-box;
+
 	.user-info-left {
 		flex: 1;
 		min-width: 0;
 		justify-content: flex-start;
 	}
+
 	.user-avatar {
 		flex-shrink: 0;
-		margin-right: 10px;
+		margin-right: 22rpx;
+		padding: 6rpx;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.86);
+		box-shadow: 0 14rpx 28rpx rgba(255, 92, 141, 0.12);
 	}
+
 	.user-info {
 		flex: 1;
 		min-width: 0;
+
+		.user-name {
+			color: #202124;
+			font-size: 21px;
+			line-height: 1.25;
+		}
+
 		.user-account {
-			color: $tinge-color;
 			justify-content: flex-start;
 			flex-wrap: wrap;
-			margin: 3px 0;
+			margin: 8rpx 0 12rpx;
+			color: $tinge-color;
+			font-size: 14px;
+
+			.user-account-prefix {
+				flex-shrink: 0;
+				margin-right: 8rpx;
+				color: #707070;
+				font-weight: 600;
+			}
+
 			.user-account-label {
-				color: $theme-color;
-                margin-right: 10px;
 				max-width: 260rpx;
+				margin-right: 10rpx;
 				overflow: hidden;
+				color: $theme-color;
+				font-size: 14px;
 				text-overflow: ellipsis;
 				white-space: nowrap;
 			}
+
+			.copy-id-btn {
+				flex-shrink: 0;
+				width: 44rpx;
+				height: 44rpx;
+				border-radius: 50%;
+				background: rgba(255, 255, 255, 0.78);
+			}
 		}
+
 		.user-info-detail {
-			justify-content: start;
+			justify-content: flex-start;
+			min-width: 0;
+
 			.user-info-detail-item {
-				padding: 2px 12px;
-				border-radius: 50px;
-				background-color: $light-color;
-				color: $tinge-color;
+				min-width: 72rpx;
+				box-sizing: border-box;
+				padding: 7rpx 22rpx;
+				border-radius: 999rpx;
+				background-color: rgba(255, 255, 255, 0.82);
+				color: #707070;
+				font-size: 14px;
+				font-weight: 700;
+				text-align: center;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+
 				&:last-child {
-					margin-left: 10px;
+					margin-left: 12rpx;
 					color: #fff;
 					background-color: $theme-color;
+					box-shadow: 0 8rpx 18rpx rgba(255, 92, 141, 0.18);
 				}
 			}
 		}
 	}
+
 	.guest-info {
 		.user-name {
-			color: #333333;
+			color: #202124;
 		}
+
 		.guest-desc {
-			margin: 5px 0 8px;
+			margin: 8rpx 0 14rpx;
 			color: $tinge-color;
 			font-size: 13px;
-			line-height: 1.3;
+			line-height: 1.45;
 		}
+
 		.guest-login-btn {
 			width: 96px;
 			height: 30px;
 			margin: 0;
 		}
 	}
+
 	.user-info-right {
 		flex-shrink: 0;
-		margin-left: 12px;
+		margin-left: 18rpx;
+	}
+
+	.setting-btn {
+		width: 72rpx;
+		height: 72rpx;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.78);
+		box-shadow: 0 12rpx 26rpx rgba(255, 92, 141, 0.1);
 	}
 }
 </style>

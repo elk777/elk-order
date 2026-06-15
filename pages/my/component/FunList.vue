@@ -7,23 +7,38 @@
  * @Description: 功能列表模块
 -->
 <template>
-	<up-card class="fun-list-container" :show-head="false" :head-border-bottom="false" :border="false">
+	<up-card
+		class="fun-list-container"
+		margin="0"
+		border-radius="16"
+		:show-head="false"
+		:head-border-bottom="false"
+		:border="false"
+	>
 		<template #body>
 			<view class="fun-list-body">
 				<template v-for="fun in funList" :key="fun.id">
 					<button v-if="fun.openType" class="fun-list-item open-button pubFlex" :open-type="fun.openType" hover-class="none">
-						<view class="pubFlex">
-							<up-icon :color="COLOURS['theme-color']" :name="fun.icon" size="26" />
+						<view class="fun-list-left pubFlex">
+							<view class="fun-icon-wrap pubFlex">
+								<up-icon :color="COLOURS['theme-color']" :name="fun.icon" size="23" />
+							</view>
 							<view class="fun-list-name publcTextSize">{{ fun.name }}</view>
 						</view>
-						<up-icon name="arrow-right" class="fun-list-arrow" />
+						<view class="fun-arrow-wrap pubFlex">
+							<up-icon name="arrow-right" class="fun-list-arrow" />
+						</view>
 					</button>
 					<view v-else @click="navigateTo(fun)" class="fun-list-item pubFlex">
-						<view class="pubFlex">
-							<up-icon :color="COLOURS['theme-color']" :name="fun.icon" size="26" />
+						<view class="fun-list-left pubFlex">
+							<view class="fun-icon-wrap pubFlex">
+								<up-icon :color="COLOURS['theme-color']" :name="fun.icon" size="23" />
+							</view>
 							<view class="fun-list-name publcTextSize">{{ fun.name }}</view>
 						</view>
-						<up-icon name="arrow-right" class="fun-list-arrow" />
+						<view class="fun-arrow-wrap pubFlex">
+							<up-icon name="arrow-right" class="fun-list-arrow" />
+						</view>
 					</view>
 				</template>
 			</view>
@@ -38,14 +53,14 @@ const funList = ref([
 	{
 		id: 0,
 		name: "我的积分",
-		icon: "coupon",
+		icon: "coupon-fill",
 		path: "/pages/my/integral",
 		open: true,
 	},
 	{
 		id: 1,
 		name: "每日签到",
-		icon: "order",
+		icon: "calendar-fill",
 		path: "/pages/my/attendance",
 		open: true,
 	},
@@ -59,7 +74,7 @@ const funList = ref([
 	{
 		id: 3,
 		name: "意见反馈",
-		icon: "chat",
+		icon: "chat-fill",
 		path: "/pages/my/feedback",
 		openType: "feedback",
 	},
@@ -96,21 +111,67 @@ const navigateTo = (fun) => {
 };
 </script>
 <style lang="scss" scoped>
+.fun-list-container {
+	display: block;
+
+	:deep(.fun-list-container.u-card) {
+		border: 1rpx solid rgba(255, 92, 141, 0.08);
+		border-radius: 16rpx !important;
+		box-shadow: 0 16rpx 36rpx rgba(40, 40, 40, 0.04);
+	}
+
+	:deep(.u-card) {
+		border: 1rpx solid rgba(255, 92, 141, 0.08);
+		border-radius: 16rpx !important;
+		box-shadow: 0 16rpx 36rpx rgba(40, 40, 40, 0.04);
+	}
+
+	:deep(.u-card__body) {
+		padding: 14rpx 22rpx !important;
+	}
+}
+
 .fun-list-body {
 	justify-content: space-between;
 }
+
 .fun-list-item {
 	width: 100%;
-    justify-content: space-between;
-	padding: 20px 0;
-	border-bottom: 1rpx solid $light-color;
+	min-height: 104rpx;
+	box-sizing: border-box;
+	justify-content: space-between;
+	padding: 14rpx 0;
+	border-bottom: 1rpx solid #f1f2f5;
+
+	.fun-list-left {
+		justify-content: flex-start;
+		min-width: 0;
+	}
+
+	.fun-icon-wrap {
+		flex-shrink: 0;
+		width: 54rpx;
+		height: 54rpx;
+		border-radius: 16rpx;
+		background: #fff2f6;
+	}
+
     .fun-list-name {
-        margin-left: 15px;
+		min-width: 0;
+		margin-left: 18rpx;
+		overflow: hidden;
+		color: #303133;
+		font-size: 16px;
+		font-weight: 700;
+		text-overflow: ellipsis;
+		white-space: nowrap;
     }
+
     &:last-child {
         border-bottom: none;
     }
 }
+
 .open-button {
 	margin: 0;
 	border: none;
@@ -122,11 +183,20 @@ const navigateTo = (fun) => {
 	line-height: inherit;
 	text-align: left;
 }
+
 .open-button::after {
 	border: none;
 }
+
+.fun-arrow-wrap {
+	flex-shrink: 0;
+	width: 42rpx;
+	height: 42rpx;
+	border-radius: 50%;
+}
+
 .fun-list-arrow {
-	font-size: 32rpx;
-	color: #999;
+	font-size: 30rpx;
+	color: #9ba0aa;
 }
 </style>

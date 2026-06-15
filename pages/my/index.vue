@@ -7,7 +7,7 @@
  * @Description: 我的页面
 -->
 <template>
-	<view class="my-container" :style="layoutStyle">
+	<view class="my-container" :style="layoutStyle" @touchmove.stop.prevent="noop">
 		<view class="my-header">
 			<NavbarMini />
 			<!-- 用户信息模块 -->
@@ -45,6 +45,7 @@ const currentRoleType = computed(() => (userStore.isLogin ? userStore.userType :
 const layoutStyle = computed(() => ({
 	"--my-bottom-space": `${getBottomSpacing()}px`,
 }));
+const noop = () => {};
 
 onShow(() => {
 	coupleRef.value?.refreshCouple?.();
@@ -61,15 +62,20 @@ onShareAppMessage((res) => {
 
 <style lang="scss" scoped>
 .my-container {
+	height: 100vh;
 	min-height: 100vh;
 	box-sizing: border-box;
+	overflow: hidden;
 	overflow-x: hidden;
-	padding-bottom: calc(var(--my-bottom-space) + 24rpx);
-	background-color: $light-color;
+	padding-bottom: calc(var(--my-bottom-space) + 132rpx);
+	background:
+		linear-gradient(180deg, #fff0f5 0, #fff6f8 300rpx, #f8f8f8 560rpx),
+		#f8f8f8;
 
 	.my-header {
-		padding-bottom: 28rpx;
-		background: linear-gradient(135deg, #FFE6EA 0%, #FFF5F5 100%);
+		position: relative;
+		padding-bottom: 34rpx;
+		background: linear-gradient(180deg, #ffe9f0 0%, #fff5f8 100%);
 	}
 
 	.user-container {
@@ -78,7 +84,10 @@ onShareAppMessage((res) => {
 	}
 
 	.my-content {
-		padding-top: 20rpx;
+		min-height: 0;
+		box-sizing: border-box;
+		padding: 22rpx 22rpx 0;
+		overflow: hidden;
 	}
 }
 </style>
