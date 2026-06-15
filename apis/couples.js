@@ -23,3 +23,13 @@ export function getActiveCouple() {
 export function bindCouple(uuid) {
 	return http.post('/couples/bind', { uuid })
 }
+
+/**
+ * @description: 解除当前用户的有效绑定关系
+ * @return {Promise}
+ */
+export function unbindCouple() {
+	return http.del('/couples/active', {}, {
+		loading: true,
+	})
+}
