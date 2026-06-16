@@ -76,14 +76,14 @@
 								</view>
 								<view class="pubFlex cate-actions">
 									<up-icon
-										v-if="isFeeder"
+										v-if="isFeeder && isRecipeManageable(pageItem)"
 										class="cate-action-icon"
 										size="32"
 										name="share-square"
 										@tap.stop="cateEdit(pageItem)"
 										:color="COLOURS['theme-color']"
 									></up-icon>
-									<view v-if="isFeeder" class="cate-action-icon">
+									<view v-if="isFeeder && isRecipeManageable(pageItem)" class="cate-action-icon">
 										<up-icon
 											size="30"
 											name="close-circle-fill"
@@ -256,6 +256,10 @@ const getCategoryRecipeCount = (category) => {
 
 const getRecipeCookTime = (recipe) => {
 	return recipe?.cookTime || recipe?.cook_time || "10分钟";
+};
+
+const isRecipeManageable = (recipe) => {
+	return recipe?.canManage !== false;
 };
 
 const noop = () => {};

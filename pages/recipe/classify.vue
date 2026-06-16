@@ -89,6 +89,7 @@ const getResponseMessage = (res, fallback) => res?.message || fallback;
 const getListData = (data) => {
 	return Array.isArray(data) ? data : data?.list || data?.items || data?.categories || [];
 };
+const getManageableCategories = (list = []) => list.filter((item) => item?.canManage !== false);
 const getCategoryId = (item) => String(item?.id || "");
 const getOrderKey = (list = []) => list.map((item) => getCategoryId(item)).join("|");
 
@@ -104,7 +105,7 @@ const loadCategories = async () => {
 	try {
 		listLoading.value = true;
 		const res = await getRecipeCategories();
-		const list = getListData(res?.data);
+		const list = getManageableCategories(getListData(res?.data));
 		if (isSuccessResponse(res) && Array.isArray(list)) {
 			classifyList.value = list;
 			lastOrderKey.value = getOrderKey(list);

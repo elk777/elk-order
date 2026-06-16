@@ -269,6 +269,13 @@ const loadRecipeDetail = async (id) => {
 
 		if (res.code === 200 && res.data) {
 			const recipe = res.data;
+			if (recipe.canManage === false) {
+				uni.showToast({ title: "只能编辑自己创建的菜谱", icon: "none" });
+				setTimeout(() => {
+					uni.navigateBack();
+				}, 1200);
+				return;
+			}
 
 			// 填充基本信息
 			form.value.basicForm.name = recipe.name || "";
