@@ -2,12 +2,12 @@
  * @Author: elk
  * @Date: 2025-07-19 16:45:55
  * @LastEditors: elk 
- * @LastEditTime: 2026-06-14 17:01:50
+ * @LastEditTime: 2026-06-16 09:03:57
  * @FilePath: /hkt-applet/config/index.js
  * @Description: 整体基础配置
  */
 // const BASE_URL = 'http://192.168.31.64:3000/api' // 局域网开发地址，支持真机调试
-const BASE_URL = 'http://vf7942c6.natappfree.cc/api' // 内网穿透 7788
+const BASE_URL = 'http://y326a263.natappfree.cc/api' // 内网穿透 7788
 
 const APP_ID = 'wx49ecb7bac043ee73' // wx appid
 
