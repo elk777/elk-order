@@ -21,7 +21,7 @@
 				></video>
 				<view class="hero-mask"></view>
 				<view class="hero-top"></view>
-				<MainSideToolVue />
+				<MainSideToolVue @open-subscribe="handleOpenSubscribePanel" />
 				<view class="hero-stage">
 					<view v-show="isStageVisible" class="stage-cluster">
 						<view class="role-node keeper-node" @click="handleStageRole(stageRoles.keeper)">
@@ -153,22 +153,31 @@
 
 		<Tabbar :current="0" />
 		<SideToolSkinVue />
+		<FirstLoginGuideVue :show="showFirstLoginGuide" @finish="handleFirstLoginGuideFinish" />
+		<SubscribeMessagePanel
+			:show="showSubscribePanel"
+			@close="showSubscribePanel = false"
+			@authorized="handleSubscribeAuthorized"
+		/>
 	</view>
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
 import { onShow, onShareAppMessage } from "@dcloudio/uni-app";
 import dayjs from "dayjs";
 import Tabbar from "@/components/Tabbar/index.vue";
 import MainBtnTypeVue from "./component/MainBtnType.vue";
 import MainSideToolVue from "./component/MainSideTool.vue";
 import SideToolSkinVue from "./component/SideToolSkin.vue";
+import FirstLoginGuideVue from "./component/FirstLoginGuide.vue";
+import SubscribeMessagePanel from "./component/SubscribeMessagePanel.vue";
 import MainBodyMiniVue from "./component/MainBodyMini.vue";
 import DefaultInviteAvatar from "@/components/DefaultInviteAvatar/index.vue";
 import Love from "@/components/Love/index.vue";
 import { useHomeSkin } from "@/hooks/home/useHomeSkin.js";
 import { useBodyMode } from "@/hooks/home/sideTool.js";
+import { useSubscribeMessage } from "@/utils/subscribeMessage.js";
 import { getBottomSpacing, getCapsuleSafeBottom } from "@/utils/tool.js";
 import { useUserStore } from "@/stores/user.js";
 import { requireLogin } from "@/utils/auth.js";
@@ -179,6 +188,7 @@ import { buildCoupleRoleSlots, ROLE_LABELS, ROLE_TYPES } from "@/utils/coupleDis
 
 const userStore = useUserStore();
 const homeSkin = useHomeSkin();
+const subscribeMessage = useSubscribeMessage();
 const bgPath = homeSkin.bgPath;
 const isVideoSkin = homeSkin.isVideoSkin;
 const bodyMode = useBodyMode();
@@ -186,6 +196,10 @@ const isStageVisible = bodyMode.isBody;
 const defaultAvatar = "/static/images/head.jpeg";
 const weekDays = ["日", "一", "二", "三", "四", "五", "六"];
 const coupleInfo = ref(null);
+const showFirstLoginGuide = ref(false);
+const showSubscribePanel = ref(false);
+const FIRST_LOGIN_GUIDE_STORAGE_PREFIX = "FIRST_LOGIN_GUIDE_V1_DONE";
+let firstLoginGuideTimer = null;
 
 const layoutStyle = computed(() => {
 	const safeTop = getCapsuleSafeBottom() + 10;
@@ -196,6 +210,7 @@ const layoutStyle = computed(() => {
 		"--home-safe-top": `${safeTop}px`,
 		"--home-tool-top": `${safeTop + 4}px`,
 		"--home-skin-extension": "230rpx",
+		"--home-stage-shift": "46rpx",
 	};
 });
 
@@ -379,6 +394,12 @@ onShow(async () => {
 	} else {
 		coupleInfo.value = null;
 	}
+
+	scheduleFirstLoginGuide();
+});
+
+onUnmounted(() => {
+	clearFirstLoginGuideTimer();
 });
 
 // 转发分享卡片，携带当前用户邀请码，好友点击进入即可完成相互绑定。
@@ -432,6 +453,65 @@ function handleQuickAction(item) {
 	}
 
 	uni.navigateTo({ url: item.url });
+}
+
+function handleOpenSubscribePanel() {
+	showSubscribePanel.value = true;
+}
+
+function handleSubscribeAuthorized() {
+	subscribeMessage.loadSettings({ force: true });
+}
+
+function getFirstLoginGuideStorageKey() {
+	const profile = userStore.profile || {};
+	return `${FIRST_LOGIN_GUIDE_STORAGE_PREFIX}_${profile.uuid || profile.id || "current"}`;
+}
+
+function hasCompletedFirstLoginGuide() {
+	try {
+		return !!uni.getStorageSync(getFirstLoginGuideStorageKey());
+	} catch (error) {
+		console.warn("[home] read first login guide state failed", error);
+		return false;
+	}
+}
+
+function markFirstLoginGuideComplete() {
+	try {
+		uni.setStorageSync(getFirstLoginGuideStorageKey(), {
+			done: true,
+			time: Date.now(),
+		});
+	} catch (error) {
+		console.warn("[home] save first login guide state failed", error);
+	}
+}
+
+function clearFirstLoginGuideTimer() {
+	if (!firstLoginGuideTimer) return;
+	clearTimeout(firstLoginGuideTimer);
+	firstLoginGuideTimer = null;
+}
+
+function scheduleFirstLoginGuide() {
+	clearFirstLoginGuideTimer();
+	if (!userStore.isLogin || hasCompletedFirstLoginGuide()) {
+		showFirstLoginGuide.value = false;
+		return;
+	}
+
+	firstLoginGuideTimer = setTimeout(() => {
+		firstLoginGuideTimer = null;
+		if (userStore.isLogin && !hasCompletedFirstLoginGuide()) {
+			showFirstLoginGuide.value = true;
+		}
+	}, 650);
+}
+
+function handleFirstLoginGuideFinish() {
+	markFirstLoginGuideComplete();
+	showFirstLoginGuide.value = false;
 }
 
 function getDiningStartDate() {
@@ -537,7 +617,7 @@ function getDiningStartDate() {
 	right: 0;
 	top: 39%;
 	height: 660rpx;
-	transform: translateY(-40%);
+	transform: translateY(-40%) translateY(var(--home-stage-shift));
 }
 
 .role-node {
@@ -807,7 +887,7 @@ function getDiningStartDate() {
 .dining-memory-card {
 	position: absolute;
 	left: 42rpx;
-	bottom: calc(116rpx + var(--home-skin-extension));
+	bottom: calc(116rpx + var(--home-skin-extension) - var(--home-stage-shift));
 	z-index: 2;
 	display: flex;
 	flex-direction: column;
@@ -823,7 +903,7 @@ function getDiningStartDate() {
 .guest-memory-card {
 	position: absolute;
 	left: 54rpx;
-	bottom: calc(116rpx + var(--home-skin-extension));
+	bottom: calc(116rpx + var(--home-skin-extension) - var(--home-stage-shift));
 	z-index: 2;
 	width: 362rpx;
 	padding: 24rpx 28rpx 22rpx;
