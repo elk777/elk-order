@@ -1,174 +1,269 @@
-# 🍳 偏爱厨房
+# 🍓 偏爱厨房小程序
 
-> 一款基于 uni-app 的情侣互动厨房管理小程序，支持「饲养员」与「吃货」双角色模式，让做饭也变得浪漫有趣。
+> 🍓 把家常饭，留给偏爱的人。
 
-[![uni-app](https://img.shields.io/badge/uni--app-3.x-2B9939?logo=vue.js)](https://uniapp.dcloud.net.cn/)
-[![Vue](https://img.shields.io/badge/Vue-3.x-4FC08D?logo=vue.js)](https://vuejs.org/)
-[![Pinia](https://img.shields.io/badge/Pinia-3.x-FFD859)](https://pinia.vuejs.org/)
-[![uview-plus](https://img.shields.io/badge/uview--plus-latest-FF5C8D)](https://uiadmin.net/uview-plus/)
-[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+偏爱厨房是一款面向情侣和亲密关系的互动厨房小程序。它把「今天想吃什么」这件很日常的小事，整理成一个可以一起参与的流程：一个人维护菜谱、准备下厨，另一个人浏览菜单、加入购物车、下单点餐；两个人绑定后，菜谱会汇成同一个共享厨房，日常签到、订单进度和饭点记忆也会被认真记录下来。
 
-## 📖 项目简介
+项目当前主要面向微信小程序，使用 uni-app + Vue 3 开发，配套后端服务为 `hkt-applet-service-nest`。
 
-**偏爱厨房** 是一款专为情侣设计的厨房互动小程序。用户可以选择「饲养员」（下厨方）或「吃货」（享用方）角色，实现从菜谱管理、下单点餐到订单跟踪的完整厨房协作流程。项目以粉色珊瑚色系为主视觉，营造温暖浪漫的使用氛围。
+## ✨ 项目亮点
 
-### 核心亮点
+- 🧑‍🍳 双角色体验：饲养员负责菜谱、接单和烹饪；吃货负责挑菜、下单和查看订单。
+- 🍱 共享厨房：情侣绑定后，双方创建的菜谱会合并展示，谁都可以浏览和下单。
+- 🛒 完整点单链路：从菜单、购物车、确认订单，到接单、烹饪中、完成订单都有对应页面。
+- 📖 菜谱管理：支持分类管理、拖拽排序、封面上传、食材清单和制作步骤。
+- 💗 生活化互动：每日签到、提醒对方签到、积分中心、烹饪日历和共进餐天数。
+- 🎀 个性首页：支持首页壁纸/皮肤切换，自定义图片和视频皮肤。
+- 🔔 订阅提醒：集中在首页开启微信订阅消息，用于订单进度和签到提醒。
 
-- **👫 双角色系统** — 饲养员管理菜谱与接单，吃货浏览菜单与下单，一套应用满足双方需求
-- **📋 完整菜谱管理** — 创建、编辑、分类、拖拽排序，支持分步骤烹饪说明与食材清单
-- **🛒 下单到出餐全流程** — 选菜 → 下单 → 接单 → 烹饪 → 完成，订单状态实时可查
-- **💕 情侣绑定** — 通过邀请码绑定伴侣，共享厨房体验
-- **🏆 积分体系** — 签到、邀请、做任务获取积分，可兑换 VIP、抽奖等权益
-- **🎨 个性化装扮** — 支持首页壁纸切换，预设多款皮肤，也可自定义上传
+## 🧁 功能模块
 
-## 📱 功能概览
+| 模块 | 说明 |
+| --- | --- |
+| 🏠 首页 | 情侣角色展示、共进餐天数、首次登录引导、皮肤切换、通知入口 |
+| 🔐 登录 | 微信授权登录，登录成功后写入本地持久化状态 |
+| 💞 情侣绑定 | 通过邀请码绑定另一半，支持绑定信息展示和解绑 |
+| 🍽️ 菜单 | 分类浏览、搜索菜谱、共享厨房展示、加入购物车 |
+| 🥗 菜谱 | 新增、编辑、删除菜谱，维护分类、食材和制作步骤 |
+| 🧾 订单 | 我的订单和厨房订单双视角，支持状态流转和再来一单 |
+| 🌷 我的 | 资料编辑、头像上传、积分、签到、烹饪日历、意见反馈 |
+| 🔔 通知 | 微信订阅消息授权、订阅状态保存、订单和签到提醒模板 |
 
-| 模块 | 功能 |
-|------|------|
-| **首页** | 情侣头像展示、共进餐天数统计、角色切换、壁纸/皮肤更换、邀请伴侣 |
-| **菜单** | 分类浏览菜谱、搜索菜品、购物车管理、添加/编辑/删除菜谱 |
-| **订单** | 厨房订单/我的订单双视角、日期筛选、状态流转（待接单→已接单→烹饪中→已完成）、订单详情 |
-| **我的** | 个人信息编辑、情侣绑定/解绑、积分明细、每日签到、意见反馈 |
+## 🛠️ 技术栈
 
-## 🛠 技术栈
-
-| 类别 | 技术选型 |
-|------|----------|
-| **框架** | [uni-app 3.x](https://uniapp.dcloud.net.cn/) (Vue 3) |
-| **语法** | Composition API (`<script setup>`) |
-| **语言** | JavaScript / SCSS |
-| **构建工具** | Vite |
-| **状态管理** | [Pinia](https://pinia.vuejs.org/) + [pinia-plugin-persistedstate](https://github.com/prazdevs/pinia-plugin-persistedstate) |
-| **UI 组件库** | [uview-plus](https://uiadmin.net/uview-plus/) (uView 2.x 的 uni-app Vue3 适配版) |
-| **日期处理** | [dayjs](https://day.js.org/) |
-| **剪贴板** | [clipboard](https://clipboardjs.com/) |
-| **云服务** | uniCloud (阿里云) + uni-id 用户体系 |
-| **跨平台** | 微信小程序 / 支付宝小程序 / 百度小程序 / 头条小程序 / H5 / Android / iOS |
+| 类型 | 技术 |
+| --- | --- |
+| 跨端框架 | uni-app |
+| 前端框架 | Vue 3，Composition API |
+| 状态管理 | Pinia，pinia-plugin-persistedstate |
+| UI 与组件 | uview-plus，uni-calendar，leo-drag，自定义业务组件 |
+| 样式 | SCSS，rpx，微信小程序自定义导航和安全区适配 |
+| 请求 | 基于 `uni.request` / `uni.uploadFile` 的统一 HTTP 封装 |
+| 后端 | NestJS，Prisma，MySQL，Redis |
 
 ## 📁 项目结构
 
-```
+```text
 hkt-applet/
-├── apis/                    # API 接口层
-│   └── order/               # 订单相关接口
-├── common/                  # 公共 SCSS 样式
-│   ├── common.scss          # 全局通用样式
-│   └── upload.scss          # 上传组件样式覆盖
-├── components/              # 全局公共组件
-│   ├── Tabbar/              # 自定义底部导航栏
-│   ├── NavbarMini/          # 自定义迷你导航栏
-│   ├── Search/              # 搜索输入框
-│   ├── CateList/            # 分类/菜谱列表
-│   ├── Love/                # 爱心动画组件
-│   └── Upload/              # 图片上传组件
-├── config/                  # 应用配置
-│   └── index.js             # 基础地址、主题色、TabBar、订单状态配置
-├── hooks/                   # 组合式函数
-│   ├── usePageTitle.js      # 页面标题与参数获取
-│   └── home/                # 首页相关 hooks
-├── pages/                   # 业务页面
-│   ├── home/                # 首页
-│   ├── sort/                # 菜单页
-│   ├── recipe/              # 菜谱详情 / 编辑 / 分类管理
-│   ├── order/               # 订单列表 / 订单详情
-│   ├── cart/                # 确认订单
-│   └── my/                  # 个人中心 / 积分明细
-├── static/                  # 静态资源
-│   ├── images/              # 图片资源
-│   └── iconfont/            # 自定义图标字体
-├── stores/                  # Pinia 状态管理
-│   ├── index.js             # Pinia 实例
-│   ├── user.js              # 用户状态（角色、个人信息）
-│   ├── recipe.js            # 菜谱状态（购物车、分类）
-│   └── order.js             # 订单状态（筛选、列表、详情）
-├── utils/                   # 工具函数
-│   └── tool.js              # 导航栏高度、安全区、ID 生成、日期格式化
-├── uni_modules/             # uni-app 插件模块
-├── uniCloud-aliyun/         # 云函数 & 数据库配置
-├── App.vue                  # 应用根组件
-├── main.js                  # 应用入口
-├── manifest.json            # 应用清单配置
-├── pages.json               # 页面路由 & 样式配置
-├── uni.scss                 # 全局 SCSS 变量
-└── package.json             # 依赖管理
+├── api/                       # 菜谱、购物车、订单等接口封装
+├── apis/                      # 登录、用户、情侣、积分、通知、首页皮肤等接口封装
+├── common/                    # 全局 SCSS 与组件样式覆盖
+├── components/                # 通用组件
+├── config/                    # 基础配置、主题色、订单状态、订阅消息模板
+├── hooks/                     # 组合式逻辑
+├── pages/                     # 页面目录
+│   ├── home/                  # 首页
+│   ├── login/                 # 登录
+│   ├── sort/                  # 菜单入口
+│   ├── recipe/                # 菜谱详情、编辑、分类
+│   ├── cart/                  # 购物车和确认订单
+│   ├── order/                 # 订单列表和详情
+│   └── my/                    # 我的、签到、积分、烹饪日历
+├── static/                    # 静态资源
+├── stores/                    # Pinia store
+├── uni_modules/               # uni-app 插件
+├── utils/                     # 请求、登录、邀请、微信授权、订阅消息等工具
+├── App.vue
+├── main.js
+├── manifest.json
+├── pages.json
+└── uni.scss
 ```
 
 ## 🚀 快速开始
 
-### 环境要求
+### 🌱 环境准备
 
-- [HBuilderX](https://www.dcloud.io/hbuilderx.html) 最新版本 或 VS Code + uni-app 插件
-- 微信开发者工具（用于微信小程序调试）
-- Node.js >= 16
+- Node.js 16+
+- HBuilderX
+- 微信开发者工具
+- 可访问的后端服务
+- 微信小程序 AppID
 
-### 安装与运行
+当前仓库没有维护 `npm run dev:*` 这类 CLI 脚本，推荐使用 HBuilderX 运行到微信开发者工具。
+
+### 📦 安装依赖
 
 ```bash
-# 1. 克隆项目
-git clone https://github.com/your-username/hkt-applet.git
-cd hkt-applet
-
-# 2. 安装依赖
 npm install
-
-# 3. 启动开发（H5 模式预览）
-npm run dev:h5
-
-# 4. 启动开发（微信小程序模式）
-npm run dev:mp-weixin
-
-# 5. 构建生产版本
-npm run build:mp-weixin
 ```
 
-### 微信小程序预览
+### 🧩 启动后端
 
-1. 使用 HBuilderX 打开项目目录
-2. 点击「运行」→「运行到小程序模拟器」→「微信开发者工具」
-3. 在微信开发者工具中导入 `unpackage/dist/dev/mp-weixin` 目录
+前端需要配套后端服务。后端项目通常与本仓库同级放置：
 
-> **注意：** 首次运行需要修改 `manifest.json` 中的微信小程序 `appid` 为你自己的 AppID。
-
-## ⚙️ 配置说明
-
-项目核心配置集中在 [config/index.js](config/index.js)：
-
-| 配置项 | 说明 |
-|--------|------|
-| `BASE_URL` | API 接口基础地址 |
-| `APP_ID` | 微信小程序 AppID |
-| `COLOURS` | 全局主题色系 |
-| `TABBAR_DATA` | 底部导航栏配置 |
-| `ORDER_STATUS_INFO` | 订单状态流转配置 |
-
-### 主题色定制
-
-在 [uni.scss](uni.scss) 和 [config/index.js](config/index.js) 中统一管理主题变量：
-
-```scss
-// 主色调
-$theme-color: #FF5C8D;   // 草莓粉
-$fu-color: #FFF5F5;       // 奶油白
-$inter-color: #FF5C8D;    // 强调色
-$tinge-color: #707070;    // 辅助灰
+```text
+H-K-T/
+├── hkt-applet
+└── hkt-applet-service-nest
 ```
 
-## 🎯 角色模式说明
+后端启动示例：
 
-| 角色 | 视角 | 核心功能 |
-|------|------|----------|
-| 🧑‍🍳 **饲养员** | 下厨方 | 管理菜谱、查看厨房订单、接单/烹饪/出餐 |
-| 😋 **吃货** | 享用方 | 浏览菜谱、加入购物车、下单投喂、查看我的订单 |
+```bash
+cd ../hkt-applet-service-nest
+pnpm install
+cp .env.example .env
+pnpm prisma:generate
+pnpm prisma:migrate
+pnpm start:dev
+```
 
-角色可在「我的」页面自由切换，不同角色下菜单页和订单页的交互界面会自动适配。
+默认接口前缀为 `/api`。本地 MySQL 和 Redis 可参考后端仓库的 `docker-compose.yml`。
 
-## 📄 License
+### 🌐 配置接口地址
 
-本项目采用 [MIT License](./LICENSE) 开源协议。
+编辑 [config/index.js](./config/index.js)：
 
-## 🙏 鸣谢
+```js
+// 局域网真机调试示例
+// const BASE_URL = 'http://localhost:3000/api'
 
-- [uni-app](https://uniapp.dcloud.net.cn/) — 跨平台开发框架
-- [uview-plus](https://uiadmin.net/uview-plus/) — 优秀的 uni-app UI 组件库
-- [Pinia](https://pinia.vuejs.org/) — 直观的 Vue 状态管理
-- [dayjs](https://day.js.org/) — 轻量级日期处理库
+// 内网穿透示例
+const BASE_URL = '内存穿透地址'
+```
+
+真机预览时，手机必须能访问 `BASE_URL`。如果后端只跑在本机 `localhost`，微信真机无法直接访问，需要改成局域网 IP 或内网穿透地址。
+
+### 🪪 配置微信 AppID
+
+编辑 [manifest.json](./manifest.json)：
+
+```json
+{
+  "mp-weixin": {
+    "appid": "你的微信小程序 AppID"
+  }
+}
+```
+
+如果需要使用订阅消息，还要在微信公众平台配置订阅模板，并同步维护 [config/subscriptionMessages.js](./config/subscriptionMessages.js) 中的模板 ID。
+
+### 📱 运行到微信小程序
+
+1. 使用 HBuilderX 打开项目根目录。
+2. 选择「运行」→「运行到小程序模拟器」→「微信开发者工具」。
+3. 微信开发者工具会打开 `unpackage/dist/dev/mp-weixin`。
+4. 真机调试前确认后端服务、`BASE_URL`、AppID、订阅消息模板都已配置。
+
+## 🍳 核心业务约定
+
+### 🧑‍🍳 角色
+
+- `userType = 0`：饲养员。
+- `userType = 1`：吃货。
+- 登录态和用户资料保存在 `stores/user.js`，并通过 Pinia 持久化到本地。
+
+### 🍱 共享厨房
+
+- 未绑定情侣时，用户只能看到自己创建的菜谱和分类。
+- 绑定后，双方菜谱会合并展示为共享厨房。
+- 菜谱和分类仍保留创建者归属。
+- 后端返回 `canManage` 标记，前端只展示当前用户可管理内容的编辑和删除入口。
+- 购物车和订单提交必须由后端校验菜谱是否属于当前共享厨房。
+
+### 🔔 订阅消息
+
+- 首页侧边通知按钮打开订阅面板。
+- 授权逻辑集中在 `utils/subscribeMessage.js`。
+- 模板类型和模板 ID 维护在 `config/subscriptionMessages.js`。
+- 微信订阅消息必须由用户点击触发授权，不能在后台静默授权。
+
+### 📨 请求格式
+
+后端统一响应结构：
+
+```json
+{
+  "code": 200,
+  "data": {},
+  "message": "ok"
+}
+```
+
+前端统一请求封装位于 [utils/request.js](./utils/request.js)，支持：
+
+- 自动拼接 `BASE_URL`
+- token 注入
+- 401 登录过期处理
+- GET 请求重试
+- 上传文件
+- 统一错误提示
+
+## 🧭 常用开发入口
+
+| 场景 | 文件 |
+| --- | --- |
+| 接口地址、主题色、订单按钮 | `config/index.js` |
+| 页面路由和 easycom | `pages.json` |
+| 请求和上传 | `utils/request.js` |
+| 登录状态 | `utils/auth.js`，`stores/user.js` |
+| 首页和皮肤 | `pages/home/index.vue`，`hooks/home/useHomeSkin.js` |
+| 菜单和共享厨房 | `pages/cart/component/CateTab.vue`，`pages/sort/index.vue` |
+| 菜谱表单和分类 | `pages/recipe/redact.vue`，`pages/recipe/classify.vue` |
+| 订单状态 | `stores/order.js`，`pages/order/component/OrderButton.vue` |
+| 签到和积分 | `pages/my/attendance.vue`，`pages/my/integral.vue`，`apis/points.js` |
+| 订阅消息 | `pages/home/component/SubscribeMessagePanel.vue`，`utils/subscribeMessage.js` |
+
+## 📝 开发与提交规范
+
+### 🌿 分支建议
+
+```text
+feat/<module-name>       # 新功能
+fix/<module-name>        # 问题修复
+docs/<topic>             # 文档调整
+refactor/<module-name>   # 重构
+```
+
+### 💬 Commit Message
+
+推荐使用 Conventional Commits，并保留当前项目常用的中文模块标识：
+
+```text
+feat：【菜单】适配共享厨房菜谱权限
+fix：【请求】更新真机调试接口地址
+docs：【README】完善项目说明
+refactor：【订单】整理状态按钮逻辑
+```
+
+常用类型：
+
+| 类型 | 说明 |
+| --- | --- |
+| `feat` | 新功能 |
+| `fix` | 问题修复 |
+| `docs` | 文档 |
+| `style` | 样式或格式调整，不改变逻辑 |
+| `refactor` | 重构 |
+| `chore` | 构建、依赖、配置等杂项 |
+
+提交前建议确认：
+
+- 只提交当前任务相关文件。
+- 不混入本地接口地址、调试日志、临时图片等无关改动。
+- 真机相关改动至少确认微信开发者工具可编译。
+- 接口契约变化需要同步后端和 README/注释。
+
+## ✅ 联调检查清单
+
+- 后端服务是否启动。
+- `BASE_URL` 是否指向可访问的 `/api` 地址。
+- 微信开发者工具是否配置了正确 AppID。
+- 真机是否能访问后端地址。
+- MySQL/Redis 是否与后端 `.env` 一致。
+- 登录后是否写入 token 和用户资料。
+- 订阅消息模板 ID 是否与微信公众平台一致。
+- 图片上传后 `/uploads` 静态资源是否可访问。
+
+## 🌙 项目状态
+
+本项目仍在持续迭代中，当前重点围绕微信小程序体验进行开发和验证。uni-app 的多端配置仍保留，但其他平台不是当前主要验收目标。
+
+如果你计划将项目发布为公开开源仓库，建议补充：
+
+- `LICENSE`
+- 示例截图或演示视频
+- 后端仓库地址
+- 线上体验二维码
+- 更完整的 API 文档

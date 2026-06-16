@@ -42,7 +42,7 @@ export const SUBSCRIBE_MESSAGE_TEMPLATES = [
 		type: SUBSCRIBE_MESSAGE_TYPES.ORDER_ACCEPTED,
 		title: "接单成功通知",
 		desc: "饲养员接单后提醒吃货",
-		templateId: "MqwIYitdCwH7WPXyb69AttnyBkNo1wfI28nnBExjcaE",
+		templateId: "MqwIYjtdCwH7WPXvb69AttnvBkNo1wfI28nnBExjcaE",
 	},
 	{
 		type: SUBSCRIBE_MESSAGE_TYPES.ORDER_CANCELED,
@@ -54,7 +54,7 @@ export const SUBSCRIBE_MESSAGE_TEMPLATES = [
 		type: SUBSCRIBE_MESSAGE_TYPES.ORDER_RESERVATION,
 		title: "订餐预约提醒",
 		desc: "吃货提交订单后提醒饲养员",
-		templateId: "9St9GUeQUstdVnHf224sIG6O8-btcQu8Bbn4orMyUiQ",
+		templateId: "9St9GUeQUstdVnHf224slG6O8-btcQu8Bbn4orMyUiQ",
 	},
 	{
 		type: SUBSCRIBE_MESSAGE_TYPES.CHECKIN_REMINDER,
