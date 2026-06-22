@@ -6,6 +6,7 @@
  */
 
 import http from '@/utils/request.js'
+import { uploadToUpyun } from '@/utils/upyunUpload.js'
 
 /**
  * @description: 获取当前用户保存的首页壁纸
@@ -36,11 +37,10 @@ export function saveHomeSkin(data) {
  * @return {Promise} 响应数据建议为 { url, path, thumb, mediaType }
  */
 export function uploadHomeSkin(filePath, mediaType = 'image') {
-	return http.upload('/home/skin/upload', filePath, 'file', {
-		scene: 'home_skin',
+	return uploadToUpyun({
+		filePath,
+		folder: 'wallpaper',
 		mediaType,
-	}, {
-		loading: true,
 		timeout: mediaType === 'video' ? 120000 : 30000,
 	})
 }

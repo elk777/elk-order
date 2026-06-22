@@ -6,6 +6,7 @@
  */
 
 import { http } from '@/utils/request.js'
+import { uploadToUpyun } from '@/utils/upyunUpload.js'
 
 // ===================== 分类管理 =====================
 
@@ -138,16 +139,11 @@ export function deleteRecipe(id) {
  * @returns {Promise<{ code: number, data: { url: string }, message: string }>}
  */
 export function uploadRecipeImage(filePath, onProgress) {
-  return http.upload(
-    '/recipes/upload',
+  return uploadToUpyun({
     filePath,
-    'file',
-    {},
-    {
-      loading: true,
-      timeout: 30000,
-      auth: true,
-      onProgress,
-    }
-  )
+    folder: 'recipes',
+    mediaType: 'image',
+    timeout: 30000,
+    onProgress,
+  })
 }
