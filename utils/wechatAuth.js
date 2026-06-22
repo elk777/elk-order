@@ -2,6 +2,7 @@
  * 微信小程序登录能力封装。
  * 页面只关心业务登录，微信 code 和用户资料采集统一收敛在这里。
  */
+import { DEFAULT_USER_AVATAR, DEFAULT_USER_NICK_NAME } from "@/utils/userDefaults.js";
 
 export function getWechatLoginCode() {
 	return new Promise((resolve, reject) => {
@@ -27,7 +28,7 @@ export function getWechatUserProfile() {
 				resolve(normalizeWechatUserInfo(res.userInfo));
 			},
 			fail: () => {
-				resolve({});
+				resolve(normalizeWechatUserInfo());
 			},
 		});
 	});
@@ -35,8 +36,8 @@ export function getWechatUserProfile() {
 
 function normalizeWechatUserInfo(userInfo = {}) {
 	return {
-		nickName: userInfo.nickName || "",
-		avatar: userInfo.avatarUrl || "",
+		nickName: userInfo.nickName || DEFAULT_USER_NICK_NAME,
+		avatar: userInfo.avatarUrl || DEFAULT_USER_AVATAR,
 		gender: normalizeGender(userInfo.gender),
 	};
 }

@@ -9,10 +9,11 @@
 
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
+import { DEFAULT_USER_AVATAR, DEFAULT_USER_NICK_NAME } from "@/utils/userDefaults.js";
 
 const DEFAULT_PROFILE = {
-	avatar: "",
-	nickName: "",
+	avatar: DEFAULT_USER_AVATAR,
+	nickName: DEFAULT_USER_NICK_NAME,
 	uuid: "",
 	phone: "",
 	gender: null,
@@ -28,6 +29,8 @@ function normalizeProfile(v = {}) {
 	const normalized = {
 		...DEFAULT_PROFILE,
 		...source,
+		avatar: source.avatar || DEFAULT_USER_AVATAR,
+		nickName: source.nickName || source.nickname || DEFAULT_USER_NICK_NAME,
 		uuid: source.uuid || source.uuId || "",
 	};
 	delete normalized.uuId;
@@ -73,11 +76,11 @@ export const useUserStore = defineStore(
 			}
 		};
 
-		// 兼容旧版本持久化缓存中的 profile.uuId，并迁移到数据库字段名 uuid。
+		// 兼容旧缓存中的空头像、空昵称和 profile.uuId，并迁移到当前默认资料结构。
 		watch(
 			profile,
 			(v) => {
-				if (v?.uuId) {
+				if (v?.uuId || !v?.avatar || !v?.nickName) {
 					profile.value = normalizeProfile(v);
 				}
 			},

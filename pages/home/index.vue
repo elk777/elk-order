@@ -1016,15 +1016,16 @@ function getDiningStartDate() {
 }
 
 .relationship-mini {
-	flex: 0 0 206rpx;
+	flex: 0 0 232rpx;
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	width: 206rpx;
+	justify-content: flex-end;
+	width: 232rpx;
 	min-width: 0;
 	height: 76rpx;
 	box-sizing: border-box;
-	overflow: hidden;
+	padding-right: 8rpx;
+	overflow: visible;
 }
 
 .relationship-mini :deep(.body-mini) {
