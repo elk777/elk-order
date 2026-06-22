@@ -2,14 +2,16 @@
  * @Author: elk
  * @Date: 2025-07-19 16:45:55
  * @LastEditors: elk 
- * @LastEditTime: 2026-06-16 09:03:57
+ * @LastEditTime: 2026-06-22 16:37:02
  * @FilePath: /hkt-applet/config/index.js
  * @Description: 整体基础配置
  */
 // const BASE_URL = 'http://192.168.31.64:3000/api' // 局域网开发地址，支持真机调试
-const BASE_URL = 'http://y326a263.natappfree.cc/api' // 内网穿透 7788
 
-const APP_ID = 'wx49ecb7bac043ee73' // wx appid
+import { baseUrl, appId } from './privacy.js' // 隐私配置
+
+const BASE_URL = baseUrl
+const APP_ID = appId
 
 // 主题颜色组合
 const COLOURS = {

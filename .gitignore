@@ -2,6 +2,7 @@
 node_modules/
 dist/
 .hbuilderx/
+config/privacy.js
 
 
 # local env files
