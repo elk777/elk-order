@@ -49,10 +49,13 @@ export async function uploadToUpyun(options = {}) {
 
 	const filename = originalName || resolveOriginalName(filePath, mediaType);
 	const mimeType = contentType || resolveContentType(filename, mediaType);
+	const fileData = await readFileAsArrayBuffer(filePath);
+	const contentLength = resolveByteLength(fileData);
 	const signatureRes = await getUpyunUploadSignature({
 		folder,
 		originalName: filename,
 		contentType: mimeType,
+		contentLength,
 	});
 	const signature = unwrapSignature(signatureRes);
 
@@ -60,7 +63,6 @@ export async function uploadToUpyun(options = {}) {
 		throw new Error("直传签名无效");
 	}
 
-	const fileData = await readFileAsArrayBuffer(filePath);
 	await putFileToUpyun({
 		uploadUrl: signature.uploadUrl,
 		headers: {
@@ -166,6 +168,19 @@ function getExtension(filename = "") {
 	return match?.[1] || "";
 }
 
+function resolveByteLength(fileData) {
+	if (typeof fileData === "string") {
+		return fileData.length;
+	}
+	if (fileData?.byteLength !== undefined) {
+		return fileData.byteLength;
+	}
+	if (fileData?.length !== undefined) {
+		return fileData.length;
+	}
+	return 0;
+}
+
 function safeDecodeURIComponent(value) {
 	try {
 		return decodeURIComponent(value);
@@ -181,4 +196,3 @@ function resolveUploadErrorMessage(res = {}) {
 	if (data?.error) return data.error;
 	return `又拍云上传失败(${res.statusCode || "unknown"})`;
 }
-

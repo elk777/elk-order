@@ -13,6 +13,7 @@ import http from "@/utils/request.js";
  * @param {string} data.folder 上传目录 avatar | recipes | wallpaper | feedback | files
  * @param {string} data.originalName 原始文件名
  * @param {string} [data.contentType] 文件 MIME
+ * @param {number} [data.contentLength] 文件字节数
  * @param {string} [data.contentMd5] 文件 MD5
  * @return {Promise}
  */
@@ -22,4 +23,3 @@ export function getUpyunUploadSignature(data) {
 		auth: true,
 	});
 }
-
