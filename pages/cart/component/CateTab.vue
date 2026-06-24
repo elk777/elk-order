@@ -133,6 +133,7 @@ import { useRecipeStore } from "@/stores/recipe.js";
 import { goLogin, requireLogin } from "@/utils/auth.js";
 import { getRecipeCategories, getRecipes, deleteRecipe } from "@/api/recipes.js";
 import { getCartList } from "@/api/cart.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
 const userStore = useUserStore();
 const recipeStore = useRecipeStore();
 const tabList = ref([]);
@@ -198,7 +199,7 @@ const getListData = (data) => {
 const normalizeRecipe = (recipe) => {
 	return {
 		...recipe,
-		cover: recipe.cover || recipe.coverImage || recipe.image || "/static/images/head.jpeg",
+		cover: withDefaultMediaUrl(recipe.cover || recipe.coverImage || recipe.image, "/static/images/head.jpeg"),
 	};
 };
 

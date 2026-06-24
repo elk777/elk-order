@@ -14,6 +14,8 @@ import {
 	updateOrderStatus as updateOrderStatusAPI,
 	reorderOrder as reorderOrderAPI,
 } from "@/api/orders.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
+import { DEFAULT_USER_AVATAR } from "@/utils/userDefaults.js";
 
 export const useOrderStore = defineStore(
 	"order",
@@ -43,7 +45,7 @@ export const useOrderStore = defineStore(
 		const normalizeOrderItem = (item = {}) => ({
 			id: item.recipeId ?? item.id,
 			name: item.recipeName || item.recipe?.name || "",
-			cover: item.recipeCover || item.recipe?.cover || "",
+			cover: withDefaultMediaUrl(item.recipeCover || item.recipe?.cover, DEFAULT_USER_AVATAR),
 			quantity: item.quantity || 1,
 			price: item.price,
 		});
@@ -60,11 +62,11 @@ export const useOrderStore = defineStore(
 				id: order.id,
 				orderNo: order.orderNo || order.id,
 				orderUser: order.orderUser || displayUser.nickName || displayUser.nickname || "",
-				userAvatar: order.userAvatar || displayUser.avatar || "",
+				userAvatar: withDefaultMediaUrl(order.userAvatar || displayUser.avatar, DEFAULT_USER_AVATAR),
 				foodieName: foodie.nickName || foodie.nickname || "",
-				foodieAvatar: foodie.avatar || "",
+				foodieAvatar: withDefaultMediaUrl(foodie.avatar, DEFAULT_USER_AVATAR),
 				feederName: feeder.nickName || feeder.nickname || "",
-				feederAvatar: feeder.avatar || "",
+				feederAvatar: withDefaultMediaUrl(feeder.avatar, DEFAULT_USER_AVATAR),
 				orderList: orderItems.map(normalizeOrderItem),
 				orderTime: displayOrderTime,
 				rawOrderTime: order.orderTime || order.createTime || "",

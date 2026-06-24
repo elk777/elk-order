@@ -6,6 +6,7 @@
  */
 
 import { getUpyunUploadSignature } from "@/apis/storage.js";
+import { normalizeMediaUrl } from "@/utils/media.js";
 
 const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "gif"]);
 const VIDEO_EXTENSIONS = new Set(["mp4", "mov", "m4v", "webm"]);
@@ -73,12 +74,14 @@ export async function uploadToUpyun(options = {}) {
 		timeout,
 	});
 
+	const publicUrl = normalizeMediaUrl(signature.publicUrl);
+
 	return {
 		code: 200,
 		data: {
-			url: signature.publicUrl,
+			url: publicUrl,
 			path: signature.path,
-			publicUrl: signature.publicUrl,
+			publicUrl,
 			uploadUrl: signature.uploadUrl,
 			driver: signature.driver,
 		},

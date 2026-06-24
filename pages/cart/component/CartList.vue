@@ -35,6 +35,7 @@
 import { computed } from "vue";
 import { COLOURS } from "@/config/index.js";
 import { useRecipeStore } from "@/stores/recipe.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
 
 defineProps({
 	readonly: {
@@ -44,8 +45,13 @@ defineProps({
 });
 
 const recipeStore = useRecipeStore();
-const cartList = computed(() => recipeStore.cartList);
 const defaultCover = "/static/images/head.jpeg";
+const cartList = computed(() => {
+	return recipeStore.cartList.map((item) => ({
+		...item,
+		cover: withDefaultMediaUrl(item.cover, defaultCover),
+	}));
+});
 
 /**
  * @description: 删除购物车项

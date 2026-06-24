@@ -10,6 +10,7 @@
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
 import { DEFAULT_USER_AVATAR, DEFAULT_USER_NICK_NAME } from "@/utils/userDefaults.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
 
 const DEFAULT_PROFILE = {
 	avatar: DEFAULT_USER_AVATAR,
@@ -29,7 +30,7 @@ function normalizeProfile(v = {}) {
 	const normalized = {
 		...DEFAULT_PROFILE,
 		...source,
-		avatar: source.avatar || DEFAULT_USER_AVATAR,
+		avatar: withDefaultMediaUrl(source.avatar, DEFAULT_USER_AVATAR),
 		nickName: source.nickName || source.nickname || DEFAULT_USER_NICK_NAME,
 		uuid: source.uuid || source.uuId || "",
 	};

@@ -160,6 +160,8 @@ import { COLOURS } from "@/config/index.js";
 import { useUserStore } from "@/stores/user.js";
 import { getUserProfile, updateUserProfile, uploadUserAvatar } from "@/apis/user.js";
 import { getActiveCouple, unbindCouple } from "@/apis/couples.js";
+import { DEFAULT_USER_AVATAR, DEFAULT_USER_NICK_NAME } from "@/utils/userDefaults.js";
+import { normalizeMediaUrl, withDefaultMediaUrl } from "@/utils/media.js";
 
 const userStore = useUserStore();
 const formRef = ref(null);
@@ -169,7 +171,7 @@ const partnerLoading = ref(false);
 const unbinding = ref(false);
 const coupleInfo = ref(null);
 const userInfo = reactive(createEditableProfile());
-const defaultAvatar = "/static/images/head.jpeg";
+const defaultAvatar = DEFAULT_USER_AVATAR;
 let coupleLoadTicket = 0;
 
 const genderOptions = [
@@ -221,7 +223,7 @@ const handleClose = () => {
 
 function createEditableProfile(profile = userStore.profile) {
 	return {
-		avatar: profile.avatar || "",
+		avatar: normalizeMediaUrl(profile.avatar || ""),
 		nickName: profile.nickName || "",
 		gender: normalizeOptionValue(profile.gender, 0),
 		userType: normalizeOptionValue(profile.userType ?? userStore.userType, 0),
@@ -302,7 +304,7 @@ async function uploadAvatarFile(filePath) {
 		const result = await uploadUserAvatar(filePath);
 		const avatarUrl = resolveAvatarUrl(result);
 		if (!avatarUrl) throw new Error("头像上传失败");
-		userInfo.avatar = avatarUrl;
+		userInfo.avatar = normalizeMediaUrl(avatarUrl);
 	} catch (error) {
 		userInfo.avatar = previousAvatar;
 		uni.showToast({
@@ -332,7 +334,7 @@ const handleSave = async () => {
 	saving.value = true;
 	try {
 		const payload = {
-			avatar: userInfo.avatar,
+			avatar: normalizeMediaUrl(userInfo.avatar),
 			nickName,
 			gender: userInfo.gender,
 			...(isBound.value ? {} : { userType: userInfo.userType }),
@@ -449,8 +451,8 @@ function normalizePartner(user, fallbackRole) {
 	if (!user) return null;
 	const role = normalizeOptionValue(user.userType, fallbackRole);
 	return {
-		avatar: user.avatar || "",
-		nickName: user.nickName || user.nickname || "偏爱用户",
+		avatar: normalizeMediaUrl(user.avatar || ""),
+		nickName: user.nickName || user.nickname || DEFAULT_USER_NICK_NAME,
 		uuid: user.uuid || user.uuId || "",
 		genderText: getGenderText(user.gender),
 		roleText: getRoleText(role),
@@ -473,7 +475,7 @@ function getRoleText(userType) {
 
 function resolveAvatarUrl(result = {}) {
 	const data = result.data || result;
-	return data.url || data.path || data.avatar || data.imageUrl || "";
+	return normalizeMediaUrl(data.url || data.path || data.avatar || data.imageUrl || "");
 }
 
 function normalizeProfile(result = {}, fallback = {}) {
@@ -483,6 +485,7 @@ function normalizeProfile(result = {}, fallback = {}) {
 		...userStore.profile,
 		...fallback,
 		...source,
+		avatar: withDefaultMediaUrl(source.avatar || fallback.avatar, userStore.profile.avatar || DEFAULT_USER_AVATAR),
 		uuid: source.uuid || source.uuId || userStore.profile.uuid,
 		phone: source.phone ?? userStore.profile.phone,
 		binding: source.binding ?? userStore.profile.binding,

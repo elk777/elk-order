@@ -13,12 +13,12 @@
 		<!-- 左右 饲养员  吃货 -->
 		<view class="kind pubFlex">
 			<view class="kind-head pubColumnFlex">
-				<view v-if="userStore.isLogin && userStore.profile.avatar" class="kind-head-img">
+				<view v-if="userStore.isLogin && userAvatar" class="kind-head-img">
 					<up-image
 						shape="circle"
 						width="50px"
 						height="50px"
-						:src="userStore.profile.avatar"
+						:src="userAvatar"
 					></up-image>
 				</view>
 				<view v-else class="kind-head-unselected">
@@ -64,11 +64,13 @@
 import { ref, computed } from "vue";
 import { getUniTopNavHeight } from "@/utils/tool.js";
 import { useUserStore } from "@/stores/user.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
 
 import Love from "@/components/Love/index.vue";
 
 const userStore = useUserStore();
 const sofaIcon = ref("/static/images/love-sofa.svg");
+const userAvatar = computed(() => withDefaultMediaUrl(userStore.profile.avatar, ""));
 
 // 格式化当前账户类型展示
 const foramtCrveUserType = computed(() => {

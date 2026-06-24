@@ -141,6 +141,7 @@ import { onShow } from "@dcloudio/uni-app";
 import { checkinPoints, getCheckinOverview, remindPartnerCheckin } from "@/apis/points.js";
 import { useUserStore } from "@/stores/user.js";
 import { useAuthGuard } from "@/hooks/useAuthGuard.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
 
 useAuthGuard();
 
@@ -165,12 +166,12 @@ const currentMonth = computed(() => currentDate.value.getMonth() + 1);
 const hasPartner = computed(() => !!overview.value.partner?.id);
 const selfStatus = computed(() => ({
 	nickName: overview.value.self?.nickName || userStore.profile.nickName || "我",
-	avatar: overview.value.self?.avatar || userStore.profile.avatar || defaultAvatar,
+	avatar: withDefaultMediaUrl(overview.value.self?.avatar || userStore.profile.avatar, defaultAvatar),
 	checked: !!overview.value.self?.checked,
 }));
 const partnerStatus = computed(() => ({
 	nickName: overview.value.partner?.nickName || "TA",
-	avatar: overview.value.partner?.avatar || defaultAvatar,
+	avatar: withDefaultMediaUrl(overview.value.partner?.avatar, defaultAvatar),
 	checked: !!overview.value.partner?.checked,
 }));
 const canRemindPartner = computed(() => hasPartner.value && !partnerStatus.value.checked);

@@ -41,6 +41,7 @@ import { computed } from "vue";
 import Love from "@/components/Love/index.vue";
 import DefaultInviteAvatar from "@/components/DefaultInviteAvatar/index.vue";
 import { useUserStore } from "@/stores/user.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
 
 const props = defineProps({
 	binding: {
@@ -68,7 +69,7 @@ const isFoodieSlotActive = computed(
 
 // 头像 fallback：profile.avatar 为空时使用本地默认头像，避免 up-image 空 src 报错。
 const currentAvatar = computed(
-	() => userStore.profile.avatar || defaultAvatar,
+	() => withDefaultMediaUrl(userStore.profile.avatar, defaultAvatar),
 );
 
 const keeperDisplay = computed(() => ({

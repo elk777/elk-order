@@ -7,7 +7,7 @@
  * @Description: 分类列表组件
 -->
 <template>
-	<view v-for="item in cateList" :key="item.id" class="cate-list-container">
+	<view v-for="item in normalizedCateList" :key="item.id" class="cate-list-container">
 		<view class="cate-list-item pubFlex">
 			<view class="cate-item-left pubFlex">
 				<up-image :radius="5" :width="imageSize" :height="imageSize" :src="item.cover" mode="aspectFill"></up-image>
@@ -28,8 +28,9 @@
 	</view>
 </template>
 <script setup>
-import { computed, watch } from "vue";
+import { computed } from "vue";
 import { COLOURS } from "@/config/index.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
 const emit = defineEmits(['delete']);
 const props = defineProps({
     // 图片大小
@@ -49,6 +50,13 @@ const props = defineProps({
 	}
 });
 
+const defaultCover = "/static/images/head.jpeg";
+const normalizedCateList = computed(() => {
+	return props.cateList.map((item) => ({
+		...item,
+		cover: withDefaultMediaUrl(item.cover, defaultCover),
+	}));
+});
 
 /**
  * @description: 删除购物车项

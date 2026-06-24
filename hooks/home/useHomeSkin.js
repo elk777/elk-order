@@ -8,6 +8,7 @@
 import { computed, ref } from 'vue'
 import { useUserStore } from '@/stores/user.js'
 import { getHomeSkin, saveHomeSkin, uploadHomeSkin } from '@/apis/home/skin.js'
+import { normalizeMediaUrl } from '@/utils/media.js'
 
 const STORAGE_KEY = 'home_skin_wallpaper'
 export const HOME_SKIN_MEDIA_TYPES = {
@@ -214,9 +215,10 @@ function normalizeSkin(input) {
 		return { ...preset }
 	}
 
-	const path = data.path || data.url || data.imageUrl || data.wallpaperUrl || data.thumb
+	const path = normalizeMediaUrl(data.path || data.url || data.imageUrl || data.wallpaperUrl || data.thumb)
 	if (!path) return null
 	const mediaType = resolveMediaType(data, path)
+	const thumb = normalizeMediaUrl(data.thumb || data.thumbnail || path)
 
 	return {
 		id: data.id || `custom_${Date.now()}`,
@@ -224,19 +226,20 @@ function normalizeSkin(input) {
 		type: data.type || 'custom',
 		mediaType,
 		path,
-		thumb: data.thumb || data.thumbnail || path,
+		thumb,
 		duration: data.duration || data.durationSeconds || data.duration_seconds || 0,
 	}
 }
 
 function createCustomSkin(path) {
+	const normalizedPath = normalizeMediaUrl(path)
 	return {
 		id: `custom_${Date.now()}`,
 		name: '自定义壁纸',
 		type: 'custom',
-		mediaType: resolveMediaType({}, path),
-		path,
-		thumb: path,
+		mediaType: resolveMediaType({}, normalizedPath),
+		path: normalizedPath,
+		thumb: normalizedPath,
 	}
 }
 
@@ -253,14 +256,14 @@ function unwrapResponse(input) {
 function getMediaUrl(input) {
 	const data = unwrapResponse(input)
 	if (!data) return ''
-	if (typeof data === 'string') return data
-	return data.url || data.path || data.imageUrl || data.fileUrl || data.thumb || ''
+	if (typeof data === 'string') return normalizeMediaUrl(data)
+	return normalizeMediaUrl(data.url || data.path || data.imageUrl || data.fileUrl || data.thumb || '')
 }
 
 function getMediaThumb(input) {
 	const data = unwrapResponse(input)
 	if (!data || typeof data === 'string') return ''
-	return data.thumb || data.thumbnail || data.poster || data.posterUrl || ''
+	return normalizeMediaUrl(data.thumb || data.thumbnail || data.poster || data.posterUrl || '')
 }
 
 function resolveMediaType(data = {}, path = '') {

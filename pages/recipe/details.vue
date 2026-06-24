@@ -125,6 +125,7 @@ import SerialStyle from "./component/SerialStyle.vue";
 import { COLOURS } from "@/config/index.js";
 import { usePageParams } from "@/hooks/usePageTitle.js";
 import { getRecipeDetail } from "@/api/recipes.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
 
 // 复制购物清单弹框显隐
 const visible = ref(false);
@@ -180,7 +181,7 @@ const loadRecipeDetail = async () => {
 			cateDetails.value = {
 				id: recipe.id,
 				name: recipe.name || "未命名菜谱",
-				image: recipe.cover || "/static/images/head.jpeg",
+				image: withDefaultMediaUrl(recipe.cover, "/static/images/head.jpeg"),
 				time: recipe.cookTime || "未知",
 				level: recipe.difficulty || "简单",
 				// 后端返回的食材字段：name, amount
@@ -191,7 +192,7 @@ const loadRecipeDetail = async () => {
 				// 后端返回的步骤字段：describe, images (数组)
 				steps: (recipe.steps || []).map((item) => ({
 					describe: item.describe || item.description || "",
-					images: Array.isArray(item.images) ? item.images : [],
+					images: Array.isArray(item.images) ? item.images.map((url) => withDefaultMediaUrl(url, "")).filter(Boolean) : [],
 				})),
 			};
 		} else {

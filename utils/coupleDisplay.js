@@ -1,3 +1,5 @@
+import { withDefaultMediaUrl } from "@/utils/media.js";
+
 export const ROLE_TYPES = {
 	keeper: 0,
 	foodie: 1,
@@ -19,7 +21,7 @@ export const isSameCoupleUser = (left = {}, right = {}) => {
 	return (!!leftId && leftId === rightId) || (!!leftUuid && leftUuid === rightUuid);
 };
 
-const getAvatar = (user, fallback) => user?.avatar || fallback;
+const getAvatar = (user, fallback) => withDefaultMediaUrl(user?.avatar, fallback);
 
 export const buildCoupleRoleSlots = ({ coupleInfo, currentUser, currentRoleType, defaultAvatar }) => {
 	if (!coupleInfo) return null;

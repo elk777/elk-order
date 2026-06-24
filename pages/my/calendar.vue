@@ -131,6 +131,7 @@ import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import { getCookingCalendarOverview, getCookingDayDetail } from "@/apis/cooking.js";
 import { useAuthGuard } from "@/hooks/useAuthGuard.js";
+import { normalizeMediaUrl } from "@/utils/media.js";
 
 useAuthGuard();
 
@@ -223,7 +224,13 @@ async function handleDateClick(day) {
 	try {
 		const res = await getCookingDayDetail({ date: day.date });
 		if (res?.code === 200 && res?.data) {
-			dayDetail.value = res.data;
+			dayDetail.value = {
+				...res.data,
+				cookings: (res.data.cookings || []).map((item) => ({
+					...item,
+					thumbnail: normalizeMediaUrl(item.thumbnail || item.cover || item.image || ""),
+				})),
+			};
 		}
 	} catch (error) {
 		console.warn("[cooking-calendar] load day detail failed", error);

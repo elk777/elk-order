@@ -185,6 +185,7 @@ import { buildInviteShareMessage, consumePendingInvite } from "@/utils/invite.js
 import { getUserProfile } from "@/apis/user.js";
 import { getActiveCouple } from "@/apis/couples.js";
 import { buildCoupleRoleSlots, ROLE_LABELS, ROLE_TYPES } from "@/utils/coupleDisplay.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
 
 const userStore = useUserStore();
 const homeSkin = useHomeSkin();
@@ -262,14 +263,14 @@ const stageRoles = computed(() => {
 			type: ROLE_TYPES.keeper,
 			active: isKeeper,
 			showAvatar: isKeeper || isBound,
-			avatar: hasCoupleInfo ? keeperSlot.avatar : (isKeeper ? userStore.profile.avatar || defaultAvatar : defaultAvatar),
+			avatar: hasCoupleInfo ? keeperSlot.avatar : (isKeeper ? withDefaultMediaUrl(userStore.profile.avatar, defaultAvatar) : defaultAvatar),
 			label: isKeeper ? "我是饲养员" : (isBound ? ROLE_LABELS[ROLE_TYPES.keeper] : isLoggedIn ? "邀请饲养员" : ROLE_LABELS[ROLE_TYPES.keeper]),
 		},
 		foodie: {
 			type: ROLE_TYPES.foodie,
 			active: isFoodie,
 			showAvatar: isFoodie || isBound,
-			avatar: hasCoupleInfo ? foodieSlot.avatar : (isFoodie ? userStore.profile.avatar || defaultAvatar : defaultAvatar),
+			avatar: hasCoupleInfo ? foodieSlot.avatar : (isFoodie ? withDefaultMediaUrl(userStore.profile.avatar, defaultAvatar) : defaultAvatar),
 			label: isFoodie ? "我是吃货" : (isBound ? ROLE_LABELS[ROLE_TYPES.foodie] : isLoggedIn ? "邀请吃货" : ROLE_LABELS[ROLE_TYPES.foodie]),
 		},
 	};

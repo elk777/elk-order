@@ -56,13 +56,14 @@ import { useUserStore } from "@/stores/user.js";
 import { COLOURS } from "@/config/index.js";
 import { goLogin, requireLogin } from "@/utils/auth.js";
 import { DEFAULT_USER_AVATAR, DEFAULT_USER_NICK_NAME } from "@/utils/userDefaults.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
 
 import UserEdit from "./UserEdit.vue";
 
 const userStore = useUserStore();
 const userInfo = computed(() => ({ ...userStore.profile }));
 const displayName = computed(() => userInfo.value.nickName || DEFAULT_USER_NICK_NAME);
-const userAvatar = computed(() => (userStore.isLogin ? userInfo.value.avatar || DEFAULT_USER_AVATAR : ""));
+const userAvatar = computed(() => (userStore.isLogin ? withDefaultMediaUrl(userInfo.value.avatar, DEFAULT_USER_AVATAR) : ""));
 const genderText = computed(() => {
 	if (userInfo.value.gender === 0) return "男";
 	if (userInfo.value.gender === 1) return "女";

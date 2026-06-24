@@ -130,6 +130,7 @@ import { useListOperations } from "./hook/useListOperations.js";
 import { useAuthGuard } from "@/hooks/useAuthGuard.js";
 // 引入菜谱 API
 import { createRecipe, updateRecipe, getRecipeDetail, uploadRecipeImage, getRecipeCategories } from "@/api/recipes.js";
+import { normalizeMediaUrl } from "@/utils/media.js";
 
 useAuthGuard();
 // 调用usePageTitle hook函数，设置默认标题为"编辑菜谱"
@@ -289,7 +290,7 @@ const loadRecipeDetail = async (id) => {
 
 			// 填充封面图片
 			if (recipe.cover) {
-				form.value.basicForm.images = [{ url: recipe.cover, status: "success" }];
+				form.value.basicForm.images = [{ url: normalizeMediaUrl(recipe.cover), status: "success" }];
 			}
 
 			// 填充食材清单（字段映射：name→ingreName, amount→ingreDose）
@@ -307,7 +308,7 @@ const loadRecipeDetail = async (id) => {
 					id: generateId(),
 					stepDesc: item.describe || "",
 					stepTip: item.tip || "",
-					stepImg: (item.images || []).map((url) => ({ url, status: "success" })),
+					stepImg: (item.images || []).map((url) => ({ url: normalizeMediaUrl(url), status: "success" })),
 				}));
 			}
 		}
@@ -371,10 +372,11 @@ const afterRead = async (file, fileList) => {
 		const res = await uploadRecipeImage(filePath);
 
 		if (res.code === 200 && res.data && res.data.url) {
+			const uploadedUrl = normalizeMediaUrl(res.data.url);
 			// 更新文件列表中的 URL
 			const lastIndex = form.value.basicForm.images.length - 1;
 			if (lastIndex >= 0) {
-				form.value.basicForm.images[lastIndex].url = res.data.url;
+				form.value.basicForm.images[lastIndex].url = uploadedUrl;
 				form.value.basicForm.images[lastIndex].status = "success";
 			}
 
@@ -444,7 +446,7 @@ const handelSubmit = () => {
 					name: form.value.basicForm.name,
 					categoryId: form.value.basicForm.categoryId,
 					description: form.value.basicForm.describe,
-					cover: form.value.basicForm.images[0]?.url || "",
+					cover: normalizeMediaUrl(form.value.basicForm.images[0]?.url || ""),
 					// 食材清单映射：ingreName→name, ingreDose→amount
 					ingreList: form.value.ingreList
 						.filter((item) => item.ingreName && item.ingreName.trim())
@@ -458,7 +460,7 @@ const handelSubmit = () => {
 						.map((item) => ({
 							stepDesc: item.stepDesc,
 							stepTip: item.stepTip || "",
-							stepImg: (item.stepImg || []).map((img) => img.url).filter(Boolean),
+							stepImg: (item.stepImg || []).map((img) => normalizeMediaUrl(img.url)).filter(Boolean),
 						})),
 				};
 

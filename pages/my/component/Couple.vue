@@ -75,6 +75,7 @@ import { COLOURS } from "@/config/index.js";
 import { requireLogin } from "@/utils/auth.js";
 import { getActiveCouple } from "@/apis/couples.js";
 import { buildCoupleRoleSlots, ROLE_LABELS, ROLE_TYPES } from "@/utils/coupleDisplay.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
 
 import Love from "@/components/Love/index.vue";
 
@@ -97,13 +98,13 @@ const coupleRoleSlots = computed(() => buildCoupleRoleSlots({
 const currentUserRole = computed(() => {
 	if (currentRoleType.value === ROLE_TYPES.foodie) {
 		return {
-			avatar: userInfo.value.avatar || defaultAvatar,
+			avatar: withDefaultMediaUrl(userInfo.value.avatar, defaultAvatar),
 			label: ROLE_LABELS[ROLE_TYPES.foodie],
 		};
 	}
 
 	return {
-		avatar: userInfo.value.avatar || defaultAvatar,
+		avatar: withDefaultMediaUrl(userInfo.value.avatar, defaultAvatar),
 		label: ROLE_LABELS[ROLE_TYPES.keeper],
 	};
 });

@@ -9,6 +9,8 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { getCartList, addToCart, updateCartItem, removeCartItem, clearCart as clearCartAPI } from "@/api/cart.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
+import { DEFAULT_USER_AVATAR } from "@/utils/userDefaults.js";
 
 export const useRecipeStore = defineStore(
 	"recipe",
@@ -52,6 +54,11 @@ export const useRecipeStore = defineStore(
 
 		const isSameId = (left, right) => hasIdValue(left) && hasIdValue(right) && String(left) === String(right);
 
+		const normalizeRecipeMedia = (recipe = {}) => ({
+			...recipe,
+			cover: withDefaultMediaUrl(recipe.cover || recipe.coverImage || recipe.image, DEFAULT_USER_AVATAR),
+		});
+
 		const getCartItemId = (cartItem) => {
 			if (!cartItem || typeof cartItem !== "object") return undefined;
 			return cartItem.cartItemId || cartItem.id;
@@ -83,7 +90,7 @@ export const useRecipeStore = defineStore(
 					} else {
 						// 新商品，添加到购物车
 						cartList.value.push({
-							...product,
+							...normalizeRecipeMedia(product),
 							cartItemId: createdCartItemId,
 							quantity: 1,
 						});
@@ -237,7 +244,7 @@ export const useRecipeStore = defineStore(
 							id: item.recipe?.id || item.recipeId, // 使用菜谱ID作为主ID
 							cartItemId: item.id, // 保存购物车项ID用于删除
 							quantity: item.quantity,
-							...(item.recipe || {}), // 展开菜谱信息
+							...normalizeRecipeMedia(item.recipe || {}), // 展开菜谱信息
 						}));
 					} else {
 						cartList.value = [];

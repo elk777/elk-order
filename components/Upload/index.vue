@@ -54,6 +54,7 @@ export default {
 </script>
 <script setup>
 import { ref, watch, computed } from "vue";
+import { normalizeMediaUrl } from "@/utils/media.js";
 
 // 定义组件属性
 const props = defineProps({
@@ -181,7 +182,7 @@ const emit = defineEmits([
 ]);
 
 // 内部文件列表
-const internalFileList = ref([...(Array.isArray(props.fileList) ? props.fileList : [])]);
+const internalFileList = ref(normalizeFileList(props.fileList));
 console.log("🚀 ~ internalFileList:", internalFileList)
 
 // 监听外部fileList变化，更新内部列表
@@ -189,7 +190,7 @@ watch(
   () => props.fileList,
   (newVal) => {
     // 确保newVal是数组类型
-    const normalizedVal = Array.isArray(newVal) ? newVal : [];
+    const normalizedVal = normalizeFileList(newVal);
     // 只有当内容真正变化时才更新
     if (JSON.stringify(normalizedVal) !== JSON.stringify(internalFileList.value)) {
       internalFileList.value = [...normalizedVal];
@@ -249,8 +250,8 @@ const handleAfterRead = ({ file }) => {
 
 	// 手动上传处理，模拟上传成功
 	const tempFile = {
-		url: file.url,
-		thumb: file.path,
+		url: normalizeMediaUrl(file.url),
+		thumb: normalizeMediaUrl(file.path),
 		name: file.name || "file",
 		type: props.accept,
 		isImage: props.accept === "image",
@@ -291,6 +292,15 @@ const handleDelete = (index) => {
 const handleAfterAutoUpload = (data) => {
 	emit("afterAutoUpload", data);
 };
+
+function normalizeFileList(fileList) {
+	if (!Array.isArray(fileList)) return [];
+	return fileList.filter(Boolean).map((file) => ({
+		...file,
+		url: normalizeMediaUrl(file.url || file.path || file.thumb || ""),
+		thumb: normalizeMediaUrl(file.thumb || file.url || file.path || ""),
+	}));
+}
 </script>
 
 <style lang="scss" scoped>

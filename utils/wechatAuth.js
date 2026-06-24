@@ -3,6 +3,7 @@
  * 页面只关心业务登录，微信 code 和用户资料采集统一收敛在这里。
  */
 import { DEFAULT_USER_AVATAR, DEFAULT_USER_NICK_NAME } from "@/utils/userDefaults.js";
+import { withDefaultMediaUrl } from "@/utils/media.js";
 
 export function getWechatLoginCode() {
 	return new Promise((resolve, reject) => {
@@ -37,7 +38,7 @@ export function getWechatUserProfile() {
 function normalizeWechatUserInfo(userInfo = {}) {
 	return {
 		nickName: userInfo.nickName || DEFAULT_USER_NICK_NAME,
-		avatar: userInfo.avatarUrl || DEFAULT_USER_AVATAR,
+		avatar: withDefaultMediaUrl(userInfo.avatarUrl, DEFAULT_USER_AVATAR),
 		gender: normalizeGender(userInfo.gender),
 	};
 }
