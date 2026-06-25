@@ -11,19 +11,8 @@
 		class="catetab-container"
 		:class="{ 'catetab-container--empty': isMenuEmpty, 'catetab-container--guest': isGuestEmpty }"
 	>
-		<view v-if="isGuestEmpty" class="menu-empty-panel menu-empty-panel--guest" @touchmove.stop.prevent="noop">
-			<EmptyState
-				:icon="emptyState.icon"
-				:title="emptyState.title"
-				:desc="emptyState.desc"
-				:actionText="emptyState.actionText"
-				:actionIcon="emptyState.actionIcon"
-				minHeight="100%"
-				padding="86rpx 48rpx 96rpx"
-				descMaxWidth="500rpx"
-				iconBgColor="linear-gradient(145deg, #fff0f5 0%, #ffffff 100%)"
-				@action="handleEmptyAction"
-			/>
+		<view v-if="isGuestEmpty" class="menu-empty-panel menu-empty-panel--guest">
+			<MenuGuestPreview @login="handleGuestLogin" />
 		</view>
 		<view v-else-if="isMenuEmpty" class="menu-empty-panel">
 			<EmptyState
@@ -128,6 +117,7 @@ export default {
 import { ref, computed, onMounted } from "vue";
 import { COLOURS } from "@/config/index.js";
 import EmptyState from "@/components/EmptyState/index.vue";
+import MenuGuestPreview from "@/pages/cart/component/MenuGuestPreview.vue";
 import { useUserStore } from "@/stores/user.js";
 import { useRecipeStore } from "@/stores/recipe.js";
 import { goLogin, requireLogin } from "@/utils/auth.js";
@@ -162,9 +152,9 @@ const emptyState = computed(() => {
 	if (!userStore.isLogin) {
 		return {
 			icon: "account",
-			title: "登录后查看专属菜单",
-			desc: "登录后可以查看家里的菜谱，饲养员也能在这里创建菜单。",
-			actionText: "去登录",
+			title: "菜单预览",
+			desc: "可先查看菜单页面内容，登录后同步家里的分类和菜谱。",
+			actionText: "登录查看",
 			actionIcon: "account",
 		};
 	}
@@ -262,8 +252,6 @@ const getRecipeCookTime = (recipe) => {
 const isRecipeManageable = (recipe) => {
 	return recipe?.canManage !== false;
 };
-
-const noop = () => {};
 
 /**
  * @description: 获取菜谱列表
@@ -365,10 +353,7 @@ const getCartTotal = async () => {
 
 const handleEmptyAction = () => {
 	if (!userStore.isLogin) {
-		goLogin({
-			redirect: "/pages/sort/index",
-			message: "请先登录后查看菜单",
-		});
+		handleGuestLogin();
 		return;
 	}
 
@@ -385,6 +370,13 @@ const handleEmptyAction = () => {
 	}
 
 	refreshMenu();
+};
+
+const handleGuestLogin = () => {
+	goLogin({
+		redirect: "/pages/sort/index",
+		message: "登录后可查看专属菜单",
+	});
 };
 
 /**

@@ -109,6 +109,14 @@ function toCateTab() {
  * @return {*}
  */
 function handleSearch(keyword) {
+	if (!userStore.isLogin) {
+		uni.showToast({
+			title: "登录后可搜索专属菜单",
+			icon: "none",
+		});
+		return;
+	}
+
 	const trimmedKeyword = (keyword || "").trim();
 	if (trimmedKeyword) {
 		refreshMenu({ keyword: trimmedKeyword });

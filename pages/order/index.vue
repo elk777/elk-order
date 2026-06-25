@@ -18,19 +18,8 @@
 				<!-- 订单列表组件 -->
 				<OrderList />
 			</template>
-			<view v-else class="order-guest-panel" @touchmove.stop.prevent="noop">
-				<EmptyState
-					icon="order"
-					title="登录后查看订单记录"
-					desc="厨房订单、我的订单和进度状态会统一展示在这里。"
-					actionText="去登录"
-					actionIcon="account"
-					minHeight="100%"
-					padding="86rpx 48rpx 96rpx"
-					descMaxWidth="500rpx"
-					iconBgColor="linear-gradient(145deg, #fff0f5 0%, #ffffff 100%)"
-					@action="handleLoginClick"
-				/>
+			<view v-else class="order-guest-panel">
+				<OrderGuestPreview @login="handleLoginClick" />
 			</view>
 		</view>
 		<Tabbar :current="2" />
@@ -45,7 +34,7 @@ import NavbarMini from "@/components/NavbarMini/index.vue";
 import OrderClassification from "./component/OrderClassification.vue";
 import DateFiltering from "./component/DateFiltering.vue";
 import OrderList from "./component/OrderList.vue";
-import EmptyState from "@/components/EmptyState/index.vue";
+import OrderGuestPreview from "./component/OrderGuestPreview.vue";
 import { goLogin } from "@/utils/auth.js";
 import { useUserStore } from "@/stores/user.js";
 import { useOrderStore } from "@/stores/order.js";
@@ -57,12 +46,11 @@ const layoutStyle = computed(() => ({
 	"--order-bottom-space": `${getBottomSpacing()}px`,
 	"--order-navbar-height": `${getCustomNavbarHeight()}px`,
 }));
-const noop = () => {};
 
 const handleLoginClick = () => {
 	goLogin({
 		redirect: "/pages/order/index",
-		message: "请先登录后查看订单",
+		message: "登录后可查看专属订单",
 	});
 };
 
