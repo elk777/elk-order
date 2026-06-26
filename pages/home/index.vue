@@ -1,7 +1,14 @@
 <template>
 	<view class="home-page">
 		<view class="home-content" :style="layoutStyle">
-			<view class="hero" :style="heroStyle">
+			<view class="hero">
+				<image
+					v-if="!isVideoSkin && imagePath"
+					class="hero-image"
+					:src="imagePath"
+					mode="aspectFill"
+					@error="handleSkinMediaError"
+				/>
 				<video
 					v-if="isVideoSkin && videoPath"
 					class="hero-video"
@@ -18,6 +25,7 @@
 					object-fit="cover"
 					playsinline
 					webkit-playsinline
+					@error="handleSkinMediaError"
 				></video>
 				<view class="hero-mask"></view>
 				<view class="hero-top"></view>
@@ -199,6 +207,7 @@ const weekDays = ["日", "一", "二", "三", "四", "五", "六"];
 const coupleInfo = ref(null);
 const showFirstLoginGuide = ref(false);
 const showSubscribePanel = ref(false);
+const skinFallbackNotified = ref(false);
 const FIRST_LOGIN_GUIDE_STORAGE_PREFIX = "FIRST_LOGIN_GUIDE_V1_DONE";
 let firstLoginGuideTimer = null;
 
@@ -216,11 +225,8 @@ const layoutStyle = computed(() => {
 });
 
 const videoPath = computed(() => (isVideoSkin.value ? bgPath.value : ""));
+const imagePath = computed(() => (!isVideoSkin.value ? bgPath.value : ""));
 const videoPoster = computed(() => homeSkin.selectedSkin.value?.thumb || "");
-const heroStyle = computed(() => {
-	if (isVideoSkin.value) return {};
-	return { backgroundImage: `url(${bgPath.value})` };
-});
 
 const welcomeText = computed(() => {
 	if (!userStore.isLogin) return "两个人的点餐灵感站";
@@ -351,6 +357,10 @@ watch(isVideoSkin, (videoMode) => {
 	}
 }, { immediate: true });
 
+watch(bgPath, () => {
+	skinFallbackNotified.value = false;
+});
+
 onShow(async () => {
 	await homeSkin.initHomeSkin(true);
 	if (isVideoSkin.value) {
@@ -424,6 +434,20 @@ function handleGuestMemoryLogin() {
 	return requireLogin(() => true, {
 		message: "请先登录后记录吃饭天数",
 	});
+}
+
+async function handleSkinMediaError() {
+	const currentSkin = homeSkin.selectedSkin.value;
+	if (!currentSkin || currentSkin.id === "warm-kitchen") return;
+
+	await homeSkin.fallbackToDefaultSkin();
+	if (!skinFallbackNotified.value) {
+		skinFallbackNotified.value = true;
+		uni.showToast({
+			title: "壁纸加载失败，已使用默认背景",
+			icon: "none",
+		});
+	}
 }
 
 function handleStageRole(role) {
@@ -553,6 +577,7 @@ function getDiningStartDate() {
 	overflow: hidden;
 }
 
+.hero-image,
 .hero-video {
 	position: absolute;
 	top: 0;
@@ -565,6 +590,10 @@ function getDiningStartDate() {
 	display: block;
 	object-fit: cover;
 	pointer-events: none;
+}
+
+.hero-image {
+	display: block;
 }
 
 .hero-mask {

@@ -115,6 +115,11 @@ export function useHomeSkin() {
 		return applySkin(defaultSkin)
 	}
 
+	async function fallbackToDefaultSkin() {
+		if (selectedSkin.value?.id === defaultSkin.id) return selectedSkin.value
+		return applySkin(defaultSkin, { remote: false, toast: false })
+	}
+
 	async function chooseCustomSkin(mediaType = HOME_SKIN_MEDIA_TYPES.IMAGE) {
 		const media = await chooseCustomMedia(mediaType)
 		if (!media.path) return null
@@ -173,6 +178,7 @@ export function useHomeSkin() {
 		initHomeSkin,
 		applySkin,
 		resetSkin,
+		fallbackToDefaultSkin,
 		chooseCustomSkin,
 	}
 }
@@ -208,8 +214,12 @@ function normalizeSkin(input) {
 	}
 
 	const preset = HOME_WALLPAPERS.find((item) => {
-		const skinPath = data.path || data.url
-		return item.id === data.id || item.path === skinPath || item.legacyPath === skinPath
+		const skinPath = normalizePresetPath(data.path || data.url || data.thumb)
+		return (
+			item.id === data.id ||
+			normalizePresetPath(item.path) === skinPath ||
+			normalizePresetPath(item.legacyPath) === skinPath
+		)
 	})
 	if (preset) {
 		return { ...preset }
@@ -229,6 +239,15 @@ function normalizeSkin(input) {
 		thumb,
 		duration: data.duration || data.durationSeconds || data.duration_seconds || 0,
 	}
+}
+
+function normalizePresetPath(value = '') {
+	const raw = String(value || '').trim().split('?')[0].split('#')[0]
+	if (!raw) return ''
+	const pathMatch = raw.match(/^https?:\/\/[^/]+(\/.*)$/i)
+	const path = pathMatch?.[1] || raw
+	const staticIndex = path.indexOf('/static/')
+	return staticIndex >= 0 ? path.slice(staticIndex) : path
 }
 
 function createCustomSkin(path) {
