@@ -8,25 +8,49 @@
 			height="36"
 			@search="handleSearch"
 			@custom="handleSearch"
+			@change="handleInputChange"
 			@clear="handleClear"
 		></up-search>
 	</view>
 </template>
 
 <script setup>
-	import { ref } from 'vue';
+	import { onUnmounted, ref } from 'vue';
 
 	const emit = defineEmits(['search', 'clear']);
 	const value = ref("");
+	let searchTimer = null;
+
+	const clearSearchTimer = () => {
+		if (searchTimer) {
+			clearTimeout(searchTimer);
+			searchTimer = null;
+		}
+	};
 
 	const handleSearch = (keyword) => {
+		clearSearchTimer();
 		emit('search', keyword || value.value);
 	};
 
+	const handleInputChange = (keyword) => {
+		clearSearchTimer();
+		// 搜索框输入频率高，延迟触发可避免菜单接口被每个字符连续刷新。
+		searchTimer = setTimeout(() => {
+			searchTimer = null;
+			emit('search', keyword || value.value);
+		}, 400);
+	};
+
 	const handleClear = () => {
+		clearSearchTimer();
 		value.value = "";
 		emit('clear');
 	};
+
+	onUnmounted(() => {
+		clearSearchTimer();
+	});
 </script>
 
 <style lang="scss" scoped>

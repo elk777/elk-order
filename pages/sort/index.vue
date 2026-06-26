@@ -71,8 +71,12 @@ const refreshMenu = async (params = {}) => {
 	}
 };
 
-onShow(() => {
-	refreshMenu();
+onShow(async () => {
+	try {
+		await refreshMenu();
+	} catch (error) {
+		console.warn("[sort] refresh menu failed", error);
+	}
 });
 
 onPullDownRefresh(async () => {

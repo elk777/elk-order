@@ -59,10 +59,13 @@ export const useUserStore = defineStore(
 		 * @description: 清空登录态
 		 * @return {void}
 		 */
-		const clearLogin = () => {
+		const clearLogin = (options = {}) => {
 			token.value = "";
 			userType.value = null;
 			profile.value = { ...DEFAULT_PROFILE };
+			if (options.clearStorage) {
+				uni.removeStorageSync("user");
+			}
 		};
 
 		/**
@@ -93,7 +96,7 @@ export const useUserStore = defineStore(
 			token,
 			(v) => {
 				if (!v || MOCK_TOKENS.includes(v)) {
-					clearLogin();
+					clearLogin({ clearStorage: MOCK_TOKENS.includes(v) });
 				}
 			},
 			{ immediate: true },
@@ -104,6 +107,8 @@ export const useUserStore = defineStore(
 	{
 		persist: {
 			key: "user",
+			pick: ["token", "userType", "profile"],
+			omit: ["profile.phone"],
 			storage: {
 				getItem: (k) => uni.getStorageSync(k),
 				setItem: (k, v) => uni.setStorageSync(k, v),

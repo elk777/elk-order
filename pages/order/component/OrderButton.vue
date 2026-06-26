@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onUnmounted, ref } from "vue";
 import { color } from "@/uni_modules/uview-plus";
 import { COLOURS, ORDER_ACTION_TYPE, getOrderActions } from "@/config/index.js";
 import { useOrderStore } from "@/stores/order.js";
@@ -58,6 +58,7 @@ const emit = defineEmits(["success"]);
 const orderStore = useOrderStore();
 const recipeStore = useRecipeStore();
 const loadingAction = ref("");
+let reorderTimer = null;
 
 const currentViewType = computed(() => (props.viewType === null ? orderStore.orderSort : props.viewType));
 const actions = computed(() => getOrderActions(currentViewType.value, props.status));
@@ -107,7 +108,8 @@ const handleClickAction = async (action) => {
 			await orderStore.reorderOrder(props.orderId);
 			await recipeStore.loadCartList();
 			uni.showToast({ title: getSuccessText(action), icon: "success" });
-			setTimeout(() => {
+			reorderTimer = setTimeout(() => {
+				reorderTimer = null;
 				uni.navigateTo({ url: "/pages/cart/AffirmOrder" });
 			}, 600);
 		} else {
@@ -124,6 +126,14 @@ const handleClickAction = async (action) => {
 		loadingAction.value = "";
 	}
 };
+
+onUnmounted(() => {
+	// 页面离开时取消延迟跳转，避免已卸载订单卡片继续触发导航。
+	if (reorderTimer) {
+		clearTimeout(reorderTimer);
+		reorderTimer = null;
+	}
+});
 </script>
 
 <style lang="scss" scoped>

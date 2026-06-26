@@ -202,7 +202,7 @@ export const clearLogin = () => {
 	const userStore = useUserStore();
 	const recipeStore = useRecipeStore();
 	const orderStore = useOrderStore();
-	userStore.clearLogin();
+	userStore.clearLogin({ clearStorage: true });
 	recipeStore.resetRecipeState();
 	orderStore.resetOrderState();
 };

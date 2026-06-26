@@ -31,17 +31,19 @@ const topNavHeight = getUniTopNavHeight();
  * @param {*} date 选中的日期
  * @return {*}
  */
-const handleChange = (date) => {
-	orderStore.setSelectedDate(date.fulldate);
+const handleChange = async (date) => {
+	orderStore.setSelectedDate(date?.fulldate);
 	orderStore.setDateShow();
+	await orderStore.getOrderList(true);
 };
 /**
  * @description: 清除筛选
  * @return {*}
  */
-const handleConfirm = () => {
-	orderStore.setSelectedDate('');
+const handleConfirm = async () => {
+	orderStore.setSelectedDate("");
 	orderStore.setDateShow();
+	await orderStore.getOrderList(true);
 };
 </script>
 <style lang="scss" scoped>

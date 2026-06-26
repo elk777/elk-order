@@ -4,10 +4,29 @@ import pinia from "@/stores";
 // 引入uview-plas 组件库
 import uviewPlus from "@/uni_modules/uview-plus";
 
+const reportGlobalError = (source, error) => {
+	const message = error?.message || error?.errMsg || String(error || "");
+	console.error(`[global-error] ${source}:`, message, error);
+};
+
+const registerUniGlobalErrors = () => {
+	if (typeof uni === "undefined") return;
+	if (typeof uni.onError === "function") {
+		uni.onError((error) => reportGlobalError("uni.onError", error));
+	}
+	if (typeof uni.onUnhandledRejection === "function") {
+		uni.onUnhandledRejection((event) => reportGlobalError("uni.onUnhandledRejection", event?.reason || event));
+	}
+};
+
 // #ifndef VUE3
 import Vue from "vue";
 import "./uni.promisify.adaptor";
 Vue.config.productionTip = false;
+Vue.config.errorHandler = (error, vm, info) => {
+	reportGlobalError(info || "vue.errorHandler", error);
+};
+registerUniGlobalErrors();
 App.mpType = "app";
 const app = new Vue({
 	...App,
@@ -19,6 +38,10 @@ app.$mount();
 import { createSSRApp } from "vue";
 export function createApp() {
 	const app = createSSRApp(App);
+	app.config.errorHandler = (error, instance, info) => {
+		reportGlobalError(info || "vue.errorHandler", error);
+	};
+	registerUniGlobalErrors();
 	// 注入组件库
 	app.use(uviewPlus, () => {
 		return {

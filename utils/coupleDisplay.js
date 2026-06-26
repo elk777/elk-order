@@ -13,10 +13,12 @@ export const ROLE_LABELS = {
 const toId = (value) => (value === undefined || value === null || value === "" ? "" : String(value));
 
 export const isSameCoupleUser = (left = {}, right = {}) => {
-	const leftId = toId(left.id);
-	const rightId = toId(right.id);
-	const leftUuid = toId(left.uuid || left.uuId);
-	const rightUuid = toId(right.uuid || right.uuId);
+	const safeLeft = left || {};
+	const safeRight = right || {};
+	const leftId = toId(safeLeft.id);
+	const rightId = toId(safeRight.id);
+	const leftUuid = toId(safeLeft.uuid || safeLeft.uuId);
+	const rightUuid = toId(safeRight.uuid || safeRight.uuId);
 
 	return (!!leftId && leftId === rightId) || (!!leftUuid && leftUuid === rightUuid);
 };

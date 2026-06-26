@@ -24,6 +24,7 @@
 					@delete="deleteImage"
 					name="images"
 					accept="image"
+					:disabled="coverUploading"
 					:sizeType="['compressed']"
 					:slotStyle="{ height: '340rpx' }"
 					:previewStyle="{ height: '340rpx' }"
@@ -97,7 +98,7 @@
 			</view>
 		</view>
 		<view class="bottom-spacer"></view>
-		<BottomBtn @submit="handelSubmit" @cancel="handleCancel" :loading="loading" />
+		<BottomBtn @submit="handelSubmit" @cancel="handleCancel" :loading="loading || coverUploading" />
 
 		<!-- 分类选择器 -->
 		<up-picker
@@ -116,7 +117,7 @@ export default {
 };
 </script>
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, nextTick, onMounted, onUnmounted } from "vue";
 import { COLOURS } from "@/config/index.js";
 import IngreIList from "./component/IngreIList.vue";
 import StepList from "./component/StepList.vue";
@@ -172,8 +173,38 @@ form.value.stepList = stepList;
 // 表单引用
 const basicForm = ref(null);
 const loading = ref(false);
+const coverUploading = ref(false);
 // 编辑模式的菜谱 ID
 const recipeId = ref(null);
+let coverUploadSeq = 0;
+let submitBackTimer = null;
+
+const clearSubmitBackTimer = () => {
+	// 页面离开后清掉延迟返回，避免卸载后的闭包继续触发导航。
+	if (submitBackTimer) {
+		clearTimeout(submitBackTimer);
+		submitBackTimer = null;
+	}
+};
+
+const getFileUrl = (file = {}) => normalizeMediaUrl(file.url || file.path || file.thumb || "");
+
+const findCoverImageIndex = (filePath) => {
+	const targetUrl = normalizeMediaUrl(filePath);
+	return form.value.basicForm.images.findIndex((item) => getFileUrl(item) === targetUrl);
+};
+
+const removeCoverImageByPath = (filePath) => {
+	const index = findCoverImageIndex(filePath);
+	if (index >= 0) {
+		form.value.basicForm.images.splice(index, 1);
+	}
+};
+
+const isLocalUploadPath = (url = "") => {
+	const value = String(url);
+	return /^(wxfile|file|blob):\/\//i.test(value) || /^https?:\/\/tmp\//i.test(value) || /^\/tmp\//i.test(value);
+};
 
 /**
  * @description: 页面加载时执行，判断是否为编辑模式
@@ -198,16 +229,11 @@ onMounted(async () => {
  */
 const loadCategories = async () => {
 	try {
-		console.log("开始加载分类列表...");
 		const res = await getRecipeCategories();
-
-		console.log("分类列表响应:", res);
 
 		if (res.code === 200 && Array.isArray(res.data)) {
 			categoryList.value = res.data;
 			categoryColumns.value = [res.data];
-
-			console.log("分类列表加载成功，数量:", res.data.length);
 
 			// 如果没有分类，提示用户
 			if (res.data.length === 0) {
@@ -249,12 +275,10 @@ const showCategoryPicker = () => {
  * @description: 分类选择确认
  */
 const onCategoryConfirm = (e) => {
-	console.log("分类选择确认:", e);
 	const selected = e.value[0];
 	if (selected) {
 		form.value.basicForm.categoryId = selected.id;
 		selectedCategoryName.value = selected.name;
-		console.log("已选择分类:", selected.name, "ID:", selected.id);
 	}
 	categoryPickerShow.value = false;
 };
@@ -272,7 +296,9 @@ const loadRecipeDetail = async (id) => {
 			const recipe = res.data;
 			if (recipe.canManage === false) {
 				uni.showToast({ title: "只能编辑自己创建的菜谱", icon: "none" });
-				setTimeout(() => {
+				clearSubmitBackTimer();
+				submitBackTimer = setTimeout(() => {
+					submitBackTimer = null;
 					uni.navigateBack();
 				}, 1200);
 				return;
@@ -364,7 +390,22 @@ const afterRead = async (file, fileList) => {
 		return;
 	}
 
+	if (coverUploading.value) {
+		await nextTick();
+		removeCoverImageByPath(filePath);
+		uni.showToast({ title: "封面正在上传，请稍后", icon: "none" });
+		return;
+	}
+
+	const currentUploadSeq = ++coverUploadSeq;
+	coverUploading.value = true;
+
 	try {
+		await nextTick();
+		const pendingIndex = findCoverImageIndex(filePath);
+		if (pendingIndex >= 0) {
+			form.value.basicForm.images[pendingIndex].status = "uploading";
+		}
 		// 显示上传中
 		uni.showLoading({ title: "上传中...", mask: true });
 
@@ -373,11 +414,13 @@ const afterRead = async (file, fileList) => {
 
 		if (res.code === 200 && res.data && res.data.url) {
 			const uploadedUrl = normalizeMediaUrl(res.data.url);
+			if (currentUploadSeq !== coverUploadSeq) return;
 			// 更新文件列表中的 URL
-			const lastIndex = form.value.basicForm.images.length - 1;
-			if (lastIndex >= 0) {
-				form.value.basicForm.images[lastIndex].url = uploadedUrl;
-				form.value.basicForm.images[lastIndex].status = "success";
+			const imageIndex = findCoverImageIndex(filePath);
+			if (imageIndex >= 0) {
+				form.value.basicForm.images[imageIndex].url = uploadedUrl;
+				form.value.basicForm.images[imageIndex].thumb = uploadedUrl;
+				form.value.basicForm.images[imageIndex].status = "success";
 			}
 
 			uni.showToast({ title: "上传成功", icon: "success" });
@@ -388,9 +431,12 @@ const afterRead = async (file, fileList) => {
 		console.error("图片上传失败:", error);
 		uni.showToast({ title: error.message || "上传失败", icon: "none" });
 
-		// 上传失败，移除最后一个文件
-		form.value.basicForm.images.pop();
+		// 上传失败只移除本次临时文件，避免并发或删除操作下误删其它图片。
+		removeCoverImageByPath(filePath);
 	} finally {
+		if (currentUploadSeq === coverUploadSeq) {
+			coverUploading.value = false;
+		}
 		uni.hideLoading();
 	}
 };
@@ -402,7 +448,6 @@ const afterRead = async (file, fileList) => {
  */
 const deleteImage = (index) => {
 	// 通用上传组件已经处理了文件删除，这里可以添加额外的业务逻辑
-	console.log("删除图片索引", index);
 };
 
 /**
@@ -412,11 +457,18 @@ const deleteImage = (index) => {
 const handelSubmit = () => {
 	basicForm.value.validate().then(async (valid) => {
 		if (valid) {
-			console.log("表单验证通过，准备提交...");
-
 			// 检查封面图片
 			if (!form.value.basicForm.images || form.value.basicForm.images.length === 0) {
 				uni.showToast({ title: "请上传菜谱封面", icon: "none" });
+				return;
+			}
+			if (coverUploading.value) {
+				uni.showToast({ title: "封面上传中，请稍后提交", icon: "none" });
+				return;
+			}
+			const coverUrl = normalizeMediaUrl(form.value.basicForm.images[0]?.url || "");
+			if (!coverUrl || isLocalUploadPath(coverUrl)) {
+				uni.showToast({ title: "封面尚未上传完成", icon: "none" });
 				return;
 			}
 
@@ -446,7 +498,7 @@ const handelSubmit = () => {
 					name: form.value.basicForm.name,
 					categoryId: form.value.basicForm.categoryId,
 					description: form.value.basicForm.describe,
-					cover: normalizeMediaUrl(form.value.basicForm.images[0]?.url || ""),
+					cover: coverUrl,
 					// 食材清单映射：ingreName→name, ingreDose→amount
 					ingreList: form.value.ingreList
 						.filter((item) => item.ingreName && item.ingreName.trim())
@@ -464,20 +516,14 @@ const handelSubmit = () => {
 						})),
 				};
 
-				console.log("提交数据:", submitData);
-
 				let res;
 				if (recipeId.value) {
 					// 编辑模式：更新菜谱
-					console.log("更新菜谱, ID:", recipeId.value);
 					res = await updateRecipe(recipeId.value, submitData);
 				} else {
 					// 新增模式：创建菜谱
-					console.log("创建新菜谱");
 					res = await createRecipe(submitData);
 				}
-
-				console.log("提交响应:", res);
 
 				if (res.code === 200) {
 					uni.showToast({
@@ -486,7 +532,8 @@ const handelSubmit = () => {
 					});
 
 					// 延迟返回上一页
-					setTimeout(() => {
+					submitBackTimer = setTimeout(() => {
+						submitBackTimer = null;
 						uni.navigateBack();
 					}, 1000);
 				} else {
@@ -499,10 +546,14 @@ const handelSubmit = () => {
 				loading.value = false;
 			}
 		} else {
-			console.log("表单验证失败", form.value);
+			uni.showToast({ title: "请完善菜谱信息", icon: "none" });
 		}
 	});
 };
+
+onUnmounted(() => {
+	clearSubmitBackTimer();
+});
 </script>
 
 <style lang="scss" scoped>

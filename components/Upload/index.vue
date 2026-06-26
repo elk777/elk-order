@@ -33,6 +33,7 @@
 			@oversize="handleOversize"
 			@clickPreview="handleClickPreview"
 			@delete="handleDelete"
+			@update:fileList="handleFileListUpdate"
 			@afterAutoUpload="handleAfterAutoUpload"
 		>
 			<!-- 将父组件的插槽内容作为 trigger 插槽传递给 u-upload 组件 -->
@@ -178,12 +179,12 @@ const emit = defineEmits([
 	"oversize",
 	"clickPreview",
 	"delete",
+	"change",
 	"afterAutoUpload",
 ]);
 
 // 内部文件列表
 const internalFileList = ref(normalizeFileList(props.fileList));
-console.log("🚀 ~ internalFileList:", internalFileList)
 
 // 监听外部fileList变化，更新内部列表
 watch(
@@ -198,16 +199,6 @@ watch(
   },
   { deep: true }
 );
-
-// 监听内部fileList变化，通知外部
-// watch(
-// 	internalFileList,
-// 	(newVal) => {
-// 		console.log("🚀 ~ newVal:", newVal);
-// 		emit("update:fileList", [...newVal]);
-// 	},
-// 	{ deep: true }
-// );
 
 // 计算 CSS 变量
 const computedStyles = computed(() => {
@@ -241,7 +232,6 @@ const handleBeforeRead = (file) => {
 
 // 处理上传后事件
 const handleAfterRead = ({ file }) => {
-	console.log("🚀 ~ handleAfterRead ~ file:", file);
 	emit("afterRead", file, internalFileList);
 	// 如果是自动上传，不需要手动处理
 	if (props.action) {
@@ -278,18 +268,27 @@ const handleClickPreview = (item, index) => {
 	emit("clickPreview", item, index);
 };
 
+const handleFileListUpdate = (fileList) => {
+	internalFileList.value = normalizeFileList(fileList);
+	emit("update:fileList", [...internalFileList.value]);
+	emit("change", [...internalFileList.value]);
+};
+
 // 处理删除事件
-const handleDelete = (index) => {
-	console.log("🚀 ~ handleDelete ~ index:", index);
+const handleDelete = (event) => {
+	const index = typeof event === "number" ? event : event?.index;
+	if (!Number.isInteger(index) || index < 0 || index >= internalFileList.value.length) return;
+	const deletedFile = internalFileList.value[index];
 	internalFileList.value.splice(index, 1);
-	console.log("🚀 ~ handleDelete ~ fileList:", props.fileList);
-	emit("delete", index);
+	emit("delete", { index, file: deletedFile });
 	// 手动通知父组件
 	emit("update:fileList", [...internalFileList.value]);
+	emit("change", [...internalFileList.value]);
 };
 
 // 处理自动上传完成事件
 const handleAfterAutoUpload = (data) => {
+	handleFileListUpdate(internalFileList.value);
 	emit("afterAutoUpload", data);
 };
 

@@ -28,6 +28,8 @@ export const useOrderStore = defineStore(
 		const page = ref(1);
 		// 加载中
 		const loading = ref(false);
+		// 是否还有更多订单数据
+		const hasMore = ref(true);
 		// 错误信息
 		const errorMessage = ref("");
 
@@ -41,11 +43,20 @@ export const useOrderStore = defineStore(
 
 		// 订单详情
 		const orderDetails = ref(null);
+		let orderListRequestSeq = 0;
+
+		const normalizeDateKey = (date) => {
+			if (!date) return "";
+			const match = String(date).match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+			if (!match) return "";
+			const [, year, month, day] = match;
+			return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+		};
 
 		const normalizeOrderItem = (item = {}) => ({
 			id: item.recipeId ?? item.id,
-			name: item.recipeName || item.recipe?.name || "",
-			cover: withDefaultMediaUrl(item.recipeCover || item.recipe?.cover, DEFAULT_USER_AVATAR),
+			name: item.name || item.recipeName || item.recipe?.name || "",
+			cover: withDefaultMediaUrl(item.cover || item.recipeCover || item.recipe?.cover, DEFAULT_USER_AVATAR),
 			quantity: item.quantity || 1,
 			price: item.price,
 		});
@@ -118,7 +129,7 @@ export const useOrderStore = defineStore(
 		 */
 		const filterOrderList = computed(() => {
 			if (selectedDate.value) {
-				return orderList.value.filter((item) => item.orderTime.includes(selectedDate.value));
+				return orderList.value.filter((item) => normalizeDateKey(item.rawOrderTime) === selectedDate.value);
 			}
 			if (orderStatus.value !== 0) {
 				return orderList.value.filter((item) => item.orderStatus === orderStatus.value);
@@ -138,7 +149,7 @@ export const useOrderStore = defineStore(
 		 * @return {*}
 		 */
 		function setSelectedDate(date) {
-			selectedDate.value = date;
+			selectedDate.value = normalizeDateKey(date);
 		}
 		/**
 		 * @description: 获取订单列表
@@ -146,11 +157,13 @@ export const useOrderStore = defineStore(
 		 * @return {*}
 		 */
 		const getOrderList = async (isRefresh = false) => {
+			const requestSeq = ++orderListRequestSeq;
 			loading.value = true;
 			try {
 				// 如果是刷新，重置页码
 				if (isRefresh) {
 					page.value = 1;
+					hasMore.value = true;
 				}
 
 				const params = {
@@ -166,6 +179,11 @@ export const useOrderStore = defineStore(
 				if (res.code === 200 && res.data) {
 					const newList = (res.data.list || []).map(normalizeOrder);
 
+					// 父页 onShow 与分类组件初始化可能并发请求，只允许最后一次请求落库。
+					if (requestSeq !== orderListRequestSeq) {
+						return { success: false, hasMore: hasMore.value, stale: true };
+					}
+
 					// 如果是刷新，替换列表；否则追加
 					if (isRefresh || page.value === 1) {
 						orderList.value = newList;
@@ -174,9 +192,9 @@ export const useOrderStore = defineStore(
 					}
 
 					// 判断是否还有更多数据
-					const hasMore = newList.length >= 10;
+					hasMore.value = newList.length >= 10;
 
-					return { success: true, hasMore };
+					return { success: true, hasMore: hasMore.value };
 				}
 
 				return { success: false, hasMore: false };
@@ -185,7 +203,9 @@ export const useOrderStore = defineStore(
 				console.error("获取订单列表失败:", error);
 				return { success: false, hasMore: false };
 			} finally {
-				loading.value = false;
+				if (requestSeq === orderListRequestSeq) {
+					loading.value = false;
+				}
 			}
 		};
 
@@ -195,11 +215,17 @@ export const useOrderStore = defineStore(
 		 * @return {*}
 		 */
 		function setOrderSort(index) {
-			orderSort.value = index;
+			const nextSort = Number(index);
+			const sortChanged = orderSort.value !== nextSort;
+			const statusChanged = orderStatus.value !== 0;
+			orderSort.value = Number.isFinite(nextSort) ? nextSort : 0;
 			// 切换分类时重置状态筛选为全部
 			orderStatus.value = 0;
+			if (!sortChanged && !statusChanged) {
+				return Promise.resolve({ success: true, hasMore: hasMore.value });
+			}
 			// 重新加载订单列表
-			getOrderList(true);
+			return getOrderList(true);
 		}
 
 		/**
@@ -219,6 +245,7 @@ export const useOrderStore = defineStore(
 			orderStatus.value = 0;
 			page.value = 1;
 			loading.value = false;
+			hasMore.value = true;
 			orderList.value = [];
 			dateShow.value = false;
 			selectedDate.value = "";
@@ -232,8 +259,14 @@ export const useOrderStore = defineStore(
 		 */
 		const loadMore = async () => {
 			if (loading.value) return { success: false, hasMore: false };
+			if (!hasMore.value) return { success: true, hasMore: false };
+			const previousPage = page.value;
 			page.value += 1;
-			return await getOrderList(false);
+			const result = await getOrderList(false);
+			if (!result.success && !result.stale) {
+				page.value = previousPage;
+			}
+			return result;
 		};
 
 		const changeOrderStatus = async (id, nextStatus) => {
@@ -258,6 +291,7 @@ export const useOrderStore = defineStore(
 			dateShow,
 			selectedDate,
 			orderList,
+			hasMore,
 			errorMessage,
 			filterOrderList,
 			orderDetails,
@@ -278,6 +312,7 @@ export const useOrderStore = defineStore(
 	{
 		persist: {
 			key: "order",
+			pick: ["orderSort", "orderStatus", "selectedDate"],
 			storage: {
 				getItem: (k) => uni.getStorageSync(k),
 				setItem: (k, v) => uni.setStorageSync(k, v),

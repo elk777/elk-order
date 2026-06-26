@@ -51,12 +51,7 @@
 						>
 							暂无食材清单
 						</view>
-						<view
-							v-else
-							class="cate-ingre-item publcTextSize"
-							v-for="(item, index) in cateDetails.ingredients"
-							:key="index"
-						>
+						<view v-else class="cate-ingre-item publcTextSize" v-for="item in cateDetails.ingredients" :key="item.id">
 							<view class="item-name-wrap">
 								<view class="item-dot"></view>
 								<view class="item-name">
@@ -81,7 +76,7 @@
 						>
 							暂无制作步骤
 						</view>
-						<view v-else class="cate-steps" v-for="(step, index) in cateDetails.steps" :key="index">
+						<view v-else class="cate-steps" v-for="(step, index) in cateDetails.steps" :key="step.id">
 							<SerialStyle :index="index" :size="44" :fontSize="17" />
 							<view class="step-card w-100">
 								<view class="step-desc">{{ step.describe }}</view>
@@ -98,8 +93,8 @@
 		<view class="copy-ingre-content">
 			<view
 				class="copy-ingre-item publcTextSize pubFlex"
-				v-for="(item, index) in cateDetails.ingredients"
-				:key="index"
+				v-for="item in cateDetails.ingredients"
+				:key="item.id"
 			>
 				<view class="item-name">{{ item.name }}&nbsp;</view>
 				<view class="item-amount">{{ item.amount }}</view>
@@ -119,7 +114,7 @@ export default {
 };
 </script>
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import DetailsTitle from "./component/DetailsTitle.vue";
 import SerialStyle from "./component/SerialStyle.vue";
 import { COLOURS } from "@/config/index.js";
@@ -143,6 +138,15 @@ const cateDetails = ref({
 	ingredients: [],
 	steps: [],
 });
+let navigateBackTimer = null;
+
+const scheduleNavigateBack = () => {
+	if (navigateBackTimer) clearTimeout(navigateBackTimer);
+	navigateBackTimer = setTimeout(() => {
+		navigateBackTimer = null;
+		uni.navigateBack();
+	}, 1500);
+};
 
 // 页面参数
 const params = usePageParams();
@@ -166,9 +170,7 @@ const loadRecipeDetail = async () => {
 				title: "菜谱ID不存在",
 				icon: "none",
 			});
-			setTimeout(() => {
-				uni.navigateBack();
-			}, 1500);
+			scheduleNavigateBack();
 			return;
 		}
 
@@ -185,12 +187,14 @@ const loadRecipeDetail = async () => {
 				time: recipe.cookTime || "未知",
 				level: recipe.difficulty || "简单",
 				// 后端返回的食材字段：name, amount
-				ingredients: (recipe.ingredients || []).map((item) => ({
+				ingredients: (recipe.ingredients || []).map((item, index) => ({
+					id: item.id || `${recipe.id || "recipe"}-ingredient-${index}`,
 					name: item.name,
 					amount: item.amount,
 				})),
 				// 后端返回的步骤字段：describe, images (数组)
-				steps: (recipe.steps || []).map((item) => ({
+				steps: (recipe.steps || []).map((item, index) => ({
+					id: item.id || `${recipe.id || "recipe"}-step-${index}`,
 					describe: item.describe || item.description || "",
 					images: Array.isArray(item.images) ? item.images.map((url) => withDefaultMediaUrl(url, "")).filter(Boolean) : [],
 				})),
@@ -206,9 +210,7 @@ const loadRecipeDetail = async () => {
 		});
 
 		// 加载失败返回上一页
-		setTimeout(() => {
-			uni.navigateBack();
-		}, 1500);
+		scheduleNavigateBack();
 	} finally {
 		loading.value = false;
 	}
@@ -219,13 +221,21 @@ const loadRecipeDetail = async () => {
  * @return {*}
  */
 const copyIngredients = () => {
-	copyContent.value = cateDetails.value.ingredients.map((item) => `${item.name}${item.amount}`).join("\n");
+	copyContent.value = cateDetails.value.ingredients.map((item) => [item.name, item.amount].filter(Boolean).join(" ")).join("\n");
 	visible.value = false;
 };
 
 // 页面加载时获取详情
 onMounted(() => {
 	loadRecipeDetail();
+});
+
+onUnmounted(() => {
+	// 失败提示后的延迟返回需要随页面销毁一起清理，避免闭包在离页后继续导航。
+	if (navigateBackTimer) {
+		clearTimeout(navigateBackTimer);
+		navigateBackTimer = null;
+	}
 });
 </script>
 

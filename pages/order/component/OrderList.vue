@@ -39,7 +39,7 @@
 					<up-loading-icon mode="circle" :color="COLOURS['theme-color']"></up-loading-icon>
 					<text>加载中...</text>
 				</view>
-				<view class="load-more" v-else-if="!hasMore && orderStore.orderList.length > 0">
+				<view class="load-more" v-else-if="!orderStore.hasMore && orderStore.orderList.length > 0">
 					<text>没有更多了</text>
 				</view>
 			</view>
@@ -61,7 +61,6 @@ import OrderItem from "./OrderItem.vue";
 
 const orderStore = useOrderStore();
 const refreshing = ref(false); // 下拉刷新状态
-const hasMore = ref(true); // 是否还有更多数据
 const emptyDesc = computed(() => {
 	if (orderStore.selectedDate) {
 		return "这一天还没有订单记录";
@@ -78,18 +77,19 @@ const emptyDesc = computed(() => {
  */
 const onRefresh = async () => {
 	refreshing.value = true;
-	const result = await orderStore.getOrderList(true);
-	hasMore.value = result.hasMore;
-	refreshing.value = false;
+	try {
+		await orderStore.getOrderList(true);
+	} finally {
+		refreshing.value = false;
+	}
 };
 
 /**
  * @description: 上拉加载更多
  */
 const onLoadMore = async () => {
-	if (!hasMore.value || orderStore.loading) return;
-	const result = await orderStore.loadMore();
-	hasMore.value = result.hasMore;
+	if (!orderStore.hasMore || orderStore.loading) return;
+	await orderStore.loadMore();
 };
 
 /**
@@ -98,8 +98,7 @@ const onLoadMore = async () => {
 const handleStatusChange = async (status) => {
 	orderStore.setOrderStatus(status);
 	// 重新加载订单列表
-	const result = await orderStore.getOrderList(true);
-	hasMore.value = result.hasMore;
+	await orderStore.getOrderList(true);
 };
 
 onMounted(async () => {

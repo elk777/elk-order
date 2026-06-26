@@ -74,6 +74,7 @@ const amountDetail = computed(() => {
 		} else if (type === 2) {
 			return "";
 		}
+		return "";
 	};
 });
 

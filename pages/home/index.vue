@@ -361,25 +361,12 @@ watch(bgPath, () => {
 	skinFallbackNotified.value = false;
 });
 
-onShow(async () => {
-	await homeSkin.initHomeSkin(true);
-	if (isVideoSkin.value) {
-		bodyMode.hide();
-	} else {
-		bodyMode.show();
-	}
-	// 已登录时静默刷新一次用户资料：B 端切回小程序时能感知 A 端切角色后被后端联动翻转的最新 userType。
-	// 必须早于 consumePendingInvite，因为后者依赖最新的 profile.binding 字段。
+const refreshProfileOnShow = async () => {
 	if (userStore.isLogin) {
 		try {
 			const res = await getUserProfile();
 			// 请求层对业务错误码（code !== 200）正常 resolve，需显式判 code。
 			if (res?.code === 200 && res?.data) {
-				console.log("[home] 刷新用户资料:", {
-					binding: res.data.binding,
-					userType: res.data.userType,
-					uuid: res.data.uuid
-				});
 				userStore.setProfile(res.data);
 			} else {
 				console.warn("[home] 用户资料响应异常:", res);
@@ -389,10 +376,9 @@ onShow(async () => {
 			console.warn("[home] refresh profile failed", error);
 		}
 	}
-	// 已登录用户从分享卡片进入首页时，尝试消费暂存的邀请码完成绑定。
-	await consumePendingInvite();
+};
 
-	// 加载情侣信息
+const loadCoupleOnShow = async () => {
 	if (userStore.isLogin && userStore.profile.binding) {
 		try {
 			const res = await getActiveCouple();
@@ -405,6 +391,22 @@ onShow(async () => {
 	} else {
 		coupleInfo.value = null;
 	}
+};
+
+onShow(async () => {
+	// 壁纸初始化和资料刷新互不依赖，可并行执行；资料刷新仍需早于邀请码消费。
+	await Promise.all([
+		homeSkin.initHomeSkin(true),
+		refreshProfileOnShow(),
+	]);
+	if (isVideoSkin.value) {
+		bodyMode.hide();
+	} else {
+		bodyMode.show();
+	}
+	// 已登录用户从分享卡片进入首页时，尝试消费暂存的邀请码完成绑定。
+	await consumePendingInvite();
+	await loadCoupleOnShow();
 
 	scheduleFirstLoginGuide();
 });

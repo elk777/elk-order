@@ -23,7 +23,6 @@ export const useListOperations = (initialList = [], defaultItem = {}) => {
   const addItem = () => {
     let newItem = { id: generateId(), ...defaultItem };
     list.value.push(newItem);
-    console.log("🚀 ~ addItem ~ list:", list)
     return newItem;
   };
 

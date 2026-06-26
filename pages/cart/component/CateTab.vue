@@ -464,7 +464,7 @@ const cateAddCart = async (item) => {
 			await recipeStore.addCart({
 				id: item.id,
 				name: item.name,
-				cover: "/static/images/head.jpeg",
+				cover: item.cover,
 				price: item.price,
 				quantity: 1,
 			});

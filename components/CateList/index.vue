@@ -17,7 +17,7 @@
 						<view class="quantity-display">x{{ item.quantity }}</view>
 					</template>
 					<template v-else>
-						<up-number-box v-model="item.quantity" @change="valChange"></up-number-box>
+						<up-number-box :modelValue="item.quantity" @change="(event) => valChange(item, event)"></up-number-box>
 					</template>
 				</view>
 			</view>
@@ -31,7 +31,7 @@
 import { computed } from "vue";
 import { COLOURS } from "@/config/index.js";
 import { withDefaultMediaUrl } from "@/utils/media.js";
-const emit = defineEmits(['delete']);
+const emit = defineEmits(['delete', 'change']);
 const props = defineProps({
     // 图片大小
     imageSize: {
@@ -65,6 +65,14 @@ const normalizedCateList = computed(() => {
  */
 const deleteCart = (item) => {
     emit('delete', item);
+}
+
+const valChange = (item, event) => {
+	const quantity = event?.value ?? event;
+	emit('change', {
+		...item,
+		quantity,
+	});
 }
 </script>
 <style lang="scss" scoped>

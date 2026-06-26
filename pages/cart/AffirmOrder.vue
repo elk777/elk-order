@@ -96,7 +96,7 @@ export default {
 };
 </script>
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import CartList from "./component/CartList.vue";
 import { useRecipeStore } from "@/stores/recipe.js";
 import { COLOURS } from "@/config/index.js";
@@ -151,6 +151,20 @@ const orderRemark = ref("");
 
 // 提交状态
 const submitting = ref(false);
+let submitSuccessTimer = null;
+let emptyCartTimer = null;
+
+const clearPageTimers = () => {
+	// 页面离开后不再执行延迟跳转，避免已销毁页面继续触发导航副作用。
+	if (submitSuccessTimer) {
+		clearTimeout(submitSuccessTimer);
+		submitSuccessTimer = null;
+	}
+	if (emptyCartTimer) {
+		clearTimeout(emptyCartTimer);
+		emptyCartTimer = null;
+	}
+};
 
 /**
  * @description: 处理自定义点击事件
@@ -158,7 +172,6 @@ const submitting = ref(false);
  * @return {*}
  */
 const handleTimeClick = (item) => {
-	console.log("🚀 ~ handleTimeClick ~ item:", item);
 	timeValue.value = item.id;
 	selectedTime.value = item.title;
 };
@@ -169,7 +182,6 @@ const handleTimeClick = (item) => {
  * @return {*}
  */
 const handelConfirmDate = (date) => {
-	console.log("🚀 ~ handelConfirmDate ~ date:", date);
 	targetDate.value = date.value;
 	dateShow.value = false;
 };
@@ -204,8 +216,6 @@ const submitOrder = async () => {
 			orderData.reservationTime = selectedDinnerTime.value; // 早餐/午餐/晚餐
 		}
 
-		console.log("🚀 ~ submitOrder ~ orderData:", orderData);
-
 		// 调用提交订单接口
 		const result = await createOrder(orderData);
 
@@ -215,13 +225,20 @@ const submitOrder = async () => {
 				icon: "success",
 			});
 
-			// 清空购物车
-			await recipeStore.clearCart();
+			try {
+				await recipeStore.clearCart();
+			} catch (clearError) {
+				// 订单已创建成功，清购物车只影响本地收尾，不能反向误报提交失败或阻断跳转。
+				console.warn("下单成功后清空购物车失败:", clearError);
+				recipeStore.setCartList([]);
+				recipeStore.setCartTotal(0);
+			}
 			orderStore.orderSort = 1;
 			orderStore.orderStatus = 0;
 
 			// 跳转到订单列表页面
-			setTimeout(() => {
+			submitSuccessTimer = setTimeout(() => {
+				submitSuccessTimer = null;
 				uni.switchTab({
 					url: "/pages/order/index",
 				});
@@ -257,10 +274,15 @@ onMounted(async () => {
 		});
 
 		// 3秒后返回上一页
-		setTimeout(() => {
+		emptyCartTimer = setTimeout(() => {
+			emptyCartTimer = null;
 			uni.navigateBack();
 		}, 2000);
 	}
+});
+
+onUnmounted(() => {
+	clearPageTimers();
 });
 </script>
 

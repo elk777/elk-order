@@ -27,7 +27,7 @@ export const useRecipeStore = defineStore(
 		 * @return {*} 商品数量
 		 */
 		const getCartQuantity = (productId) => {
-			const item = cartList.value.find((item) => item.id === productId);
+			const item = cartList.value.find((item) => isSameId(item.id, productId));
 			return item ? item.quantity : 0;
 		};
 
@@ -290,6 +290,7 @@ export const useRecipeStore = defineStore(
 	{
 		persist: {
 			key: "recipe",
+			pick: ["cateTotal"],
 			storage: {
 				getItem: (k) => uni.getStorageSync(k),
 				setItem: (k, v) => uni.setStorageSync(k, v),

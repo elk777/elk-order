@@ -401,7 +401,8 @@ function parseResponse(res, traceId) {
 
   // 正常响应，取业务 code
   if (data && typeof data === 'object') {
-    return { code: data.code ?? SUCCESS_CODE, data: data.data ?? data, message: data.message ?? data.msg ?? 'ok', traceId }
+    const hasDataField = Object.prototype.hasOwnProperty.call(data, 'data')
+    return { code: data.code ?? SUCCESS_CODE, data: hasDataField ? data.data : data, message: data.message ?? data.msg ?? 'ok', traceId }
   }
 
   return { code: SUCCESS_CODE, data, message: 'ok', traceId }
@@ -411,9 +412,10 @@ function parseResponse(res, traceId) {
 function parseUploadResponse(res) {
   try {
     const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data
+    const hasDataField = data && typeof data === 'object' && Object.prototype.hasOwnProperty.call(data, 'data')
     return {
       code: data.code ?? SUCCESS_CODE,
-      data: data.data ?? data,
+      data: hasDataField ? data.data : data,
       message: data.message ?? data.msg ?? 'ok',
     }
   } catch {
@@ -438,6 +440,7 @@ async function refreshToken() {
   }
 
   refreshing = true
+  let newToken = null
   try {
     const res = await uniRequest({
       url: BASE + '/auth/refresh',
@@ -447,16 +450,16 @@ async function refreshToken() {
       timeout: 10000,
     })
     const data = res.data?.data || res.data
-    const newToken = data?.token || data?.accessToken
+    newToken = data?.token || data?.accessToken || null
     if (newToken) {
       const userStore = useUserStore()
       userStore.setToken(newToken)
     }
-    refreshQueue.forEach((cb) => cb(newToken))
     return newToken
   } catch {
     return null
   } finally {
+    refreshQueue.forEach((cb) => cb(newToken))
     refreshing = false
     refreshQueue = []
   }
@@ -498,7 +501,19 @@ function createError(code, message, traceId, raw) {
 function log(traceId, url, status, cost, req, res) {
   if (process.env.NODE_ENV === 'production') return
   const emoji = status === 'success' ? '✅' : '❌'
-  const reqStr = req ? `\n  req: ${JSON.stringify({ method: req.method, url: req.fullUrl || req.url, data: req.data })}` : ''
-  const resStr = res ? `\n  res: ${JSON.stringify(res).slice(0, 300)}` : ''
+  const reqStr = req ? `\n  req: ${JSON.stringify(sanitizeLogData({ method: req.method, url: req.fullUrl || req.url, data: req.data }))}` : ''
+  const resStr = res ? `\n  res: ${JSON.stringify(sanitizeLogData(res)).slice(0, 300)}` : ''
   console.log(`[request] ${emoji} ${url} | ${cost}ms | ${traceId}${reqStr}${resStr}`)
+}
+
+const SENSITIVE_LOG_KEYS = /authorization|token|accessToken|refreshToken|phone|openid|unionid/i
+
+function sanitizeLogData(value) {
+  if (Array.isArray(value)) return value.map(sanitizeLogData)
+  if (!value || typeof value !== 'object') return value
+
+  return Object.entries(value).reduce((result, [key, entry]) => {
+    result[key] = SENSITIVE_LOG_KEYS.test(key) ? '[REDACTED]' : sanitizeLogData(entry)
+    return result
+  }, {})
 }

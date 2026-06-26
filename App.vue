@@ -12,9 +12,6 @@
 			captureInvite(options)
 			consumePendingInvite()
 		},
-		onHide: function() {
-			console.log('App Hide')
-		}
 	}
 </script>
 
