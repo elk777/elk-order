@@ -181,6 +181,8 @@ class Http {
       retry = method === 'GET' ? MAX_RETRY : 0,   // 仅 GET 幂等请求重试
       dedup = false,                                // 是否开启请求去重
       raw = false,                                  // 是否返回原始响应
+      onTask,                                       // 暴露 uni.request task，供长耗时请求主动取消
+      isCanceled,                                   // 判断业务侧是否已取消，避免 token 刷新后继续重放
     } = config
 
     const id = traceId()
@@ -203,12 +205,16 @@ class Http {
     const executor = () => {
       return new Promise((resolve, reject) => {
         const run = async () => {
-          let reqConfig = { url, method, params, data, auth, timeout, id }
+          let reqConfig = { url, method, params, data, auth, timeout, id, onTask, isCanceled }
           try {
             // 构建请求配置
             // 执行请求拦截器链
             for (const fn of requestInterceptors) {
               reqConfig = await fn(reqConfig)
+            }
+
+            if (isRequestCanceled(reqConfig)) {
+              throw createError(-2, '请求已取消', id)
             }
 
             // 拼接 URL 参数
@@ -229,6 +235,7 @@ class Http {
               data: reqConfig.data,
               header: headers,
               timeout: reqConfig.timeout,
+              onTask: reqConfig.onTask,
             })
 
             if (loading) hideLoading()
@@ -245,6 +252,10 @@ class Http {
               const currentToken = getToken()
               const newToken = currentToken ? await refreshToken() : ''
               if (newToken) {
+                if (isRequestCanceled(reqConfig)) {
+                  reject(createError(-2, '请求已取消', id, res))
+                  return
+                }
                 // 刷新成功后重放当前请求，调用方不需要感知 token 更新。
                 headers['Authorization'] = `Bearer ${newToken}`
                 const retryRes = await uniRequest({
@@ -253,6 +264,7 @@ class Http {
                   data: reqConfig.data,
                   header: headers,
                   timeout: reqConfig.timeout,
+                  onTask: reqConfig.onTask,
                 })
                 normalized = parseResponse(retryRes, id)
                 resolve(raw ? retryRes : normalized)
@@ -272,8 +284,10 @@ class Http {
           } catch (err) {
             attempt++
 
-            // 仅网络/超时错误可重试
-            const isNetErr = /timeout|network|fail|abort/i.test(err.message || '')
+            // 仅网络/超时错误可重试；主动 abort 是用户取消，不能自动重发。
+            const errorMessage = err.message || err.errMsg || ''
+            const isAbortErr = /abort/i.test(errorMessage)
+            const isNetErr = !isAbortErr && /timeout|network|fail/i.test(errorMessage)
             if (isNetErr && attempt <= retry) {
               console.warn(`[request] ${url} 第 ${attempt} 次重试`, id)
               await delay(RETRY_BASE_DELAY * attempt)
@@ -323,7 +337,7 @@ export default http
 /** uni.request Promise 化 */
 function uniRequest(opts) {
   return new Promise((resolve, reject) => {
-    uni.request({
+    const requestTask = uni.request({
       url: opts.url,
       method: opts.method,
       data: opts.data,
@@ -332,7 +346,19 @@ function uniRequest(opts) {
       success: (res) => resolve(res),
       fail: (err) => reject(err),
     })
+
+    if (typeof opts.onTask === 'function') {
+      try {
+        opts.onTask(requestTask)
+      } catch (error) {
+        console.warn('[request] onTask 回调执行失败', error)
+      }
+    }
   })
+}
+
+function isRequestCanceled(config = {}) {
+  return typeof config.isCanceled === 'function' && config.isCanceled()
 }
 
 /** 构建请求头 */
@@ -377,6 +403,7 @@ function getNetworkErrorMessage(err, baseURL) {
   if (/ERR_ADDRESS_UNREACHABLE|ADDRESS_UNREACHABLE/i.test(message)) {
     return `无法连接后端服务，请确认手机和电脑在同一网络，并检查服务地址：${baseURL}`
   }
+  if (/abort/i.test(message)) return '请求已取消'
   if (/timeout/i.test(message)) return '请求超时，请检查网络或后端服务'
   return message || '网络异常'
 }

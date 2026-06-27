@@ -39,6 +39,15 @@
 			"style": {}
 		},
 		{
+			"path": "pages/recipe/ai-generate",
+			"style": {
+				"navigationBarTitleText": "灵感成菜",
+				"navigationBarBackgroundColor": "#FFF0F6",
+				"navigationBarTextStyle": "black",
+				"backgroundColor": "#FFF7FA"
+			}
+		},
+		{
 			"path": "pages/recipe/details",
 			"style": {
 				"navigationBarTitleText": "菜谱详情"

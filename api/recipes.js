@@ -130,6 +130,17 @@ export function deleteRecipe(id) {
   return http.del(`/recipes/${id}`)
 }
 
+/**
+ * @description 生成 AI 菜谱草稿，供新增菜谱页回填可编辑文本字段。
+ * @param {Object} data - 生成入参
+ * @param {string} data.prompt - 用户输入的菜名、食材或口味描述
+ * @param {Object} [opts] - 请求配置，支持 onTask/isCanceled 处理长耗时生成取消。
+ * @returns {Promise<{ code: number, data: Object, message: string }>}
+ */
+export function generateRecipeDraft(data, opts = {}) {
+  return http.post('/recipe-assistant/drafts', data, opts)
+}
+
 // ===================== 图片上传 =====================
 
 /**

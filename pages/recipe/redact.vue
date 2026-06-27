@@ -132,6 +132,7 @@ import { useAuthGuard } from "@/hooks/useAuthGuard.js";
 // 引入菜谱 API
 import { createRecipe, updateRecipe, getRecipeDetail, uploadRecipeImage, getRecipeCategories } from "@/api/recipes.js";
 import { normalizeMediaUrl } from "@/utils/media.js";
+import { consumeAiRecipeDraft } from "@/utils/recipeDraft.js";
 
 useAuthGuard();
 // 调用usePageTitle hook函数，设置默认标题为"编辑菜谱"
@@ -221,6 +222,11 @@ onMounted(async () => {
 	if (options.id) {
 		recipeId.value = options.id;
 		loadRecipeDetail(options.id);
+		return;
+	}
+
+	if (options.aiDraftKey) {
+		applyAiRecipeDraft(decodeURIComponent(options.aiDraftKey));
 	}
 });
 
@@ -343,6 +349,43 @@ const loadRecipeDetail = async (id) => {
 		uni.showToast({ title: error.message || "加载失败", icon: "none" });
 	} finally {
 		uni.hideLoading();
+	}
+};
+
+const applyAiRecipeDraft = (draftKey) => {
+	try {
+		const draft = consumeAiRecipeDraft(draftKey);
+		if (!draft) return;
+
+		form.value.basicForm.name = draft.name || "";
+		form.value.basicForm.describe = draft.description || "";
+
+		// 【字段映射契约】：后端 AI 草稿使用标准字段，新增页表单沿用历史 ingre/step 命名。
+		ingreList.value = (draft.ingredients || []).map((item) => ({
+			id: generateId(),
+			ingreName: item.name || "",
+			ingreDose: item.amount || "",
+		}));
+
+		const fallbackTips = Array.isArray(draft.tips) ? draft.tips.filter(Boolean) : [];
+		stepList.value = (draft.steps || []).map((item, index) => ({
+			id: generateId(),
+			stepDesc: item.describe || "",
+			stepTip: item.tip || (index === 0 ? fallbackTips.join("；") : ""),
+			stepImg: [],
+		}));
+
+		if (!ingreList.value.length) {
+			ingreList.value = [{ id: generateId(), ingreName: "", ingreDose: "" }];
+		}
+		if (!stepList.value.length) {
+			stepList.value = [{ id: generateId(), stepDesc: "", stepTip: "", stepImg: [] }];
+		}
+
+		uni.showToast({ title: "草稿已回填，请补充封面和分类", icon: "none" });
+	} catch (error) {
+		console.error("读取 AI 菜谱草稿失败:", error);
+		uni.showToast({ title: "草稿读取失败，请重新生成", icon: "none" });
 	}
 };
 

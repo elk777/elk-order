@@ -37,6 +37,7 @@
 
 		<!-- 购物车弹窗 -->
 		<CartPopup :show="showCart" ref="cartPopup" />
+		<RecipeCreateModePopup :show="createModeShow" @close="createModeShow = false" @select="handleCreateModeSelect" />
 	</view>
 </template>
 
@@ -48,12 +49,14 @@ import { COLOURS } from "@/config/index.js";
 import { useRecipeStore } from "@/stores/recipe.js";
 import { requireLogin } from "@/utils/auth.js";
 import CartPopup from "./CartPopup.vue";
+import RecipeCreateModePopup from "./RecipeCreateModePopup.vue";
 
 const userStore = useUserStore();
 const recipeStore = useRecipeStore();
 
 // 购物车弹窗是否显示
 const showCart = ref(false);
+const createModeShow = ref(false);
 
 const noop = () => {};
 
@@ -109,13 +112,31 @@ const handelCart = () => {
  * @return {:type}
  */
 const handelAddRedact = () => {
-	const url = "/pages/recipe/redact?title=新增菜谱";
 	requireLogin(() => {
-		uni.navigateTo({
-			url,
-		});
+		closeCartPopup();
+		createModeShow.value = true;
 	}, {
-		redirect: url,
+		redirect: "/pages/sort/index",
+	});
+};
+
+const handleCreateModeSelect = (mode) => {
+	createModeShow.value = false;
+	if (mode === "manual") {
+		uni.navigateTo({
+			url: "/pages/recipe/redact?title=新增菜谱",
+		});
+		return;
+	}
+	if (mode === "ai") {
+		uni.navigateTo({
+			url: "/pages/recipe/ai-generate",
+		});
+		return;
+	}
+	uni.showToast({
+		title: "拍照识菜还在准备中",
+		icon: "none",
 	});
 };
 
