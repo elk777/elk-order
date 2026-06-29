@@ -111,7 +111,7 @@ export const clearLoginRedirect = () => {
  * @return {boolean} 固定返回 false，方便中断原业务流程
  */
 export const goLogin = (options = {}) => {
-	const { redirect = getCurrentPageUrl(), message = "请先登录" } = options;
+	const { redirect = getCurrentPageUrl(), message = "请先登录", replace = false } = options;
 	const currentPath = getPathWithoutQuery(getCurrentPageUrl());
 
 	// 已经在登录页时不重复跳转，避免循环进入登录页。
@@ -136,7 +136,8 @@ export const goLogin = (options = {}) => {
 	// 延迟跳转让 toast 先展示，同时用 redirecting 防止连续点击重复入栈。
 	redirecting = true;
 	setTimeout(() => {
-		uni.navigateTo({
+		const navigate = replace ? uni.redirectTo : uni.navigateTo;
+		navigate({
 			url: LOGIN_PAGE,
 			complete: () => {
 				redirecting = false;
@@ -177,6 +178,7 @@ export const requireRouteLogin = (options = {}) => {
 	return requireLogin(null, {
 		...options,
 		redirect,
+		replace: true,
 	});
 };
 

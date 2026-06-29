@@ -336,6 +336,8 @@ const quickActions = [
 		icon: "/static/images/home/inte.svg",
 		iconClass: "quick-points",
 		url: "/pages/my/integral",
+		authRequired: true,
+		loginMessage: "请先登录后查看积分",
 	},
 	{
 		id: "guest",
@@ -474,12 +476,23 @@ function handleQuickAction(item) {
 		return;
 	}
 
-	if (item.tab) {
-		uni.switchTab({ url: item.url });
-		return;
+	const navigate = () => {
+		if (item.tab) {
+			uni.switchTab({ url: item.url });
+			return;
+		}
+
+		uni.navigateTo({ url: item.url });
+	};
+
+	if (item.authRequired) {
+		return requireLogin(navigate, {
+			redirect: item.url,
+			message: item.loginMessage || "请先登录",
+		});
 	}
 
-	uni.navigateTo({ url: item.url });
+	return navigate();
 }
 
 function handleOpenSubscribePanel() {
