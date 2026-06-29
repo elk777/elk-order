@@ -6,6 +6,16 @@
 			<view class="hero-desc">输入菜名、现有食材或想吃的口味，我先帮你整理成可编辑菜谱。</view>
 		</view>
 
+		<view class="points-card">
+			<view class="points-copy">
+				<view class="points-title">本次将消耗 {{ aiCost }} 积分</view>
+				<view class="points-desc">当前可用 {{ currentPoints }} 积分，生成失败或取消不会扣除</view>
+			</view>
+			<view class="points-badge" :class="{ 'points-badge--low': currentPoints < aiCost }">
+				{{ currentPoints >= aiCost ? "可生成" : "积分不足" }}
+			</view>
+		</view>
+
 		<view class="prompt-card">
 			<view class="field-head">
 				<view class="field-title">今天想做什么？</view>
@@ -106,16 +116,20 @@
 
 <script setup>
 import { computed, onUnmounted, ref } from "vue";
-import { onUnload } from "@dcloudio/uni-app";
+import { onShow, onUnload } from "@dcloudio/uni-app";
 import { COLOURS } from "@/config/index.js";
 import { generateRecipeDraft } from "@/api/recipes.js";
+import { getPointsOverview } from "@/apis/points.js";
 import { saveAiRecipeDraft } from "@/utils/recipeDraft.js";
 
+const DEFAULT_AI_COST = 20;
 const prompt = ref("");
 const generating = ref(false);
 const generationStepIndex = ref(0);
 const currentRequestTask = ref(null);
 const activeRequestId = ref(0);
+const currentPoints = ref(0);
+const aiCost = ref(DEFAULT_AI_COST);
 const canceledRequestIds = new Set();
 let generationTimer = null;
 let generationRequestSeq = 0;
@@ -145,6 +159,10 @@ const generationStepItems = computed(() => {
 		if (index === generationStepIndex.value) state = "active";
 		return { ...item, state };
 	});
+});
+
+onShow(() => {
+	loadPointsOverview();
 });
 
 const useExample = (value) => {
@@ -211,9 +229,14 @@ const handleGenerate = async () => {
 		uni.showToast({ title: "描述不能超过300字", icon: "none" });
 		return;
 	}
+	if (currentPoints.value < aiCost.value) {
+		uni.showToast({ title: "积分不足，先去完成任务吧", icon: "none" });
+		return;
+	}
 	if (generating.value) return;
 
 	const requestId = ++generationRequestSeq;
+	const requestKey = `${Date.now()}-${requestId}`;
 	try {
 		// 【防重复提交】：AI 请求耗时较长，锁住按钮避免连续点击消耗免费额度。
 		generating.value = true;
@@ -221,7 +244,7 @@ const handleGenerate = async () => {
 		currentRequestTask.value = null;
 		startGenerationTimer();
 		const res = await generateRecipeDraft(
-			{ prompt: content },
+			{ prompt: content, requestId: requestKey },
 			{
 				timeout: 45000,
 				onTask: (task) => bindRecipeDraftTask(task, requestId),
@@ -247,6 +270,18 @@ const handleGenerate = async () => {
 		stopGeneration(requestId);
 	}
 };
+
+async function loadPointsOverview() {
+	try {
+		const res = await getPointsOverview();
+		if (res?.code !== 200 || !res?.data) return;
+		currentPoints.value = Number(res.data.account?.currentPoints || 0);
+		const aiBenefit = (res.data.benefits || []).find((item) => item.id === "ai-text");
+		aiCost.value = Number(aiBenefit?.cost || DEFAULT_AI_COST);
+	} catch (error) {
+		console.warn("[ai-generate] load points overview failed", error);
+	}
+}
 
 onUnload(() => {
 	// 【生命周期自闭环】：用户离开页面时终止长耗时 AI 请求，避免后台继续等待和潜在额度消耗。
@@ -302,6 +337,54 @@ onUnmounted(() => {
 	font-size: 15px;
 	font-weight: 500;
 	line-height: 1.55;
+}
+
+.points-card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 18rpx;
+	margin-bottom: 22rpx;
+	padding: 22rpx 24rpx;
+	box-sizing: border-box;
+	border: 1rpx solid rgba(255, 92, 141, 0.1);
+	border-radius: 22rpx;
+	background: rgba(255, 255, 255, 0.92);
+	box-shadow: 0 10rpx 28rpx rgba(255, 92, 141, 0.08);
+}
+
+.points-copy {
+	flex: 1;
+	min-width: 0;
+}
+
+.points-title {
+	color: #202124;
+	font-size: 15px;
+	font-weight: 800;
+	line-height: 1.3;
+}
+
+.points-desc {
+	margin-top: 8rpx;
+	color: #8c8f96;
+	font-size: 12px;
+	line-height: 1.35;
+}
+
+.points-badge {
+	flex-shrink: 0;
+	padding: 10rpx 16rpx;
+	border-radius: 999rpx;
+	background: #eaf9f6;
+	color: #34b6a6;
+	font-size: 12px;
+	font-weight: 800;
+}
+
+.points-badge--low {
+	background: #fff0f5;
+	color: #ff5c8d;
 }
 
 .prompt-card,

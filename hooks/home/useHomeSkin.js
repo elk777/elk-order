@@ -8,6 +8,7 @@
 import { computed, ref } from 'vue'
 import { useUserStore } from '@/stores/user.js'
 import { getHomeSkin, saveHomeSkin, uploadHomeSkin } from '@/apis/home/skin.js'
+import { getPointsOverview } from '@/apis/points.js'
 import { normalizeMediaUrl } from '@/utils/media.js'
 
 const STORAGE_KEY = 'home_skin_wallpaper'
@@ -16,6 +17,7 @@ export const HOME_SKIN_MEDIA_TYPES = {
 	VIDEO: 'video',
 }
 export const HOME_SKIN_VIDEO_LIMIT_SECONDS = 10
+const HOME_SKIN_COST_FALLBACK = 60
 
 export const HOME_WALLPAPERS = [
 	{
@@ -97,6 +99,11 @@ export function useHomeSkin() {
 		const nextSkin = normalizeSkin(skin)
 		if (!nextSkin) return null
 
+		const shouldBlockRemote = remote && nextSkin.type === 'custom'
+		if (shouldBlockRemote) {
+			await saveRemoteSkin(nextSkin, { throwOnError: true })
+		}
+
 		selectedSkin.value = nextSkin
 		writeLocalSkin(nextSkin)
 
@@ -104,7 +111,7 @@ export function useHomeSkin() {
 			uni.showToast({ title: '已切换壁纸', icon: 'none' })
 		}
 
-		if (remote) {
+		if (remote && !shouldBlockRemote) {
 			await saveRemoteSkin(nextSkin)
 		}
 
@@ -121,6 +128,9 @@ export function useHomeSkin() {
 	}
 
 	async function chooseCustomSkin(mediaType = HOME_SKIN_MEDIA_TYPES.IMAGE) {
+		const canContinue = await confirmCustomSkinCost()
+		if (!canContinue) return null
+
 		const media = await chooseCustomMedia(mediaType)
 		if (!media.path) return null
 
@@ -134,22 +144,29 @@ export function useHomeSkin() {
 			: media.path
 
 		uploading.value = true
+		let uploadRes = null
 		try {
-			const uploadRes = await uploadHomeSkin(uploadPath, media.mediaType)
+			uploadRes = await uploadHomeSkin(uploadPath, media.mediaType)
 			const remoteUrl = getMediaUrl(uploadRes)
 			if (remoteUrl) {
-				return await applySkin({
-					id: `custom_${Date.now()}`,
+				const remoteSkin = {
+					id: getMediaId(uploadRes) || `custom_${Date.now()}`,
 					name: media.mediaType === HOME_SKIN_MEDIA_TYPES.VIDEO ? '动态壁纸' : '自定义壁纸',
 					type: 'custom',
 					mediaType: media.mediaType,
 					path: remoteUrl,
 					thumb: getMediaThumb(uploadRes) || remoteUrl,
 					duration: media.duration,
-				})
+				}
+				return await applySkin(remoteSkin)
 			}
 			throw new Error('上传响应缺少资源地址')
 		} catch (err) {
+			if (uploadRes) {
+				console.warn('[home-skin] 自定义壁纸保存失败', err)
+				uni.showToast({ title: resolveErrorMessage(err, '保存失败，请稍后重试'), icon: 'none' })
+				return null
+			}
 			console.warn('[home-skin] 自定义壁纸上传失败，使用本地文件兜底', err)
 			const fallbackText = media.mediaType === HOME_SKIN_MEDIA_TYPES.VIDEO ? '上传失败，已本地预览视频' : '上传失败，已使用本地图片'
 			uni.showToast({ title: fallbackText, icon: 'none' })
@@ -183,13 +200,14 @@ export function useHomeSkin() {
 	}
 }
 
-async function saveRemoteSkin(skin) {
+async function saveRemoteSkin(skin, options = {}) {
+	const { throwOnError = false } = options
 	const userStore = useUserStore()
 	if (!userStore.isLogin) return
 
 	saving.value = true
 	try {
-		await saveHomeSkin({
+		const res = await saveHomeSkin({
 			id: skin.id,
 			name: skin.name,
 			type: skin.type,
@@ -198,11 +216,49 @@ async function saveRemoteSkin(skin) {
 			thumb: skin.thumb || skin.path,
 			duration: skin.duration,
 		})
+		if (res?.code && res.code !== 200) {
+			throw new Error(res.message || '保存壁纸失败')
+		}
 	} catch (err) {
 		console.warn('[home-skin] 保存远端壁纸失败，已保留本地缓存', err)
+		if (throwOnError) throw err
 	} finally {
 		saving.value = false
 	}
+}
+
+async function confirmCustomSkinCost() {
+	const userStore = useUserStore()
+	if (!userStore.isLogin) return true
+
+	let cost = HOME_SKIN_COST_FALLBACK
+	try {
+		const overview = await getPointsOverview()
+		if (overview?.code !== 200 || !overview?.data) {
+			throw new Error(overview?.message || '积分概览加载失败')
+		}
+		const data = overview?.data || {}
+		const currentPoints = Number(data.account?.currentPoints || 0)
+		const benefit = (data.benefits || []).find((item) => item.id === 'kitchen-skin')
+		cost = Number(benefit?.cost || HOME_SKIN_COST_FALLBACK)
+		if (currentPoints < cost) {
+			uni.showToast({ title: '积分不足，先去完成任务吧', icon: 'none' })
+			return false
+		}
+	} catch (error) {
+		console.warn('[home-skin] 获取积分概览失败，继续交给后端兜底', error)
+	}
+
+	return new Promise((resolve) => {
+		uni.showModal({
+			title: '厨房装扮',
+			content: `保存新的自定义壁纸将消耗 ${cost} 积分，是否继续？`,
+			confirmText: '继续',
+			cancelText: '再想想',
+			success: (res) => resolve(!!res.confirm),
+			fail: () => resolve(false),
+		})
+	})
 }
 
 function normalizeSkin(input) {
@@ -283,6 +339,16 @@ function getMediaThumb(input) {
 	const data = unwrapResponse(input)
 	if (!data || typeof data === 'string') return ''
 	return normalizeMediaUrl(data.thumb || data.thumbnail || data.poster || data.posterUrl || '')
+}
+
+function getMediaId(input) {
+	const data = unwrapResponse(input)
+	if (!data || typeof data === 'string') return ''
+	return String(data.id || data.fileId || '').slice(0, 50)
+}
+
+function resolveErrorMessage(error, fallback) {
+	return error?.data?.message || error?.message || error?.errMsg || fallback
 }
 
 function resolveMediaType(data = {}, path = '') {

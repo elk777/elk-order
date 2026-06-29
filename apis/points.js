@@ -16,6 +16,22 @@ export function getPointsAccount() {
 }
 
 /**
+ * @description: 获取积分首页概览，包含账户、任务、兑换和亲密等级
+ * @return {Promise}
+ */
+export function getPointsOverview() {
+	return http.get('/points/overview');
+}
+
+/**
+ * @description: 获取当前亲密等级概览
+ * @return {Promise}
+ */
+export function getIntimacyOverview() {
+	return http.get('/points/intimacy');
+}
+
+/**
  * @description: 获取积分流水
  * @param {Object} params 查询参数
  * @return {Promise}

@@ -46,9 +46,26 @@
 				</view>
 				<view class="stat-divider"></view>
 				<view class="stat-item">
-					<view class="stat-value">{{ estimateLevel }}</view>
+					<view class="stat-value">{{ intimacyLevelCode }}</view>
 					<view class="stat-label">亲密等级</view>
 				</view>
+			</view>
+		</view>
+
+		<view class="intimacy-card">
+			<view class="intimacy-head pubFlex">
+				<view>
+					<view class="intimacy-title">{{ intimacyLevelName }}</view>
+					<view class="intimacy-subtitle">{{ intimacySubtitle }}</view>
+				</view>
+				<view class="intimacy-growth">{{ intimacy.totalGrowth || 0 }}</view>
+			</view>
+			<view class="intimacy-progress">
+				<view class="intimacy-progress__bar" :style="{ width: (intimacy.progress || 0) + '%' }"></view>
+			</view>
+			<view class="intimacy-foot pubFlex">
+				<text>{{ intimacy.level?.code || "L0" }}</text>
+				<text>{{ intimacyProgressText }}</text>
 			</view>
 		</view>
 
@@ -70,10 +87,17 @@
 						<view class="task-desc">{{ item.desc }}</view>
 					</view>
 					<view class="task-reward">
-						<view class="reward-text">+{{ item.points }}</view>
+						<view class="reward-text">{{ item.pointsText }}</view>
 						<view class="reward-label">积分</view>
 					</view>
 					<up-icon name="arrow-right" size="16" color="#c7c7c7"></up-icon>
+					<button
+						v-if="isInviteShareTask(item)"
+						class="task-share-button"
+						open-type="share"
+						:data-role="inviteTargetRole"
+						@click.stop
+					></button>
 				</view>
 			</view>
 		</view>
@@ -87,12 +111,12 @@
 				<view class="section-link" @click="showComingSoon">全部</view>
 			</view>
 			<view class="benefit-grid">
-				<view class="benefit-item" v-for="item in benefits" :key="item.id" @click="showComingSoon">
+				<view class="benefit-item" v-for="item in benefits" :key="item.id" @click="handleBenefit(item)">
 					<view class="benefit-icon pubFlex" :class="item.className">
 						<up-icon :name="item.icon" size="25" :color="item.iconColor"></up-icon>
 					</view>
 					<view class="benefit-title">{{ item.title }}</view>
-					<view class="benefit-cost">{{ item.cost }}</view>
+					<view class="benefit-cost">{{ item.cost }} 积分/次</view>
 				</view>
 			</view>
 		</view>
@@ -127,115 +151,152 @@ export default {
 </script>
 <script setup>
 import { computed, ref } from "vue";
-import { onShow } from "@dcloudio/uni-app";
+import { onShareAppMessage, onShow } from "@dcloudio/uni-app";
 import IntegralDetail from "./component/IntegralDetail.vue";
-import { getPointsAccount } from "@/apis/points.js";
+import { getPointsOverview } from "@/apis/points.js";
 import { useAuthGuard } from "@/hooks/useAuthGuard.js";
+import { useUserStore } from "@/stores/user.js";
+import { buildInviteShareMessage } from "@/utils/invite.js";
 
 useAuthGuard();
 
+const userStore = useUserStore();
 const show = ref(false);
 const pointsAccount = ref({
 	totalPoints: 0,
 	currentPoints: 0,
 	usedPoints: 0,
 });
+const intimacy = ref({
+	totalGrowth: 0,
+	progress: 0,
+	remainingGrowth: 100,
+	isMaxLevel: false,
+	level: { code: "L0", name: "等待贴贴" },
+	nextLevel: { code: "L1", name: "刚刚贴贴", min: 0 },
+});
 
-const earnTasks = ref([
-	{
-		id: "checkin",
-		title: "每日签到",
-		desc: "连续签到奖励会逐步提升",
-		points: "10-20",
-		icon: "calendar-fill",
-		className: "task-calendar",
-		action: "attendance",
-	},
-	{
-		id: "invite",
-		title: "邀请绑定",
-		desc: "邀请对方加入两个人的厨房",
-		points: 30,
-		icon: "share-square",
-		className: "task-share",
-		action: "soon",
-	},
-	{
-		id: "recipe",
-		title: "完成点餐",
-		desc: "下单、做菜、完成订单都能获得奖励",
-		points: 15,
-		icon: "order",
-		className: "task-order",
-		action: "soon",
-	},
-]);
+const earnTasks = ref([]);
 
-const benefits = ref([
-	{
-		id: "vip",
-		title: "兑换会员",
-		cost: "199 积分起",
-		icon: "coupon-fill",
-		iconColor: "#ff5c8d",
-		className: "benefit-vip",
-	},
-	{
-		id: "ai",
-		title: "AI识菜",
-		cost: "20 积分/次",
-		icon: "camera-fill",
-		iconColor: "#34b6a6",
-		className: "benefit-ai",
-	},
-	{
-		id: "lottery",
-		title: "惊喜抽奖",
-		cost: "50 积分/次",
-		icon: "red-packet-fill",
-		iconColor: "#ff8a3d",
-		className: "benefit-lottery",
-	},
-	{
-		id: "kitchen",
-		title: "厨房装扮",
-		cost: "80 积分起",
-		icon: "gift-fill",
-		iconColor: "#8b79ff",
-		className: "benefit-kitchen",
-	},
-]);
+const benefits = ref([]);
 
-const estimateLevel = computed(() => {
-	const total = Number(pointsAccount.value.totalPoints || 0);
-	if (total >= 1000) return "L4";
-	if (total >= 500) return "L3";
-	if (total >= 100) return "L2";
-	return "L1";
+const currentRoleType = computed(() => (userStore.isLogin ? userStore.userType : null));
+const inviteTargetRole = computed(() => (currentRoleType.value === 1 ? "keeper" : "foodie"));
+const intimacyLevelCode = computed(() => intimacy.value.level?.code || "L0");
+const intimacyLevelName = computed(() => intimacy.value.level?.name || "等待贴贴");
+const intimacySubtitle = computed(() => {
+	if (intimacy.value.isMaxLevel) return "已达到当前最高亲密等级";
+	if (intimacy.value.level?.level === 0) return "绑定后开启两个人的亲密等级";
+	return `下一等级 ${intimacy.value.nextLevel?.name || ""}`;
+});
+const intimacyProgressText = computed(() => {
+	if (intimacy.value.isMaxLevel) return "满格啦";
+	if (intimacy.value.level?.level === 0) return "等待绑定";
+	return `还差 ${intimacy.value.remainingGrowth || 0} 成长值`;
 });
 
 onShow(() => {
-	loadPointsAccount();
+	loadOverview();
 });
 
-async function loadPointsAccount() {
+onShareAppMessage((res) => {
+	return buildInviteShareMessage({
+		uuid: userStore.profile.uuid,
+		userType: currentRoleType.value,
+		targetRole: res?.target?.dataset?.role || inviteTargetRole.value,
+	});
+});
+
+async function loadOverview() {
 	try {
-		const res = await getPointsAccount();
+		const res = await getPointsOverview();
 		if (res?.code === 200 && res?.data) {
 			pointsAccount.value = {
-				totalPoints: res.data.totalPoints ?? 0,
-				currentPoints: res.data.currentPoints ?? 0,
-				usedPoints: res.data.usedPoints ?? 0,
+				totalPoints: res.data.account?.totalPoints ?? 0,
+				currentPoints: res.data.account?.currentPoints ?? 0,
+				usedPoints: res.data.account?.usedPoints ?? 0,
 			};
+			intimacy.value = normalizeIntimacy(res.data.intimacy);
+			earnTasks.value = normalizeTasks(res.data.tasks);
+			benefits.value = normalizeBenefits(res.data.benefits);
 		}
 	} catch (error) {
-		console.warn("[integral] load points account failed", error);
+		console.warn("[integral] load overview failed", error);
 	}
 }
 
 function handleTask(item) {
-	if (item.action === "attendance") {
+	const action = resolveTaskAction(item);
+	if (action === "attendance" || action === "checkin") {
 		goAttendance();
+		return;
+	}
+	if (action === "invite") {
+		handleInviteTask();
+		return;
+	}
+	if (action === "order") {
+		goOrderTask();
+		return;
+	}
+	showComingSoon();
+}
+
+function resolveTaskAction(item = {}) {
+	return item.action || item.id || "";
+}
+
+function isInviteShareTask(item = {}) {
+	return (
+		resolveTaskAction(item) === "invite" &&
+		userStore.isLogin &&
+		!userStore.profile?.binding &&
+		!!userStore.profile?.uuid
+	);
+}
+
+function handleInviteTask() {
+	if (!userStore.isLogin) {
+		uni.showToast({
+			title: "请先登录后邀请绑定",
+			icon: "none",
+		});
+		return;
+	}
+	if (userStore.profile?.binding) {
+		uni.showToast({
+			title: "已完成绑定",
+			icon: "none",
+		});
+		return;
+	}
+	if (!userStore.profile?.uuid) {
+		uni.showToast({
+			title: "暂无用户ID",
+			icon: "none",
+		});
+		return;
+	}
+	uni.showToast({
+		title: "点击邀请任务发送给对方",
+		icon: "none",
+	});
+}
+
+function goOrderTask() {
+	uni.switchTab({
+		url: "/pages/sort/index",
+	});
+}
+
+function handleBenefit(item) {
+	if (item.id === "ai-text") {
+		uni.navigateTo({ url: "/pages/recipe/ai-generate" });
+		return;
+	}
+	if (item.id === "kitchen-skin") {
+		uni.switchTab({ url: "/pages/home/index" });
+		uni.showToast({ title: "在首页右侧工具栏选择装扮", icon: "none" });
 		return;
 	}
 	showComingSoon();
@@ -260,6 +321,45 @@ function showComingSoon() {
 		title: "功能即将开放",
 		icon: "none",
 	});
+}
+
+function normalizeIntimacy(value = {}) {
+	return {
+		totalGrowth: Number(value.totalGrowth || 0),
+		progress: Math.max(0, Math.min(100, Number(value.progress || 0))),
+		remainingGrowth: Number(value.remainingGrowth || 0),
+		isMaxLevel: !!value.isMaxLevel,
+		level: value.level || { code: "L0", name: "等待贴贴", level: 0 },
+		nextLevel: value.nextLevel || null,
+	};
+}
+
+function normalizeTasks(list = []) {
+	const iconMap = {
+		checkin: { icon: "calendar-fill", className: "task-calendar" },
+		invite: { icon: "share-square", className: "task-share" },
+		order: { icon: "order", className: "task-order" },
+	};
+	return list.map((item) => ({
+		...item,
+		icon: iconMap[item.id]?.icon || "coupon-fill",
+		className: iconMap[item.id]?.className || "task-calendar",
+		pointsText: item.pointsText || "+0",
+	}));
+}
+
+function normalizeBenefits(list = []) {
+	const iconMap = {
+		"ai-text": { icon: "file-text-fill", iconColor: "#34b6a6", className: "benefit-ai" },
+		"ai-image": { icon: "camera-fill", iconColor: "#34b6a6", className: "benefit-ai" },
+		"kitchen-skin": { icon: "gift-fill", iconColor: "#8b79ff", className: "benefit-kitchen" },
+	};
+	return list.map((item) => ({
+		...item,
+		icon: iconMap[item.id]?.icon || "coupon-fill",
+		iconColor: iconMap[item.id]?.iconColor || "#ff5c8d",
+		className: iconMap[item.id]?.className || "benefit-ai",
+	}));
 }
 </script>
 
@@ -426,6 +526,65 @@ function showComingSoon() {
 	box-shadow: 0 8rpx 26rpx rgba(30, 34, 42, 0.05);
 }
 
+.intimacy-card {
+	margin-top: 24rpx;
+	padding: 26rpx 24rpx;
+	border-radius: 22rpx;
+	background: #ffffff;
+	box-shadow: 0 8rpx 26rpx rgba(30, 34, 42, 0.05);
+}
+
+.intimacy-head {
+	justify-content: space-between;
+	align-items: flex-start;
+}
+
+.intimacy-title {
+	font-size: 31rpx;
+	font-weight: 900;
+	color: #2b1c25;
+}
+
+.intimacy-subtitle {
+	margin-top: 8rpx;
+	font-size: 23rpx;
+	color: #8c8f96;
+}
+
+.intimacy-growth {
+	min-width: 84rpx;
+	padding: 10rpx 16rpx;
+	border-radius: 999rpx;
+	background: #fff1f5;
+	color: #ff5c8d;
+	font-size: 26rpx;
+	font-weight: 900;
+	text-align: center;
+	box-sizing: border-box;
+}
+
+.intimacy-progress {
+	overflow: hidden;
+	height: 14rpx;
+	margin-top: 24rpx;
+	border-radius: 999rpx;
+	background: #f3eef1;
+}
+
+.intimacy-progress__bar {
+	height: 100%;
+	border-radius: inherit;
+	background: linear-gradient(90deg, #ff5c8d, #ff9db8);
+	transition: width 0.2s ease;
+}
+
+.intimacy-foot {
+	justify-content: space-between;
+	margin-top: 14rpx;
+	color: #9b8b94;
+	font-size: 22rpx;
+}
+
 .section-head {
 	justify-content: space-between;
 	align-items: flex-start;
@@ -462,11 +621,28 @@ function showComingSoon() {
 }
 
 .task-item {
+	position: relative;
 	justify-content: space-between;
 	min-height: 108rpx;
 	padding: 18rpx 0;
 	border-bottom: 1rpx solid #f0f0f2;
 	box-sizing: border-box;
+}
+
+.task-share-button {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background: transparent;
+	opacity: 0;
+}
+
+.task-share-button::after {
+	border: none;
 }
 
 .task-item:last-child {
@@ -548,16 +724,8 @@ function showComingSoon() {
 	border-radius: 20rpx;
 }
 
-.benefit-vip {
-	background: #fff0f5;
-}
-
 .benefit-ai {
 	background: #eaf9f6;
-}
-
-.benefit-lottery {
-	background: #fff4e8;
 }
 
 .benefit-kitchen {
