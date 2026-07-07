@@ -19,15 +19,15 @@
 				<up-image class="hero-image" width="100%" height="320px" :src="cateDetails.image" mode="aspectFill" />
 				<!-- 一个上下渐变的背景 由白到黑 -->
 				<view class="cate-details-bg"></view>
-				<!-- 菜谱标识  制作时间 简易程度 在标题图片上面 -->
+				<!-- 菜谱元信息仅在后端返回可信字段时展示。 -->
 				<view class="cate-details-info">
 					<view class="cate-details-title font-weight-600">{{ cateDetails.name }}</view>
-					<view class="cate-details-info-item">
-						<view class="meta-pill pubFlex">
+					<view v-if="cateDetails.time || cateDetails.level" class="cate-details-info-item">
+						<view v-if="cateDetails.time" class="meta-pill pubFlex">
 							<up-icon name="clock" size="18" color="#FF5C8D" />
 							<view class="cate-d-i-i-label">{{ cateDetails.time }}</view>
 						</view>
-						<view class="meta-pill pubFlex">
+						<view v-if="cateDetails.level" class="meta-pill pubFlex">
 							<up-icon name="coupon" size="18" color="#FF5C8D" />
 							<view class="cate-d-i-i-label">{{ cateDetails.level }}</view>
 						</view>
@@ -121,6 +121,7 @@ import { COLOURS } from "@/config/index.js";
 import { usePageParams } from "@/hooks/usePageTitle.js";
 import { getRecipeDetail } from "@/api/recipes.js";
 import { withDefaultMediaUrl } from "@/utils/media.js";
+import { formatRecipeCookTime, formatRecipeDifficulty } from "@/utils/recipeMeta.js";
 
 // 复制购物清单弹框显隐
 const visible = ref(false);
@@ -184,8 +185,8 @@ const loadRecipeDetail = async () => {
 				id: recipe.id,
 				name: recipe.name || "未命名菜谱",
 				image: withDefaultMediaUrl(recipe.cover, "/static/images/head.jpeg"),
-				time: recipe.cookTime || "未知",
-				level: recipe.difficulty || "简单",
+				time: formatRecipeCookTime(recipe),
+				level: formatRecipeDifficulty(recipe),
 				// 后端返回的食材字段：name, amount
 				ingredients: (recipe.ingredients || []).map((item, index) => ({
 					id: item.id || `${recipe.id || "recipe"}-ingredient-${index}`,

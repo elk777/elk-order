@@ -56,8 +56,8 @@
 							<!-- 标题 -->
 							<view class="cate-title font-weight-600 publcTitleSize">{{ pageItem.name }}</view>
 							<view class="pubFlex cate-base">
-								<!-- 左侧 烹饪时间  右侧 饲养员 删除按钮 吃货 添加购物车按钮 -->
-								<view class="pubFlex cate-time">
+								<!-- 左侧仅展示真实烹饪时间，右侧按角色展示管理或购物车操作。 -->
+								<view v-if="getRecipeCookTime(pageItem)" class="pubFlex cate-time">
 									<view class="cate-time-icon pubFlex">
 										<up-icon name="clock" size="18" color="#FF5C8D" />
 									</view>
@@ -82,8 +82,7 @@
 									</view>
 									<view v-if="!isFeeder" class="cate-cart-action">
 										<up-icon
-											name="cart"
-											customPrefix="lovers-icon"
+											name="shopping-cart"
 											size="30"
 											@tap.stop="cateAddCart(pageItem)"
 											:color="COLOURS['theme-color']"
@@ -124,6 +123,7 @@ import { goLogin, requireLogin } from "@/utils/auth.js";
 import { getRecipeCategories, getRecipes, deleteRecipe } from "@/api/recipes.js";
 import { getCartList } from "@/api/cart.js";
 import { withDefaultMediaUrl } from "@/utils/media.js";
+import { formatRecipeCookTime } from "@/utils/recipeMeta.js";
 const userStore = useUserStore();
 const recipeStore = useRecipeStore();
 const tabList = ref([]);
@@ -246,7 +246,7 @@ const getCategoryRecipeCount = (category) => {
 };
 
 const getRecipeCookTime = (recipe) => {
-	return recipe?.cookTime || recipe?.cook_time || "10分钟";
+	return formatRecipeCookTime(recipe);
 };
 
 const isRecipeManageable = (recipe) => {
