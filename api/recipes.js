@@ -101,7 +101,7 @@ export function getRecipeDetail(id) {
  * @param {number|string} data.categoryId - 分类 ID
  * @param {string} [data.coverImage] - 封面图片 URL
  * @param {string} [data.description] - 描述
- * @param {number} [data.cookingTime] - 烹饪时间（分钟）
+ * @param {string} [data.cookTime] - 烹饪时长描述
  * @param {string} [data.difficulty] - 难度等级
  * @param {Array<Object>} [data.ingredients] - 食材清单
  * @param {Array<Object>} [data.steps] - 制作步骤

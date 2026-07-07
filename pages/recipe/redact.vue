@@ -49,6 +49,12 @@
 							<up-icon name="arrow-down" size="16" color="#909399"></up-icon>
 						</view>
 					</up-form-item>
+					<up-form-item :borderBottom="true" :required="true" label="烹饪时长" prop="cookTime">
+						<RecipeMetaSelector v-model="form.basicForm.cookTime" :options="RECIPE_COOK_TIME_OPTIONS" />
+					</up-form-item>
+					<up-form-item :borderBottom="true" :required="true" label="制作难度" prop="difficulty">
+						<RecipeMetaSelector v-model="form.basicForm.difficulty" :options="RECIPE_DIFFICULTY_OPTIONS" />
+					</up-form-item>
 					<up-form-item label="菜谱描述" prop="describe">
 						<up-textarea v-model="form.basicForm.describe" placeholder="发挥你的想象吧~" :height="92"></up-textarea>
 					</up-form-item>
@@ -122,6 +128,7 @@ import { COLOURS } from "@/config/index.js";
 import IngreIList from "./component/IngreIList.vue";
 import StepList from "./component/StepList.vue";
 import BottomBtn from "./component/BottomBtn.vue";
+import RecipeMetaSelector from "./component/RecipeMetaSelector.vue";
 // 引入通用上传组件
 import Upload from "@/components/Upload/index.vue";
 // 引入usePageTitle hook函数
@@ -133,6 +140,12 @@ import { useAuthGuard } from "@/hooks/useAuthGuard.js";
 import { createRecipe, updateRecipe, getRecipeDetail, uploadRecipeImage, getRecipeCategories } from "@/api/recipes.js";
 import { normalizeMediaUrl } from "@/utils/media.js";
 import { consumeAiRecipeDraft } from "@/utils/recipeDraft.js";
+import {
+	RECIPE_COOK_TIME_OPTIONS,
+	RECIPE_DIFFICULTY_OPTIONS,
+	normalizeRecipeCookTimeChoice,
+	normalizeRecipeDifficultyChoice,
+} from "@/utils/recipeMeta.js";
 
 useAuthGuard();
 // 调用usePageTitle hook函数，设置默认标题为"编辑菜谱"
@@ -150,6 +163,8 @@ const form = ref({
 	basicForm: {
 		name: "",
 		categoryId: "",
+		cookTime: "",
+		difficulty: "",
 		describe: "",
 		// 新增：存储上传的图片列表
 		images: [],
@@ -160,6 +175,8 @@ const form = ref({
 const rules = ref({
 	name: [{ required: true, message: "请输入名称", trigger: ["blur"] }],
 	categoryId: [{ required: true, message: "请选择分类", trigger: ["change"] }],
+	cookTime: [{ required: true, message: "请选择烹饪时长", trigger: ["change"] }],
+	difficulty: [{ required: true, message: "请选择制作难度", trigger: ["change"] }],
 });
 
 // 分类选择器相关
@@ -313,6 +330,8 @@ const loadRecipeDetail = async (id) => {
 			// 填充基本信息
 			form.value.basicForm.name = recipe.name || "";
 			form.value.basicForm.categoryId = recipe.categoryId || "";
+			form.value.basicForm.cookTime = normalizeRecipeCookTimeChoice(recipe.cookTime || recipe.cook_time);
+			form.value.basicForm.difficulty = normalizeRecipeDifficultyChoice(recipe.difficulty);
 			form.value.basicForm.describe = recipe.description || "";
 
 			// 填充已选分类名称
@@ -358,6 +377,8 @@ const applyAiRecipeDraft = (draftKey) => {
 		if (!draft) return;
 
 		form.value.basicForm.name = draft.name || "";
+		form.value.basicForm.cookTime = normalizeRecipeCookTimeChoice(draft.cookTime);
+		form.value.basicForm.difficulty = normalizeRecipeDifficultyChoice(draft.difficulty);
 		form.value.basicForm.describe = draft.description || "";
 
 		// 【字段映射契约】：后端 AI 草稿使用标准字段，新增页表单沿用历史 ingre/step 命名。
@@ -540,6 +561,8 @@ const handelSubmit = () => {
 				const submitData = {
 					name: form.value.basicForm.name,
 					categoryId: form.value.basicForm.categoryId,
+					cookTime: form.value.basicForm.cookTime,
+					difficulty: form.value.basicForm.difficulty,
 					description: form.value.basicForm.describe,
 					cover: coverUrl,
 					// 食材清单映射：ingreName→name, ingreDose→amount
