@@ -1,7 +1,7 @@
 <template>
 	<view class="ai-recipe-page">
 		<view class="hero">
-			<view class="hero-chip">AI 菜谱草稿</view>
+			<view class="hero-chip">灵感草稿</view>
 			<view class="hero-title">灵感成菜</view>
 			<view class="hero-desc">输入菜名、现有食材或想吃的口味，我先帮你整理成可编辑菜谱。</view>
 		</view>
