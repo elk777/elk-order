@@ -13,7 +13,12 @@
  */
 
 import { BASE_URL } from '@/config/index.js'
-import { ADMIN_LOGIN_PAGE, ADMIN_PROFILE_KEY, ADMIN_TOKEN_KEY } from './constants.js'
+import {
+	ADMIN_DEV_BASE_URL,
+	ADMIN_LOGIN_PAGE,
+	ADMIN_PROFILE_KEY,
+	ADMIN_TOKEN_KEY,
+} from './constants.js'
 
 /** 业务成功码，与后端统一响应体一致 */
 const SUCCESS_CODE = 200
@@ -24,10 +29,12 @@ const TIMEOUT = 15000
 /**
  * 管理端接口基地址。
  * 生产走同源相对路径：admin.lucky-elk.xyz/api/* 由 nginx 反代到 NestJS，
- * 同源意味着不依赖 CORS 配置是否漏配。开发时没有这层反代，退回 config 的完整地址，
+ * 同源意味着不依赖 CORS 配置是否漏配。
+ * 开发环境优先用管理端自己的地址，未配置时才回退到用户端 BASE_URL，
  * 由后端 CORS_ORIGIN 放行本地端口。
  */
-const ADMIN_BASE = process.env.NODE_ENV === 'production' ? '/api' : BASE_URL
+const ADMIN_BASE =
+	process.env.NODE_ENV === 'production' ? '/api' : ADMIN_DEV_BASE_URL || BASE_URL
 
 /** 跳转登录页的进行中标记，避免并发请求同时 401 时连续 reLaunch 多次 */
 let redirectingToLogin = false

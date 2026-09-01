@@ -12,6 +12,15 @@
 /** 管理端 token 存储键。刻意与用户端的 token 分开，两套鉴权互不影响 */
 export const ADMIN_TOKEN_KEY = 'ADMIN_TOKEN'
 
+/**
+ * 开发环境下管理端的接口地址。
+ * 【为什么不复用用户端 BASE_URL】后台调试几乎总是连本地后端，而小程序端往往还挂在
+ * 测试环境上；共用一个地址意味着为了调后台得把小程序也切到本地，验证完再切回去。
+ * 两端分开配置后互不牵制。
+ * 留空则回退到 config/index.js 的 BASE_URL；生产环境不读此项，走同源 /api。
+ */
+export const ADMIN_DEV_BASE_URL = 'http://localhost:7788/api'
+
 /** 管理端登录管理员信息存储键 */
 export const ADMIN_PROFILE_KEY = 'ADMIN_PROFILE'
 
