@@ -23,6 +23,9 @@ export const LOGIN_REDIRECT_KEY = "LOGIN_REDIRECT";
 export const AUTH_ROUTE_LIST = [
 	// "/pages/my/index",
 	"/pages/my/integral",
+	"/pages/my/feedback/index",
+	"/pages/my/feedback/list",
+	"/pages/my/feedback/detail",
 	"/pages/order/details",
 	"/pages/cart/AffirmOrder",
 	"/pages/recipe/redact",

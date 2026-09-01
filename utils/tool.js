@@ -76,3 +76,42 @@ export const formatDate = (date) => {
 	const day = String(dateObj.getDate()).padStart(2, "0");
 	return `${year}-${month}-${day}`;
 };
+
+/**
+ * @description: 格式化日期时间
+ * @param {*} value 日期对象 / 时间戳 / 后端返回的 ISO 字符串
+ * @return {string} YYYY-MM-DD HH:mm，无法解析时原样返回
+ */
+export const formatDateTime = (value) => {
+	if (!value) return "";
+	const dateObj = new Date(value);
+	if (Number.isNaN(dateObj.getTime())) return String(value);
+	const pad = (num) => String(num).padStart(2, "0");
+	return `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}`;
+};
+
+/**
+ * @description: 格式化为相对时间，用于列表里更易读的「刚刚 / 2小时前」
+ * @param {*} value 日期对象 / 时间戳 / 后端返回的 ISO 字符串
+ * @return {string} 相对时间描述，超过 30 天回落到具体日期
+ */
+export const formatRelativeTime = (value) => {
+	if (!value) return "";
+	const dateObj = new Date(value);
+	if (Number.isNaN(dateObj.getTime())) return String(value);
+
+	const diff = Date.now() - dateObj.getTime();
+	// 服务端与客户端时钟可能有偏差，未来时间统一按「刚刚」展示，避免出现「-1分钟前」
+	if (diff < 60 * 1000) return "刚刚";
+
+	const minutes = Math.floor(diff / (60 * 1000));
+	if (minutes < 60) return `${minutes} 分钟前`;
+
+	const hours = Math.floor(minutes / 60);
+	if (hours < 24) return `${hours} 小时前`;
+
+	const days = Math.floor(hours / 24);
+	if (days <= 30) return `${days} 天前`;
+
+	return formatDate(dateObj);
+};

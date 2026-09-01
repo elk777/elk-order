@@ -17,7 +17,7 @@
 			<!-- 邀请绑定模块 -->
 			<Couple ref="coupleRef" />
 			<!-- 功能列表模块 -->
-			<FunList />
+			<FunList ref="funListRef" />
 		</view>
 		<!-- 底部tabbar模块 -->
 		<Tabbar :current="3" />
@@ -41,6 +41,7 @@ useAuthGuard();
 
 const userStore = useUserStore();
 const coupleRef = ref(null);
+const funListRef = ref(null);
 const currentRoleType = computed(() => (userStore.isLogin ? userStore.userType : null));
 const layoutStyle = computed(() => ({
 	"--my-bottom-space": `${getBottomSpacing()}px`,
@@ -49,6 +50,8 @@ const noop = () => {};
 
 onShow(() => {
 	coupleRef.value?.refreshCouple?.();
+	// 从反馈列表/详情返回时重新比对本地已读态，角标要跟着一起消掉
+	funListRef.value?.refreshFeedbackBadge?.();
 });
 
 onShareAppMessage((res) => {

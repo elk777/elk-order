@@ -96,6 +96,33 @@
 			}
 		},
 		{
+			"path": "pages/my/feedback/index",
+			"style": {
+				"navigationBarTitleText": "意见反馈",
+				"navigationBarBackgroundColor": "#FFF0F6",
+				"navigationBarTextStyle": "black",
+				"backgroundColor": "#FFF7FA"
+			}
+		},
+		{
+			"path": "pages/my/feedback/list",
+			"style": {
+				"navigationBarTitleText": "我的反馈",
+				"navigationBarBackgroundColor": "#FFF0F6",
+				"navigationBarTextStyle": "black",
+				"backgroundColor": "#FFF7FA"
+			}
+		},
+		{
+			"path": "pages/my/feedback/detail",
+			"style": {
+				"navigationBarTitleText": "反馈详情",
+				"navigationBarBackgroundColor": "#FFF0F6",
+				"navigationBarTextStyle": "black",
+				"backgroundColor": "#FFF7FA"
+			}
+		},
+		{
 			"path": "pages/cart/AffirmOrder",
 			"style": {
 				"navigationBarTitleText": "确认订单"
