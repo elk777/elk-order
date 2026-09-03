@@ -11,33 +11,6 @@
 		}
 	},
 	"pages": [
-		// #ifdef H5
-		// 管理端仅在 H5 产物中存在：条件编译保证小程序包内不含 pages-admin 任何代码。
-		// 刻意排在数组首位——H5 产物专供 admin.lucky-elk.xyz，启动页即后台登录页，
-		// 无需再靠 nginx rewrite 把根路径指向管理端路由。
-		{
-			"path": "pages-admin/login/index",
-			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "运营后台"
-			}
-		},
-		{
-			"path": "pages-admin/feedback/list",
-			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "反馈工单",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages-admin/feedback/detail",
-			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "工单详情"
-			}
-		},
-		// #endif
 		//pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
 			"path": "pages/home/index",
