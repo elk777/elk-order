@@ -18,7 +18,7 @@
 
 		<view class="prompt-card">
 			<view class="field-head">
-				<view class="field-title">今天想做什么？？</view>
+				<view class="field-title">今天想做什么？</view>
 				<view class="field-count">{{ prompt.length }}/300</view>
 			</view>
 			<up-textarea
