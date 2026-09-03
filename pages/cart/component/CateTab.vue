@@ -120,7 +120,7 @@ import MenuGuestPreview from "@/pages/cart/component/MenuGuestPreview.vue";
 import { useUserStore } from "@/stores/user.js";
 import { useRecipeStore } from "@/stores/recipe.js";
 import { goLogin, requireLogin } from "@/utils/auth.js";
-import { getRecipeCategories, getRecipes, deleteRecipe } from "@/api/recipes.js";
+import { getRecipesGrouped, deleteRecipe } from "@/api/recipes.js";
 import { getCartList } from "@/api/cart.js";
 import { withDefaultMediaUrl } from "@/utils/media.js";
 import { formatRecipeCookTime } from "@/utils/recipeMeta.js";
@@ -132,12 +132,6 @@ const cateLoading = ref(true);
 //计算属性： 根据用户类型判断图标icon的展示 0 是饲养员 1 是吃货
 const isFeeder = computed(() => {
 	return userStore.isLogin && userStore.userType === 0;
-});
-
-const recipeTotal = computed(() => {
-	return tabList.value.reduce((total, tab) => {
-		return total + (Array.isArray(tab.children) ? tab.children.length : 0);
-	}, 0);
 });
 
 const isMenuEmpty = computed(() => {
@@ -193,48 +187,6 @@ const normalizeRecipe = (recipe) => {
 	};
 };
 
-const normalizeCategory = (category) => {
-	return {
-		...category,
-		title: category.title || category.name || category.categoryName || "未分类",
-		name: category.name || category.title || category.categoryName || "未分类",
-		children: [],
-	};
-};
-
-const getRecipeCategoryKey = (recipe) => {
-	return String(recipe.categoryId || recipe.category?.id || recipe.category_id || "uncategorized");
-};
-
-const getCategoryKey = (category) => {
-	return String(category.id || category.categoryId || category.value || category.name || "uncategorized");
-};
-
-const buildGroups = (categories, recipes) => {
-	const groups = categories.map(normalizeCategory);
-	const groupMap = new Map(groups.map((group) => [getCategoryKey(group), group]));
-
-	recipes.map(normalizeRecipe).forEach((recipe) => {
-		const categoryKey = getRecipeCategoryKey(recipe);
-		const fallbackName = recipe.category?.name || recipe.categoryName || "未分类";
-
-		if (!groupMap.has(categoryKey)) {
-			const fallbackGroup = {
-				id: categoryKey,
-				title: fallbackName,
-				name: fallbackName,
-				children: [],
-			};
-			groups.push(fallbackGroup);
-			groupMap.set(categoryKey, fallbackGroup);
-		}
-
-		groupMap.get(categoryKey).children.push(recipe);
-	});
-
-	return groups;
-};
-
 const getTotalFromGroups = (groups) => {
 	return groups.reduce((sum, tab) => {
 		return sum + (Array.isArray(tab.children) ? tab.children.length : 0);
@@ -254,7 +206,7 @@ const isRecipeManageable = (recipe) => {
 };
 
 /**
- * @description: 获取菜谱列表
+ * @description: 获取菜单页的完整分组菜谱列表
  * @param {Object} [params] - 查询参数
  * @param {string} [params.keyword] - 搜索关键词
  * @return {*}
@@ -268,21 +220,25 @@ const getCateList = async (params = {}) => {
 
 	try {
 		cateLoading.value = true;
-		const [categoryRes, recipeRes] = await Promise.all([getRecipeCategories(), getRecipes(params)]);
-
-		if (categoryRes.code !== 200) {
-			throw new Error(categoryRes.message || "获取分类失败");
-		}
+		const recipeRes = await getRecipesGrouped(params);
 
 		if (recipeRes.code !== 200) {
 			throw new Error(recipeRes.message || "获取菜单失败");
 		}
 
-		if (Array.isArray(getListData(categoryRes.data)) && Array.isArray(getListData(recipeRes.data))) {
-			const normalizedList = buildGroups(getListData(categoryRes.data), getListData(recipeRes.data));
+		if (Array.isArray(getListData(recipeRes.data))) {
+			// 菜单接口返回完整的分类分组，避免通用分页接口默认只返回 10 条菜谱。
+			const normalizedList = getListData(recipeRes.data)
+				.map((group) => ({
+					...group,
+					title: group.title || group.name || "未分类",
+					name: group.name || group.title || "未分类",
+					children: Array.isArray(group.children) ? group.children.map(normalizeRecipe) : [],
+				}))
+				.filter((group) => group.title !== "默认分类" || group.children.length > 0);
 			tabList.value = normalizedList;
 
-			// 计算总菜谱数量
+			// 分组接口返回完整列表，列表长度与后端真实可见菜谱总数一致。
 			const total = getTotalFromGroups(tabList.value);
 
 			recipeStore.setCateTotal(total);

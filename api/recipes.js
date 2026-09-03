@@ -68,14 +68,14 @@ export function reorderRecipeCategories(items) {
  * @param {Object} [params] - 查询参数
  * @param {string} [params.keyword] - 搜索关键词
  * @param {number|string} [params.categoryId] - 分类 ID
- * @returns {Promise<{ code: number, data: Array|Object, message: string }>}
+ * @returns {Promise<{ code: number, data: Object, message: string }>}
  */
 export function getRecipes(params = {}) {
   return http.get('/recipes', params)
 }
 
 /**
- * 获取分组后的菜谱列表（按分类分组）
+ * 获取菜单页使用的完整分组菜谱列表（按分类分组）
  * @param {Object} [params] - 查询参数
  * @param {string} [params.keyword] - 搜索关键词
  * @param {number|string} [params.categoryId] - 分类 ID
