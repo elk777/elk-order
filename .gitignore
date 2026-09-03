@@ -3,7 +3,7 @@ node_modules/
 dist/
 .hbuilderx/
 config/privacy.js
-
+docs/
 
 # local env files
 .env.local
