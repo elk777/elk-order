@@ -1,24 +1,24 @@
 <template>
 	<view class="ai-recipe-page">
 		<view class="hero">
-			<view class="hero-chip">灵感草稿</view>
-			<view class="hero-title">灵感成菜</view>
-			<view class="hero-desc">输入菜名、现有食材或想吃的口味，我先帮你整理成可编辑菜谱。</view>
+			<view class="hero-chip">灵感整理</view>
+			<view class="hero-title">菜谱整理</view>
+			<view class="hero-desc">输入食材、口味或想吃的方向，帮你整理成一份可编辑菜谱。</view>
 		</view>
 
 		<view class="points-card">
 			<view class="points-copy">
 				<view class="points-title">本次将消耗 {{ aiCost }} 积分</view>
-				<view class="points-desc">当前可用 {{ currentPoints }} 积分，生成失败或取消不会扣除</view>
+				<view class="points-desc">当前可用 {{ currentPoints }} 积分，整理失败或取消不会扣除</view>
 			</view>
 			<view class="points-badge" :class="{ 'points-badge--low': currentPoints < aiCost }">
-				{{ currentPoints >= aiCost ? "可生成" : "积分不足" }}
+				{{ currentPoints >= aiCost ? "可整理" : "积分不足" }}
 			</view>
 		</view>
 
 		<view class="prompt-card">
 			<view class="field-head">
-				<view class="field-title">今天想做什么？</view>
+				<view class="field-title">今天想做什么？？</view>
 				<view class="field-count">{{ prompt.length }}/300</view>
 			</view>
 			<up-textarea
@@ -38,7 +38,7 @@
 				</view>
 				<view class="generation-copy">
 					<view class="generation-title">正在把灵感整理成菜谱</view>
-					<view class="generation-desc">生成完成后自动回填新增菜谱页</view>
+					<view class="generation-desc">整理完成后自动回填新增菜谱页</view>
 				</view>
 				<view class="generation-badge">第 {{ generationStepIndex + 1 }}/{{ generationSteps.length }} 步</view>
 			</view>
@@ -65,7 +65,7 @@
 			</view>
 
 			<view class="draft-skeleton">
-				<view class="draft-skeleton__label">草稿预览生成中</view>
+				<view class="draft-skeleton__label">草稿预览整理中</view>
 				<view class="draft-skeleton__lines">
 					<view class="draft-skeleton__line draft-skeleton__line--short"></view>
 					<view class="draft-skeleton__line"></view>
@@ -93,7 +93,7 @@
 				<up-icon name="file-text-fill" size="22" color="#FF5C8D"></up-icon>
 			</view>
 			<view class="note-copy">
-				<view class="note-title">生成后会回填新增菜谱页</view>
+				<view class="note-title">整理后会回填新增菜谱页</view>
 				<view class="note-desc">名称、描述、食材、步骤和小贴士会先成为草稿。封面、分类、步骤图片仍由你决定。</view>
 			</view>
 		</view>
@@ -102,13 +102,13 @@
 			<view v-if="generating" class="generation-status">
 				<view class="generation-spinner"></view>
 				<view class="generation-status__copy">
-					<view class="generation-status__title">正在生成菜谱</view>
+					<view class="generation-status__title">正在整理菜谱</view>
 					<view class="generation-status__desc">通常 10-20 秒，完成后自动回填</view>
 				</view>
 				<view class="generation-cancel pubFlex" @click="cancelGeneration">取消</view>
 			</view>
 			<up-button v-else shape="circle" :color="COLOURS['theme-color']" @click="handleGenerate">
-				开始生成
+				开始整理
 			</up-button>
 		</view>
 	</view>
@@ -143,7 +143,7 @@ const examples = [
 const generationSteps = [
 	{ title: "理解你的口味", desc: "把菜名、食材和偏好整理清楚" },
 	{ title: "搭配食材和火候", desc: "让味道更下饭，步骤更清楚" },
-	{ title: "整理制作步骤", desc: "马上生成可编辑草稿" },
+	{ title: "整理制作步骤", desc: "马上整理好可编辑草稿" },
 	{ title: "补充小贴士", desc: "封面和分类仍由你决定" },
 ];
 

@@ -41,7 +41,7 @@
 		{
 			"path": "pages/recipe/ai-generate",
 			"style": {
-				"navigationBarTitleText": "灵感成菜",
+				"navigationBarTitleText": "菜谱整理",
 				"navigationBarBackgroundColor": "#FFF0F6",
 				"navigationBarTextStyle": "black",
 				"backgroundColor": "#FFF7FA"

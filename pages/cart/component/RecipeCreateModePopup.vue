@@ -29,8 +29,8 @@
 						<up-icon name="file-text-fill" size="25" color="#FF5C8D"></up-icon>
 					</view>
 					<view class="mode-copy">
-						<view class="mode-title">灵感成菜</view>
-						<view class="mode-desc">输入菜名或食材，生成可编辑草稿。</view>
+						<view class="mode-title">菜谱整理</view>
+						<view class="mode-desc">输入菜名或食材，整理好可编辑草稿。</view>
 					</view>
 					<up-icon name="arrow-right" size="16" color="#B7BBC4"></up-icon>
 				</view>
